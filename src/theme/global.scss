@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+
+html {
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Helvetica Neue',
+    'Roboto',
+    sans-serif;
+}
+
+ion-page {
+  --padding-top: 20px;
+  --padding-bottom: 20px;
+  --padding-end: 20px;
+  --padding-start: 20px;
+}
+
+ion-input {
+  background-color: #e8ecf4;
+  border-radius: 10px;
+  --padding-start: 12px !important;
+  --padding-end: 12px !important;
+}
+
+ion-label {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+ion-item {
+  --border-color: transparent;
+}
+
+ion-item::part(native) {
+  background-color: inherit;
+}
+
+ion-button {
+  padding: 0 !important;
+  margin: 0;
+  --border-radius: 10px;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+ion-button[disabled] {
+  --background: #d2cdcd;
+  color: #212020;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}

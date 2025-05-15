@@ -1,0 +1,65 @@
+/* Ionic Variables and Theming. For more info, please see:
+http://ionicframework.com/docs/theming/ */
+
+$MobileSelectors: '.plt-capacitor, .plt-mobile';
+
+/** Ionic CSS Variables **/
+:root {
+  /** primary **/
+  --primary-color: #3880ff;
+  --secondary-color: #3dc2ff;
+  --tertiary-color: #5260ff;
+  --success-color: #2dd36f;
+  --warning-color: #ffc409;
+  --danger-color: #eb445a;
+  --medium-color: #92949c;
+  --light-color: #f4f5f8;
+  --dark-color: #222428;
+  --contrast-color: #ffffff;
+
+  /* ===== Ionic Theming Aliases ===== */
+  --ion-color-primary: var(--primary-color);
+  --ion-color-primary-contrast: var(--contrast-color);
+  --ion-color-primary-shade: #3171e0;
+  --ion-color-primary-tint: #4c8dff;
+
+  --ion-color-secondary: var(--secondary-color);
+  --ion-color-secondary-contrast: var(--contrast-color);
+  --ion-color-secondary-shade: #36abe0;
+  --ion-color-secondary-tint: #50c8ff;
+
+  --ion-color-tertiary: var(--tertiary-color);
+  --ion-color-tertiary-contrast: var(--contrast-color);
+  --ion-color-tertiary-shade: #4854e0;
+  --ion-color-tertiary-tint: #6370ff;
+
+  --ion-color-success: var(--success-color);
+  --ion-color-success-contrast: var(--contrast-color);
+  --ion-color-success-shade: #28ba62;
+  --ion-color-success-tint: #42d77d;
+
+  --ion-color-warning: var(--warning-color);
+  --ion-color-warning-contrast: var(--dark-color);
+  --ion-color-warning-shade: #e0ac08;
+  --ion-color-warning-tint: #ffca22;
+
+  --ion-color-danger: var(--danger-color);
+  --ion-color-danger-contrast: var(--contrast-color);
+  --ion-color-danger-shade: #cf3c4f;
+  --ion-color-danger-tint: #ed576b;
+
+  --ion-color-medium: var(--medium-color);
+  --ion-color-medium-contrast: var(--contrast-color);
+  --ion-color-medium-shade: #808289;
+  --ion-color-medium-tint: #9d9fa6;
+
+  --ion-color-light: var(--light-color);
+  --ion-color-light-contrast: var(--dark-color);
+  --ion-color-light-shade: #d7d8da;
+  --ion-color-light-tint: #f5f6f9;
+
+  --ion-color-dark: var(--dark-color);
+  --ion-color-dark-contrast: var(--contrast-color);
+  --ion-color-dark-shade: #1e2023;
+  --ion-color-dark-tint: #383a3e;
+}
