@@ -19,21 +19,12 @@ import { logoGoogle } from 'ionicons/icons';
 import { ref } from 'vue';
 
 const router = useRouter();
-const backendError = ref('');
-
-const CLIENTID = import.meta.env.VITE_CLIENT_ID;
-const CLIENTSECRET = import.meta.env.VITE_CLIENT_SECRET;
+const formError = ref('');
 
 const loginSchema = toTypedSchema(
   z.object({
     email: z.string().email('Please enter a valid email'),
-    password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters')
-      .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])/,
-        'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
-      ),
+    password: z.string().min(1, 'Password is required'),
   }),
 );
 
@@ -45,24 +36,16 @@ const { value: email } = useField<string>('email');
 const { value: password } = useField<string>('password');
 
 const onSubmit = handleSubmit((values) => {
-  backendError.value = '';
-
-  const loginData = {
-    email: values.email,
-    password: values.password,
-    client_id: CLIENTID,
-    client_secret: CLIENTSECRET,
-    grant_type: 'password',
-  };
+  formError.value = '';
 
   loadingService.withLoading(
     () =>
-      login(loginData)
+      login(values)
         .then(() => {
           router.push('/dashboard');
         })
         .catch((error) => {
-          backendError.value =
+          formError.value =
             error.response?.data?.message || 'Login failed, please try again.';
           console.error('Signin failed:', error);
         }),
@@ -92,24 +75,20 @@ const handleGoogleLogin = () => {
           <h1
             class="title"
             :class="{
-              'mb-2': backendError,
+              'mb-2': formError,
             }"
           >
             Sign In
           </h1>
 
-          <GlobalMessage
-            v-if="backendError"
-            type="error"
-            :message="backendError"
-          />
+          <GlobalMessage v-if="formError" type="error" :message="formError" />
 
           <ion-button
             expand="block"
             class="google-btn"
             @click="handleGoogleLogin"
             :class="{
-              'mt-2': backendError,
+              'mt-2': formError,
             }"
           >
             <ion-icon
@@ -136,7 +115,7 @@ const handleGoogleLogin = () => {
                 class="ion-no-padding"
               ></ion-input>
             </ion-item>
-            <ion-text color="danger" class="error-text">
+            <ion-text color="danger" class="error-text" v-if="errors.email">
               <ErrorMessage name="email" />
             </ion-text>
 
@@ -151,7 +130,7 @@ const handleGoogleLogin = () => {
                 class="ion-no-padding"
               ></ion-input>
             </ion-item>
-            <ion-text color="danger" class="error-text">
+            <ion-text color="danger" class="error-text" v-if="errors.password">
               <ErrorMessage name="password" />
             </ion-text>
 

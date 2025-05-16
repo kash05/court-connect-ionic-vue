@@ -17,24 +17,28 @@ import {
   IonRadio,
   IonRadioGroup,
   IonLabel,
+  IonList,
+  IonListHeader,
 } from '@ionic/vue';
-import {
-  logoGoogle,
-  lockClosedOutline,
-  mailOutline,
-  personOutline,
-  personCircleOutline,
-} from 'ionicons/icons';
+import { logoGoogle } from 'ionicons/icons';
+import { ref } from 'vue';
 import { toastService } from '@/services/toastService';
 
 const router = useRouter();
+const formError = ref('');
 
 const registerSchema = toTypedSchema(
   z
     .object({
       fullName: z.string().min(2, 'Name must be at least 2 characters'),
       email: z.string().email('Please enter a valid email'),
-      password: z.string().min(6, 'Password must be at least 6 characters'),
+      password: z
+        .string()
+        .min(8, 'Password must be at least 8 characters')
+        .regex(
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])/,
+          'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+        ),
       confirmPassword: z.string(),
       gender: z.string().min(2, 'Gender is required'),
       agreeTerms: z.boolean().refine((val) => val, {
@@ -47,7 +51,7 @@ const registerSchema = toTypedSchema(
     }),
 );
 
-const { handleSubmit, isSubmitting } = useForm({
+const { handleSubmit, errors } = useForm({
   validationSchema: registerSchema,
   initialValues: {
     fullName: '',
@@ -67,6 +71,8 @@ const { value: gender } = useField<string>('gender');
 const { value: agreeTerms } = useField<boolean>('agreeTerms');
 
 const onSubmit = handleSubmit((values) => {
+  formError.value = '';
+
   const registrationData = {
     email: values.email,
     password: values.password,
@@ -82,7 +88,9 @@ const onSubmit = handleSubmit((values) => {
           router.push('/login');
         })
         .catch((error) => {
-          toastService.dangerMessage('Registration failed, please try again.');
+          formError.value =
+            error.response?.data?.message ||
+            'Registration failed, please try again.';
           console.error('Error registering owner:', error);
         }),
     'Registering your account...',
@@ -92,150 +100,167 @@ const onSubmit = handleSubmit((values) => {
 const goToLogin = () => {
   router.push('/login');
 };
+
+const handleGoogleRegistration = () => {
+  console.log('Google login clicked');
+  toastService.informationMessage('Google login feature is in development.');
+};
 </script>
 
 <template>
   <ion-page>
     <ion-content class="ion-padding">
-      <div class="register-container">
-        <div class="register-card">
-          <div class="brand">
+      <div class="page-container slide-in">
+        <div class="registration-container">
+          <div class="logo-container">
             <div class="logo"></div>
           </div>
 
-          <h1 class="register-title">Create Account</h1>
-          <p class="register-subtitle">Join us to get started</p>
+          <h1
+            class="title"
+            :class="{
+              'mb-2': formError,
+            }"
+          >
+            Registeration
+          </h1>
 
-          <form class="register-form" @submit.prevent="onSubmit">
-            <div class="input-group">
-              <div class="form-field">
-                <ion-item>
-                  <ion-icon :icon="personOutline" slot="start"></ion-icon>
-                  <ion-input
-                    type="text"
-                    aria-label="Full Name"
-                    placeholder="Enter your full name"
-                    v-model="fullName"
-                  ></ion-input>
-                </ion-item>
-                <ion-text color="danger" class="text-sm pl-16 block pb-2">
-                  <ErrorMessage name="fullName" />
-                </ion-text>
-              </div>
+          <GlobalMessage v-if="formError" type="error" :message="formError" />
 
-              <div class="form-field">
-                <ion-item>
-                  <ion-icon :icon="mailOutline" slot="start"></ion-icon>
-                  <ion-input
-                    type="email"
-                    aria-label="Email"
-                    placeholder="Enter your email"
-                    v-model="email"
-                    autocomplete="email"
-                  ></ion-input>
-                </ion-item>
-                <ion-text color="danger" class="text-sm pl-16 block pb-2">
-                  <ErrorMessage name="email" />
-                </ion-text>
-              </div>
+          <ion-button
+            expand="block"
+            class="google-btn"
+            @click="handleGoogleRegistration"
+            :class="{
+              'mt-2': formError,
+            }"
+          >
+            <ion-icon
+              :icon="logoGoogle"
+              class="btn-icon"
+              slot="start"
+            ></ion-icon>
+            Continue with Google
+          </ion-button>
 
-              <div class="form-field">
-                <ion-item>
-                  <ion-icon :icon="lockClosedOutline" slot="start"></ion-icon>
-                  <ion-input
-                    type="password"
-                    aria-label="Password"
-                    placeholder="Create password"
-                    v-model="password"
-                    autocomplete="new-password"
-                  ></ion-input>
-                </ion-item>
-                <ion-text color="danger" class="text-sm pl-16 block pb-2">
-                  <ErrorMessage name="password" />
-                </ion-text>
-              </div>
+          <div class="divider">
+            <span>or</span>
+          </div>
 
-              <div class="form-field">
-                <ion-item>
-                  <ion-icon :icon="lockClosedOutline" slot="start"></ion-icon>
-                  <ion-input
-                    type="password"
-                    aria-label="Confirm Password"
-                    placeholder="Confirm password"
-                    v-model="confirmPassword"
-                    autocomplete="new-password"
-                  ></ion-input>
-                </ion-item>
-                <ion-text color="danger" class="text-sm pl-16 block pb-2">
-                  <ErrorMessage name="confirmPassword" />
-                </ion-text>
-              </div>
+          <form class="registration-form" @submit.prevent="onSubmit">
+            <ion-item
+              class="form-item ion-no-padding"
+              :class="{ 'has-error': errors.fullName }"
+            >
+              <ion-input
+                placeholder="Full Name"
+                v-model="fullName"
+                class="ion-no-padding"
+              ></ion-input>
+            </ion-item>
+            <ion-text color="danger" class="error-text" v-if="errors.fullName">
+              <ErrorMessage name="fullName" />
+            </ion-text>
 
-              <div class="form-field">
-                <ion-item>
-                  <ion-icon :icon="personCircleOutline" slot="start"></ion-icon>
+            <ion-item
+              class="form-item ion-no-padding"
+              :class="{ 'has-error': errors.email }"
+            >
+              <ion-input
+                type="email"
+                placeholder="Email"
+                v-model="email"
+                class="ion-no-padding"
+              ></ion-input>
+            </ion-item>
+            <ion-text color="danger" class="error-text" v-if="errors.email">
+              <ErrorMessage name="email" />
+            </ion-text>
+
+            <ion-item
+              class="form-item ion-no-padding"
+              :class="{ 'has-error': errors.password }"
+            >
+              <ion-input
+                type="password"
+                placeholder="Password"
+                v-model="password"
+                class="ion-no-padding"
+              ></ion-input>
+            </ion-item>
+            <ion-text color="danger" class="error-text" v-if="errors.password">
+              <ErrorMessage name="password" />
+            </ion-text>
+
+            <ion-item
+              class="form-item ion-no-padding"
+              :class="{ 'has-error': errors.confirmPassword }"
+            >
+              <ion-input
+                type="password"
+                placeholder="Confirm password"
+                v-model="confirmPassword"
+                class="ion-no-padding"
+              ></ion-input>
+            </ion-item>
+            <ion-text
+              color="danger"
+              class="error-text"
+              v-if="errors.confirmPassword"
+            >
+              <ErrorMessage name="confirmPassword" />
+            </ion-text>
+
+            <ion-list class="form-item">
+              <ion-radio-group v-model="gender">
+                <ion-list-header>
                   <ion-label>Gender</ion-label>
+                </ion-list-header>
+
+                <ion-item>
+                  <ion-label>Male</ion-label>
+                  <ion-radio value="male"></ion-radio>
                 </ion-item>
 
-                <div class="radio-container pl-16">
-                  <ion-radio-group v-model="gender">
-                    <ion-item lines="none">
-                      <ion-radio value="male">Male</ion-radio>
-                    </ion-item>
+                <ion-item>
+                  <ion-label>Female</ion-label>
+                  <ion-radio slot="end" value="female"></ion-radio>
+                </ion-item>
+              </ion-radio-group>
+            </ion-list>
 
-                    <ion-item lines="none">
-                      <ion-radio value="female">Female</ion-radio>
-                    </ion-item>
-                  </ion-radio-group>
-                </div>
+            <ion-text color="danger" class="error-text" v-if="errors.gender">
+              <ErrorMessage name="gender" />
+            </ion-text>
 
-                <ion-text color="danger" class="text-sm pl-16 block pb-2">
-                  <ErrorMessage name="gender" />
+            <ion-item class="form-item ion-no-padding">
+              <div class="flex flex-col space-y-1">
+                <ion-checkbox v-model="agreeTerms"></ion-checkbox>
+                <ion-text class="text-sm">
+                  <span>I agree to the</span>
+                  <a href="#" class="terms-link"> Terms of Service</a>
+                  and
+                  <a href="#" class="terms-link"> Privacy Policy</a>
                 </ion-text>
               </div>
-            </div>
-
-            <div class="terms-row">
-              <ion-checkbox v-model="agreeTerms" labelPlacement="end">
-                <span class="terms-text">
-                  I agree to the
-                  <a href="#" class="terms-link">Terms of Service</a> and
-                  <a href="#" class="terms-link">Privacy Policy</a>
-                </span>
-              </ion-checkbox>
-              <ion-text color="danger" class="text-sm block pl-16">
-                <ErrorMessage name="agreeTerms" />
-              </ion-text>
-            </div>
-
-            <ion-button
-              expand="block"
-              class="register-button"
-              type="submit"
-              :disabled="isSubmitting"
+            </ion-item>
+            <ion-text
+              color="danger"
+              class="error-text"
+              v-if="errors.agreeTerms"
             >
-              <span class="btn-text">Create Account</span>
+              <ErrorMessage name="agreeTerms" />
+            </ion-text>
+
+            <ion-button expand="block" type="submit" class="submit-btn">
+              Create Account
             </ion-button>
-
-            <ion-button
-              expand="block"
-              fill="clear"
-              class="login-link"
-              @click="goToLogin"
-            >
-              <span>Already have an account? <strong>Sign in</strong></span>
-            </ion-button>
-
-            <div class="divider">
-              <span>or register with</span>
-            </div>
-
-            <div class="social-buttons">
-              <ion-button class="social-btn google-btn">
-                <ion-icon :icon="logoGoogle" slot="icon-only"></ion-icon>
-              </ion-button>
-            </div>
           </form>
+
+          <div class="create-account">
+            <span>Already have an account?</span>
+            <ion-button fill="clear" @click="goToLogin">Sign in</ion-button>
+          </div>
         </div>
       </div>
     </ion-content>
@@ -243,94 +268,110 @@ const goToLogin = () => {
 </template>
 
 <style scoped lang="scss">
-@use '@/theme/mixins.scss' as *;
-
-.register-container {
+.page-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100%;
-  padding: 16px;
+  background-color: var(--bg-light, var(--ion-color-light));
 }
 
-.register-card {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 24px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  padding: 32px;
-  width: 100%;
-  max-width: 400px;
-  transform: translateY(0);
-  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-  animation: fadeIn 0.6s ease-out;
-}
-
-.brand {
+.registration-container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  max-width: 340px;
+  width: 100%;
+  background-color: var(--bg-card, #ffffff);
+  border-radius: var(--radius-lg, 20px);
+  box-shadow: var(--shadow-md, 0 4px 20px rgba(0, 0, 0, 0.06));
+  padding: 32px 24px;
+  margin: 16px;
+}
+
+.logo-container {
+  text-align: center;
   margin-bottom: 24px;
 }
 
 .logo {
   width: 64px;
   height: 64px;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--secondary-color)
-  );
+  background-color: var(--ion-color-primary);
   border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: pulse 2s infinite;
+  margin: 0 auto;
 }
 
-.register-title {
-  margin: 0;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--dark-color);
-  text-align: center;
-  margin-bottom: 8px;
-  letter-spacing: -0.5px;
-}
-
-.register-subtitle {
-  margin: 0;
-  font-size: 16px;
-  color: var(--medium-color);
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.register-form {
-  display: flex;
-  flex-direction: column;
-}
-
-.input-group {
+.title {
+  font-size: 24px;
+  font-weight: 600;
   margin-bottom: 24px;
+  text-align: center;
+  color: var(--text-primary, var(--ion-color-dark));
 }
 
-.form-field {
-  margin-bottom: 16px;
+.google-btn {
+  --background: white;
+  --color: #333;
+  --border-radius: var(--radius-md, 12px);
+  --border-color: var(--border-color, #e0e0e0);
+  --border-style: solid;
+  --border-width: 1px;
+  --box-shadow: none;
+  height: 48px;
+  font-weight: 500;
 }
 
-ion-item ion-icon {
-  color: var(--medium-color);
+.btn-icon {
   margin-right: 8px;
 }
 
-.terms-row {
-  margin-bottom: 24px;
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 24px 0;
 }
 
-.terms-text {
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--divider-color, #e0e0e0);
+}
+
+.divider span {
+  padding: 0 12px;
+  color: var(--text-muted, var(--ion-color-medium));
+  font-size: 14px;
+}
+
+.registration-form {
+  width: 100%;
+}
+
+.form-item {
+  --border-radius: var(--radius-md, 12px);
+  --background: var(--bg-input, rgba(0, 0, 0, 0.03));
+  --padding: 0;
+  --inner-padding-end: 0;
+  --border-color: transparent;
+  --highlight-height: 0;
+  margin-bottom: 4px;
+  transition: all 0.2s ease;
+}
+
+.form-item.has-error {
+  --background: rgba(235, 68, 90, 0.05);
+  --border-color: var(--ion-color-danger);
+  --border-width: 1px;
+  --border-style: solid;
+}
+
+.error-text {
   font-size: 12px;
-  color: var(--medium-color);
+  margin: 4px 0 16px 4px;
+  height: 18px;
+  display: block;
 }
 
 .terms-link {
@@ -343,142 +384,39 @@ ion-item ion-icon {
   }
 }
 
-.register-button {
-  margin: 0;
-  --background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--secondary-color)
-  );
-  --background-activated: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--secondary-color)
-  );
-  --background-hover: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--secondary-color)
-  );
-  --border-radius: 12px;
-  --box-shadow: 0 4px 16px rgba(56, 128, 255, 0.3);
-  --padding-top: 16px;
-  --padding-bottom: 16px;
-  margin-bottom: 16px;
-  overflow: hidden;
-  position: relative;
-  z-index: 1;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    --box-shadow: 0 6px 20px rgba(56, 128, 255, 0.4);
-  }
-
-  &:disabled {
-    opacity: 0.7;
-    transform: none;
-  }
-}
-
-.btn-text {
-  font-weight: 600;
-  font-size: 16px;
-  letter-spacing: 0.5px;
-}
-
-.login-link {
-  --color: var(--medium-color);
-  font-size: 14px;
-  margin: 0;
-  margin-bottom: 32px;
-
-  strong {
-    color: var(--primary-color);
-  }
-}
-
-.divider {
-  display: flex;
-  align-items: center;
-  text-align: center;
+.submit-btn {
+  --border-radius: var(--radius-md, 12px);
+  height: 48px;
   margin-bottom: 24px;
-
-  &::before,
-  &::after {
-    content: '';
-    flex: 1;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  }
-
-  span {
-    padding: 0 16px;
-    color: var(--medium-color);
-    font-size: 14px;
-  }
+  --background: var(--ion-color-primary);
+  --box-shadow: 0 4px 12px rgba(var(--primary-color-rgb, 56, 128, 255), 0.15);
 }
 
-.social-buttons {
+.create-account {
   display: flex;
   justify-content: center;
-  gap: 16px;
+  align-items: center;
+  gap: 8px;
 }
 
-.social-btn {
-  --background: #ffffff;
-  --background-activated: #f5f5f5;
-  --background-hover: #f8f8f8;
-  --border-radius: 12px;
-  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --color: var(--dark-color);
-  width: 56px;
-  height: 56px;
+.create-account span {
+  color: var(--text-muted, var(--ion-color-medium));
+  font-size: 14px;
+}
+
+.create-account ion-button {
+  --color: var(--ion-color-primary);
+  --padding-start: 4px;
+  --padding-end: 4px;
+  height: auto;
+  font-weight: 500;
   margin: 0;
-  transition: transform 0.2s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-  }
 }
 
-.google-btn ion-icon {
-  color: #db4437;
-}
-
-@include mobile-selector {
-  .register-card {
-    padding: 24px;
-    border-radius: 20px;
-  }
-
-  .register-title {
-    font-size: 24px;
-  }
-
-  .register-subtitle {
-    font-size: 14px;
-    margin-bottom: 24px;
-  }
-
-  .logo {
-    width: 56px;
-    height: 56px;
-  }
-}
-
-@include tablet-selector {
-  .register-card {
-    padding: 40px;
-  }
-
-  .register-title {
-    font-size: 32px;
-  }
-
-  .register-subtitle {
-    font-size: 16px;
+@media (max-height: 600px) {
+  .page-container {
+    align-items: flex-start;
+    padding: 48px 0;
   }
 }
 </style>

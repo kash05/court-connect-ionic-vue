@@ -5,54 +5,38 @@ import type {
   TokenResponse,
 } from '@/types/authInterface';
 
-export const fetchUser = () =>
-  api
-    .get('/user')
-    .then((res) => res.data)
-    .catch((error) => {
-      throw error;
-    });
+const CLIENTID = import.meta.env.VITE_CLIENT_ID;
+const CLIENTSECRET = import.meta.env.VITE_CLIENT_SECRET;
 
-export const login = (data: LoginCredentials) =>
-  api
-    .post<TokenResponse>('/oauth/token', data)
-    .then((response) => {
-      return response.data;
-    })
-    .catch((error) => {
-      throw error;
-    });
+export const fetchUser = () => api.get('/user').then((res) => res.data);
+
+export const login = (data: Pick<LoginCredentials, 'email' | 'password'>) => {
+  const loginData = {
+    email: data.email,
+    password: data.password,
+    client_id: CLIENTID,
+    client_secret: CLIENTSECRET,
+    grant_type: 'password',
+  };
+
+  return api
+    .post<TokenResponse>('/oauth/token', loginData)
+    .then((response) => response.data);
+};
 
 export const registerUser = (data: RegisterInterface) =>
-  api
-    .post<RegisterInterface>('/user/register', data)
-    .then((response) => {
-      return response.data;
-    })
-    .catch((error) => {
-      throw error;
-    });
+  api.post<RegisterInterface>('/user/register', data).then((response) => {
+    return response.data;
+  });
 
 export const resetPassword = (data: any) =>
-  api
-    .post('/user/reset-password', data)
-    .then((response) => {
-      return response.data;
-    })
-    .catch((error) => {
-      throw error;
-    });
+  api.post('/user/reset-password', data).then((response) => {
+    return response.data;
+  });
 
 export const validateToken = () =>
-  api
-    .get('/user/validate-token')
-    .then((response) => response.data)
-    .catch((error) => {
-      throw error;
-    });
+  api.get('/user/validate-token').then((response) => response.data);
 
 export const logout = () => {
-  api.post('/user/logout').catch((error) => {
-    throw error;
-  });
+  api.post('/user/logout');
 };
