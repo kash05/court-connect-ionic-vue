@@ -1,5 +1,5 @@
 import api from '@/lib/apiClient';
-import { Event } from '@/types/event';
+import { Event } from '@/types/eventInterface';
 
 export const getEvents = (filters?: { type?: string; date?: string }) =>
   api

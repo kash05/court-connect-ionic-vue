@@ -1,5 +1,5 @@
 import api from '@/lib/apiClient';
-import { UserProfile } from '@/types/user';
+import { UserProfile } from '@/types/userInterface';
 
 export const getCurrentUser = () =>
   api

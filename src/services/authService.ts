@@ -1,9 +1,13 @@
-import api from '@/lib/apiClient';
-import type { User, LoginCredentials, RegisterInterface } from '@/types/auth';
+import api from "@/lib/apiClient";
+import type {
+  User,
+  LoginCredentials,
+  RegisterInterface,
+} from "@/types/authInterface";
 
 export const fetchUser = () =>
   api
-    .get('/user')
+    .get("/user")
     .then((res) => res.data)
     .catch((error) => {
       throw error;
@@ -11,7 +15,7 @@ export const fetchUser = () =>
 
 export const login = (data: LoginCredentials) =>
   api
-    .post<{ user: User; token: string }>('/login', data)
+    .post<{ user: User; token: string }>("/user/login", data)
     .then((response) => {
       return response.data;
     })
@@ -21,7 +25,7 @@ export const login = (data: LoginCredentials) =>
 
 export const registerUser = (data: RegisterInterface) =>
   api
-    .post<{ user: User; token: string }>('/register', data)
+    .post<RegisterInterface>("/user/register", data)
     .then((response) => {
       return response.data;
     })
@@ -31,7 +35,7 @@ export const registerUser = (data: RegisterInterface) =>
 
 export const resetPassword = (data: any) =>
   api
-    .post('/auth/reset-password', data)
+    .post("/user/reset-password", data)
     .then((response) => {
       return response.data;
     })
@@ -41,14 +45,14 @@ export const resetPassword = (data: any) =>
 
 export const validateToken = () =>
   api
-    .get<{ user: User }>('/auth/validate-token')
+    .get<{ user: User }>("/user/validate-token")
     .then((response) => response.data)
     .catch((error) => {
       throw error;
     });
 
 export const logout = () => {
-  api.post('/auth/logout').catch((error) => {
+  api.post("/user/logout").catch((error) => {
     throw error;
   });
 };
