@@ -8,16 +8,17 @@ import AuthLayout from "../layouts/AuthLayout.vue";
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
+    redirect: "/login",
     component: AuthLayout,
     meta: { requiresGuest: true },
     children: [
       {
-        path: "login",
+        path: "/login",
         name: "Login",
         component: () => import("../views/auth/LoginView.vue"),
       },
       {
-        path: "register",
+        path: "/register",
         name: "Registeration",
         component: () => import("../views/auth/RegistrationView.vue"),
       },
