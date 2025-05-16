@@ -67,6 +67,11 @@ function checkRoute() {
   }
 }
 
+function gotToPath(path: string) {
+  menuController.close("primaryMenu");
+  router.push(path);
+}
+
 watch(
   () => router.currentRoute.value.path,
   () => {
@@ -158,7 +163,7 @@ const ownerMenuGroups: MenuGroup[] = [
                 v-for="item in group.items"
                 :key="item.path"
                 :class="['menu-item', { active: currentPath === item.path }]"
-                @click="router.push(item.path)"
+                @click="gotToPath(item.path)"
               >
                 <div class="flex items-center">
                   <IonIcon :icon="item.icon" class="menu-icon" />
@@ -182,7 +187,7 @@ const ownerMenuGroups: MenuGroup[] = [
                 v-for="item in group.items"
                 :key="item.path"
                 :class="['menu-item', { active: currentPath === item.path }]"
-                @click="router.push(item.path)"
+                @click="gotToPath(item.path)"
               >
                 <div class="flex items-center">
                   <IonIcon :icon="item.icon" class="menu-icon" />

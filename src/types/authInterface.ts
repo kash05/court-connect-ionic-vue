@@ -2,7 +2,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'player' | 'owner';
+  role: "player" | "owner";
   profileImage?: string;
 }
 
@@ -11,19 +11,10 @@ export interface LoginCredentials {
   password: string;
 }
 
-export interface RegisterPlayerData {
-  email: string;
-  password: string;
-  name: string;
-  birthdate: string;
-  phone: string;
-  agreeTerms: boolean;
-}
-
 export interface RegisterInterface {
   email: string;
   password: string;
-  name: string;
+  full_name: string;
   gender: string;
-  agreeTerms: boolean;
+  agree_terms: boolean;
 }

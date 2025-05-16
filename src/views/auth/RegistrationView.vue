@@ -1,93 +1,96 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
-import { ErrorMessage, useField, useForm } from 'vee-validate';
-import { toTypedSchema } from '@vee-validate/zod';
-import { z } from 'zod';
-import { registerUser } from '@/services/authService';
-import { loadingService } from '@/services/loadingService';
+import { useRouter } from "vue-router";
+import { ErrorMessage, useField, useForm } from "vee-validate";
+import { toTypedSchema } from "@vee-validate/zod";
+import { z } from "zod";
+import { registerUser } from "@/services/authService";
+import { loadingService } from "@/services/loadingService";
 import {
-	IonInput,
-	IonCheckbox,
-	IonButton,
-	IonItem,
-	IonIcon,
-	IonContent,
-	IonPage,
-	IonText,
-} from '@ionic/vue';
+  IonInput,
+  IonCheckbox,
+  IonButton,
+  IonItem,
+  IonIcon,
+  IonContent,
+  IonPage,
+  IonText,
+  IonRadio,
+  IonRadioGroup,
+  IonLabel,
+} from "@ionic/vue";
 import {
-	logoGoogle,
-	lockClosedOutline,
-	mailOutline,
-	personOutline,
-	personCircleOutline,
-} from 'ionicons/icons';
-import { toastService } from '@/services/toastService';
+  logoGoogle,
+  lockClosedOutline,
+  mailOutline,
+  personOutline,
+  personCircleOutline,
+} from "ionicons/icons";
+import { toastService } from "@/services/toastService";
 
 const router = useRouter();
 
 const registerSchema = toTypedSchema(
   z
     .object({
-      name: z.string().min(2, 'Name must be at least 2 characters'),
-      email: z.string().email('Please enter a valid email'),
-      password: z.string().min(6, 'Password must be at least 6 characters'),
+      fullName: z.string().min(2, "Name must be at least 2 characters"),
+      email: z.string().email("Please enter a valid email"),
+      password: z.string().min(6, "Password must be at least 6 characters"),
       confirmPassword: z.string(),
-      gender: z.string().min(2, 'Gender is required'),
+      gender: z.string().min(2, "Gender is required"),
       agreeTerms: z.boolean().refine((val) => val, {
-        message: 'You must agree to terms and conditions',
+        message: "You must agree to terms and conditions",
       }),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: "Passwords don't match",
-      path: ['confirmPassword'],
-    }),
+      path: ["confirmPassword"],
+    })
 );
 
 const { handleSubmit, isSubmitting } = useForm({
   validationSchema: registerSchema,
   initialValues: {
-    name: '',
-    email: '',
-    password: '',
-    gender: '',
-    confirmPassword: '',
+    fullName: "",
+    email: "",
+    password: "",
+    gender: "",
+    confirmPassword: "",
     agreeTerms: false,
   },
 });
 
-const { value: name } = useField<string>('name');
-const { value: email } = useField<string>('email');
-const { value: password } = useField<string>('password');
-const { value: confirmPassword } = useField<string>('confirmPassword');
-const { value: gender } = useField<string>('gender');
-const { value: agreeTerms } = useField<boolean>('agreeTerms');
+const { value: fullName } = useField<string>("fullName");
+const { value: email } = useField<string>("email");
+const { value: password } = useField<string>("password");
+const { value: confirmPassword } = useField<string>("confirmPassword");
+const { value: gender } = useField<string>("gender");
+const { value: agreeTerms } = useField<boolean>("agreeTerms");
 
 const onSubmit = handleSubmit((values) => {
   const registrationData = {
     email: values.email,
     password: values.password,
-    name: values.name,
+    full_name: values.fullName,
     gender: values.gender,
-    agreeTerms: values.agreeTerms,
+    agree_terms: values.agreeTerms,
   };
 
   loadingService.withLoading(
     () =>
       registerUser(registrationData)
         .then(() => {
-          router.push('/dashboard');
+          router.push("/login");
         })
         .catch((error) => {
-          toastService.dangerMessage('Registration failed, please try again.');
-          console.error('Error registering owner:', error);
+          toastService.dangerMessage("Registration failed, please try again.");
+          console.error("Error registering owner:", error);
         }),
-    'Registering...',
+    "Registering your account..."
   );
 });
 
 const goToLogin = () => {
-  router.push('/login');
+  router.push("/login");
 };
 </script>
 
@@ -112,11 +115,11 @@ const goToLogin = () => {
                     type="text"
                     aria-label="Full Name"
                     placeholder="Enter your full name"
-                    v-model="name"
+                    v-model="fullName"
                   ></ion-input>
                 </ion-item>
                 <ion-text color="danger" class="text-sm pl-16 block pb-2">
-                  <ErrorMessage name="name" />
+                  <ErrorMessage name="fullName" />
                 </ion-text>
               </div>
 
@@ -171,13 +174,21 @@ const goToLogin = () => {
               <div class="form-field">
                 <ion-item>
                   <ion-icon :icon="personCircleOutline" slot="start"></ion-icon>
-                  <ion-input
-                    type="text"
-                    aria-label="none"
-                    placeholder="Enter your gender"
-                    v-model="gender"
-                  ></ion-input>
+                  <ion-label>Gender</ion-label>
                 </ion-item>
+
+                <div class="radio-container pl-16">
+                  <ion-radio-group v-model="gender">
+                    <ion-item lines="none">
+                      <ion-radio value="male">Male</ion-radio>
+                    </ion-item>
+
+                    <ion-item lines="none">
+                      <ion-radio value="female">Female</ion-radio>
+                    </ion-item>
+                  </ion-radio-group>
+                </div>
+
                 <ion-text color="danger" class="text-sm pl-16 block pb-2">
                   <ErrorMessage name="gender" />
                 </ion-text>
@@ -206,7 +217,12 @@ const goToLogin = () => {
               <span class="btn-text">Create Account</span>
             </ion-button>
 
-            <ion-button expand="block" fill="clear" class="login-link" @click="goToLogin">
+            <ion-button
+              expand="block"
+              fill="clear"
+              class="login-link"
+              @click="goToLogin"
+            >
               <span>Already have an account? <strong>Sign in</strong></span>
             </ion-button>
 
@@ -227,7 +243,7 @@ const goToLogin = () => {
 </template>
 
 <style scoped lang="scss">
-@use '@/theme/mixins.scss' as *;
+@use "@/theme/mixins.scss" as *;
 
 .register-container {
   display: flex;
@@ -260,7 +276,11 @@ const goToLogin = () => {
 .logo {
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -325,9 +345,21 @@ ion-item ion-icon {
 
 .register-button {
   margin: 0;
-  --background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  --background-activated: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  --background-hover: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  --background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  --background-activated: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  --background-hover: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
   --border-radius: 12px;
   --box-shadow: 0 4px 16px rgba(56, 128, 255, 0.3);
   --padding-top: 16px;
@@ -376,7 +408,7 @@ ion-item ion-icon {
 
   &::before,
   &::after {
-    content: '';
+    content: "";
     flex: 1;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   }

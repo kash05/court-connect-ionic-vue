@@ -50,7 +50,7 @@ const onSubmit = handleSubmit((values) => {
           toastService.dangerMessage('Login failed, please try again.');
           console.error('Signin failed:', error);
         }),
-    'Signing in...',
+    'Loggin you in...',
   );
 });
 

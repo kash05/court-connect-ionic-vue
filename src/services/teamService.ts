@@ -1,5 +1,5 @@
 import api from '@/lib/apiClient';
-import { Team } from '@/types/team';
+import { Team } from '@/types/teamInterface';
 
 export const getTeams = () =>
   api
