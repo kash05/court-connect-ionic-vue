@@ -30,7 +30,9 @@ class ToastService {
       duration,
       position,
       color,
-      buttons: showCloseButton ? [{ text: closeButtonText, role: 'cancel' }] : [],
+      buttons: showCloseButton
+        ? [{ text: closeButtonText, role: 'cancel' }]
+        : [],
       cssClass,
     });
 

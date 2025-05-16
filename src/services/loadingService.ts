@@ -32,7 +32,10 @@ class LoadingService {
    * Wrap any async function with a loading indicator.
    * It will automatically show and hide the loader.
    */
-  async withLoading<T>(fn: () => Promise<T>, message: string = 'Please wait...'): Promise<T> {
+  async withLoading<T>(
+    fn: () => Promise<T>,
+    message: string = 'Please wait...',
+  ): Promise<T> {
     await this.show(message);
     try {
       return await fn();

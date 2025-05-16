@@ -107,7 +107,10 @@ const toggleEditMode = () => {
                   class="h-32 w-32 overflow-hidden rounded-full border-4 border-white bg-white shadow-md"
                 >
                   <img
-                    :src="authStore.user?.profileImage || 'https://via.placeholder.com/128'"
+                    :src="
+                      authStore.user?.profileImage ||
+                      'https://via.placeholder.com/128'
+                    "
                     alt="Profile"
                     class="h-full w-full object-cover"
                   />
@@ -118,7 +121,9 @@ const toggleEditMode = () => {
                     {{ profileData.name }}
                   </h1>
                   <p class="text-gray-600">
-                    {{ isPlayer() ? 'Player' : isOwner() ? 'Team Owner' : 'User' }}
+                    {{
+                      isPlayer() ? 'Player' : isOwner() ? 'Team Owner' : 'User'
+                    }}
                   </p>
                 </div>
               </div>
@@ -142,7 +147,11 @@ const toggleEditMode = () => {
               <div v-if="isEditMode">
                 <form @submit.prevent="onSubmit" class="space-y-4">
                   <label for="name" class="form-label">Full Name</label>
-                  <input name="name" label="Full Name" :placeholder="profileData.name" />
+                  <input
+                    name="name"
+                    label="Full Name"
+                    :placeholder="profileData.name"
+                  />
 
                   <label for="email" class="form-label">Email Address</label>
                   <input
@@ -182,7 +191,11 @@ const toggleEditMode = () => {
                       Cancel
                     </button>
 
-                    <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
+                    <button
+                      type="submit"
+                      class="btn btn-primary"
+                      :disabled="isSubmitting"
+                    >
                       Save Changes
                     </button>
                   </div>
@@ -207,7 +220,9 @@ const toggleEditMode = () => {
                   </div>
 
                   <div>
-                    <h3 class="text-sm font-medium text-gray-500">Birth Date</h3>
+                    <h3 class="text-sm font-medium text-gray-500">
+                      Birth Date
+                    </h3>
                     <p class="mt-1 text-gray-900">
                       {{ new Date(profileData.birthdate).toLocaleDateString() }}
                     </p>
@@ -261,7 +276,9 @@ const toggleEditMode = () => {
                 </div>
 
                 <div>
-                  <h3 class="text-sm font-medium text-gray-500">Preferred Foot</h3>
+                  <h3 class="text-sm font-medium text-gray-500">
+                    Preferred Foot
+                  </h3>
                   <p class="mt-1 text-lg font-semibold text-gray-900">
                     {{ playerStats.preferredFoot }}
                   </p>
@@ -291,7 +308,9 @@ const toggleEditMode = () => {
               <h3 class="mb-4 text-lg font-semibold">Account</h3>
 
               <div class="space-y-3">
-                <button class="btn w-full justify-start bg-white text-gray-700 hover:bg-gray-50">
+                <button
+                  class="btn w-full justify-start bg-white text-gray-700 hover:bg-gray-50"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="mr-2 h-5 w-5 text-gray-500"
@@ -309,7 +328,9 @@ const toggleEditMode = () => {
                   Change Password
                 </button>
 
-                <button class="btn w-full justify-start bg-white text-gray-700 hover:bg-gray-50">
+                <button
+                  class="btn w-full justify-start bg-white text-gray-700 hover:bg-gray-50"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="mr-2 h-5 w-5 text-gray-500"
@@ -333,7 +354,9 @@ const toggleEditMode = () => {
                   Account Settings
                 </button>
 
-                <button class="btn w-full justify-start bg-white text-gray-700 hover:bg-gray-50">
+                <button
+                  class="btn w-full justify-start bg-white text-gray-700 hover:bg-gray-50"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="mr-2 h-5 w-5 text-gray-500"
@@ -359,7 +382,9 @@ const toggleEditMode = () => {
 
               <div class="space-y-3">
                 <div class="flex items-center rounded-lg bg-gray-50 p-3">
-                  <div class="mr-3 h-10 w-10 flex-shrink-0 overflow-hidden rounded-full">
+                  <div
+                    class="mr-3 h-10 w-10 flex-shrink-0 overflow-hidden rounded-full"
+                  >
                     <img
                       src="https://via.placeholder.com/40"
                       alt="Team Logo"
@@ -373,7 +398,9 @@ const toggleEditMode = () => {
                 </div>
 
                 <div class="flex items-center rounded-lg bg-gray-50 p-3">
-                  <div class="mr-3 h-10 w-10 flex-shrink-0 overflow-hidden rounded-full">
+                  <div
+                    class="mr-3 h-10 w-10 flex-shrink-0 overflow-hidden rounded-full"
+                  >
                     <img
                       src="https://via.placeholder.com/40"
                       alt="Team Logo"
@@ -387,7 +414,9 @@ const toggleEditMode = () => {
                 </div>
               </div>
 
-              <button class="btn mt-4 w-full bg-white text-primary-600 hover:bg-primary-50">
+              <button
+                class="btn mt-4 w-full bg-white text-primary-600 hover:bg-primary-50"
+              >
                 View All Teams
               </button>
             </div>

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-import { ErrorMessage, useField, useForm } from "vee-validate";
-import { toTypedSchema } from "@vee-validate/zod";
-import { z } from "zod";
-import { registerUser } from "@/services/authService";
-import { loadingService } from "@/services/loadingService";
+import { useRouter } from 'vue-router';
+import { ErrorMessage, useField, useForm } from 'vee-validate';
+import { toTypedSchema } from '@vee-validate/zod';
+import { z } from 'zod';
+import { registerUser } from '@/services/authService';
+import { loadingService } from '@/services/loadingService';
 import {
   IonInput,
   IonCheckbox,
@@ -17,54 +17,54 @@ import {
   IonRadio,
   IonRadioGroup,
   IonLabel,
-} from "@ionic/vue";
+} from '@ionic/vue';
 import {
   logoGoogle,
   lockClosedOutline,
   mailOutline,
   personOutline,
   personCircleOutline,
-} from "ionicons/icons";
-import { toastService } from "@/services/toastService";
+} from 'ionicons/icons';
+import { toastService } from '@/services/toastService';
 
 const router = useRouter();
 
 const registerSchema = toTypedSchema(
   z
     .object({
-      fullName: z.string().min(2, "Name must be at least 2 characters"),
-      email: z.string().email("Please enter a valid email"),
-      password: z.string().min(6, "Password must be at least 6 characters"),
+      fullName: z.string().min(2, 'Name must be at least 2 characters'),
+      email: z.string().email('Please enter a valid email'),
+      password: z.string().min(6, 'Password must be at least 6 characters'),
       confirmPassword: z.string(),
-      gender: z.string().min(2, "Gender is required"),
+      gender: z.string().min(2, 'Gender is required'),
       agreeTerms: z.boolean().refine((val) => val, {
-        message: "You must agree to terms and conditions",
+        message: 'You must agree to terms and conditions',
       }),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: "Passwords don't match",
-      path: ["confirmPassword"],
-    })
+      path: ['confirmPassword'],
+    }),
 );
 
 const { handleSubmit, isSubmitting } = useForm({
   validationSchema: registerSchema,
   initialValues: {
-    fullName: "",
-    email: "",
-    password: "",
-    gender: "",
-    confirmPassword: "",
+    fullName: '',
+    email: '',
+    password: '',
+    gender: '',
+    confirmPassword: '',
     agreeTerms: false,
   },
 });
 
-const { value: fullName } = useField<string>("fullName");
-const { value: email } = useField<string>("email");
-const { value: password } = useField<string>("password");
-const { value: confirmPassword } = useField<string>("confirmPassword");
-const { value: gender } = useField<string>("gender");
-const { value: agreeTerms } = useField<boolean>("agreeTerms");
+const { value: fullName } = useField<string>('fullName');
+const { value: email } = useField<string>('email');
+const { value: password } = useField<string>('password');
+const { value: confirmPassword } = useField<string>('confirmPassword');
+const { value: gender } = useField<string>('gender');
+const { value: agreeTerms } = useField<boolean>('agreeTerms');
 
 const onSubmit = handleSubmit((values) => {
   const registrationData = {
@@ -79,18 +79,18 @@ const onSubmit = handleSubmit((values) => {
     () =>
       registerUser(registrationData)
         .then(() => {
-          router.push("/login");
+          router.push('/login');
         })
         .catch((error) => {
-          toastService.dangerMessage("Registration failed, please try again.");
-          console.error("Error registering owner:", error);
+          toastService.dangerMessage('Registration failed, please try again.');
+          console.error('Error registering owner:', error);
         }),
-    "Registering your account..."
+    'Registering your account...',
   );
 });
 
 const goToLogin = () => {
-  router.push("/login");
+  router.push('/login');
 };
 </script>
 
@@ -243,7 +243,7 @@ const goToLogin = () => {
 </template>
 
 <style scoped lang="scss">
-@use "@/theme/mixins.scss" as *;
+@use '@/theme/mixins.scss' as *;
 
 .register-container {
   display: flex;
@@ -408,7 +408,7 @@ ion-item ion-icon {
 
   &::before,
   &::after {
-    content: "";
+    content: '';
     flex: 1;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   }

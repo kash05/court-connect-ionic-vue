@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import NavBar from "@/components/layout/NavBar.vue";
-import TabBarComponent from "@/components/layout/TabBarComponent.vue";
+import NavBar from '@/components/layout/NavBar.vue';
+import TabBarComponent from '@/components/layout/TabBarComponent.vue';
 import {
   IonContent,
   IonHeader,
   IonMenuButton,
   IonPage,
   IonToolbar,
-} from "@ionic/vue";
-import { useWindowSize } from "@vueuse/core";
-import { computed } from "vue";
+} from '@ionic/vue';
+import { useWindowSize } from '@vueuse/core';
+import { computed } from 'vue';
 
 const { width } = useWindowSize();
 

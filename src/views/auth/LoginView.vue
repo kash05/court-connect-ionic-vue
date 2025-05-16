@@ -106,14 +106,21 @@ const goToRegister = () => {
 
             <div class="options-row">
               <ion-checkbox labelPlacement="end">Remember me</ion-checkbox>
-              <ion-button fill="clear" size="small" class="forgot-btn">Forgot password?</ion-button>
+              <ion-button fill="clear" size="small" class="forgot-btn"
+                >Forgot password?</ion-button
+              >
             </div>
 
             <ion-button expand="block" class="login-button" type="submit">
               <span class="btn-text">Log in</span>
             </ion-button>
 
-            <ion-button expand="block" fill="clear" class="signup-link" @click="goToRegister">
+            <ion-button
+              expand="block"
+              fill="clear"
+              class="signup-link"
+              @click="goToRegister"
+            >
               <span>Not yet a member? <strong>Sign up!</strong></span>
             </ion-button>
 
@@ -167,7 +174,11 @@ const goToRegister = () => {
 .logo {
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -236,9 +247,21 @@ ion-checkbox {
 
 .login-button {
   margin: 0;
-  --background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  --background-activated: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  --background-hover: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  --background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  --background-activated: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  --background-hover: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
   --border-radius: 12px;
   --box-shadow: 0 4px 16px rgba(56, 128, 255, 0.3);
   --padding-top: 16px;

@@ -2,7 +2,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: "player" | "owner";
+  role: 'player' | 'owner';
   profileImage?: string;
 }
 

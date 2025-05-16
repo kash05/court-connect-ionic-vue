@@ -5,46 +5,46 @@ import {
   IonSegment,
   IonSegmentButton,
   IonLabel,
-} from "@ionic/vue";
-import { ref } from "vue";
+} from '@ionic/vue';
+import { ref } from 'vue';
 
 // const authStore = useAuthStore();
-const selectedTab = ref("live");
+const selectedTab = ref('live');
 
 const liveMatches = ref([
   {
     id: 1,
-    title: "Champions FC vs Tigers",
-    time: "45:00",
+    title: 'Champions FC vs Tigers',
+    time: '45:00',
     score: { home: 2, away: 1 },
-    status: "In Progress",
-    location: "Main Stadium",
+    status: 'In Progress',
+    location: 'Main Stadium',
   },
 ]);
 
 const upcomingMatches = ref([
   {
     id: 1,
-    title: "Weekly Practice",
-    date: "2025-01-15T18:00:00",
-    type: "practice",
-    location: "Training Ground",
+    title: 'Weekly Practice',
+    date: '2025-01-15T18:00:00',
+    type: 'practice',
+    location: 'Training Ground',
   },
   {
     id: 2,
-    title: "Quarter Finals",
-    date: "2025-01-18T14:30:00",
-    type: "tournament",
-    location: "City Stadium",
+    title: 'Quarter Finals',
+    date: '2025-01-18T14:30:00',
+    type: 'tournament',
+    location: 'City Stadium',
   },
 ]);
 
 const matchHistory = ref([
   {
     id: 1,
-    title: "Semi Finals",
-    date: "2025-01-10",
-    result: "Won",
+    title: 'Semi Finals',
+    date: '2025-01-10',
+    result: 'Won',
     score: { home: 3, away: 1 },
     stats: {
       goals: 2,
@@ -54,9 +54,9 @@ const matchHistory = ref([
   },
   {
     id: 2,
-    title: "League Match",
-    date: "2025-01-05",
-    result: "Lost",
+    title: 'League Match',
+    date: '2025-01-05',
+    result: 'Lost',
     score: { home: 1, away: 2 },
     stats: {
       goals: 1,
@@ -66,9 +66,9 @@ const matchHistory = ref([
   },
   {
     id: 2,
-    title: "League Match",
-    date: "2025-01-05",
-    result: "Lost",
+    title: 'League Match',
+    date: '2025-01-05',
+    result: 'Lost',
     score: { home: 1, away: 2 },
     stats: {
       goals: 1,
@@ -78,9 +78,9 @@ const matchHistory = ref([
   },
   {
     id: 2,
-    title: "League Match",
-    date: "2025-01-05",
-    result: "Lost",
+    title: 'League Match',
+    date: '2025-01-05',
+    result: 'Lost',
     score: { home: 1, away: 2 },
     stats: {
       goals: 1,
@@ -98,12 +98,12 @@ const playerStats = ref({
 });
 
 function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
+  return new Date(dateString).toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
   });
 }
 </script>

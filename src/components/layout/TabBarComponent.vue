@@ -6,15 +6,15 @@ import {
   IonIcon,
   IonLabel,
   IonRouterOutlet,
-} from "@ionic/vue";
-import { useWindowSize } from "@vueuse/core";
+} from '@ionic/vue';
+import { useWindowSize } from '@vueuse/core';
 import {
   homeOutline,
   personOutline,
   peopleOutline,
   calendarOutline,
-} from "ionicons/icons";
-import { computed } from "vue";
+} from 'ionicons/icons';
+import { computed } from 'vue';
 
 const { width } = useWindowSize();
 
@@ -50,7 +50,7 @@ const isDesktop = computed(() => width.value >= 768);
 </template>
 
 <style scoped lang="scss">
-@use "@/theme/variables.scss" as *;
+@use '@/theme/variables.scss' as *;
 
 .floating-tabs {
   --background-color: var(--ion-color-medium-tint);

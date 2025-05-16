@@ -5,7 +5,7 @@ import {
   IonRouterOutlet,
   IonSplitPane,
   menuController,
-} from "@ionic/vue";
+} from '@ionic/vue';
 import {
   homeOutline,
   personOutline,
@@ -18,10 +18,10 @@ import {
   statsChartOutline,
   walletOutline,
   logOutOutline,
-} from "ionicons/icons";
-import { useAuthStore } from "@/stores/useAuthStore";
-import { useRouter, useRoute } from "vue-router";
-import { computed, onMounted, watch } from "vue";
+} from 'ionicons/icons';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { useRouter, useRoute } from 'vue-router';
+import { computed, onMounted, watch } from 'vue';
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -41,23 +41,23 @@ interface MenuGroup {
   items: MenuItem[];
 }
 
-const EXCLUDED_ROUTES: string[] = ["/login", "/register"];
+const EXCLUDED_ROUTES: string[] = ['/login', '/register'];
 
 onMounted(() => {
   checkRoute();
 });
 
 async function enableMenu() {
-  return await menuController.enable(true, "primaryMenu");
+  return await menuController.enable(true, 'primaryMenu');
 }
 
 async function disableMenu() {
-  return await menuController.enable(false, "primaryMenu");
+  return await menuController.enable(false, 'primaryMenu');
 }
 
 function checkRoute() {
   const shouldEnableMenu = !EXCLUDED_ROUTES.some((excluded) =>
-    router.currentRoute.value.path.startsWith(excluded)
+    router.currentRoute.value.path.startsWith(excluded),
   );
 
   if (shouldEnableMenu) {
@@ -68,7 +68,7 @@ function checkRoute() {
 }
 
 function gotToPath(path: string) {
-  menuController.close("primaryMenu");
+  menuController.close('primaryMenu');
   router.push(path);
 }
 
@@ -76,48 +76,48 @@ watch(
   () => router.currentRoute.value.path,
   () => {
     checkRoute();
-  }
+  },
 );
 
 const playerMenuGroups: MenuGroup[] = [
   {
-    title: "Main",
+    title: 'Main',
     items: [
-      { title: "Dashboard", icon: homeOutline, path: "/dashboard" },
-      { title: "My Teams", icon: peopleOutline, path: "/teams" },
-      { title: "Tournaments", icon: trophyOutline, path: "/tournaments" },
-      { title: "Events", icon: calendarOutline, path: "/events", badge: 2 },
+      { title: 'Dashboard', icon: homeOutline, path: '/dashboard' },
+      { title: 'My Teams', icon: peopleOutline, path: '/teams' },
+      { title: 'Tournaments', icon: trophyOutline, path: '/tournaments' },
+      { title: 'Events', icon: calendarOutline, path: '/events', badge: 2 },
     ],
   },
   {
-    title: "Personal",
+    title: 'Personal',
     items: [
-      { title: "Statistics", icon: statsChartOutline, path: "/player/stats" },
-      { title: "Profile", icon: personOutline, path: "/profile" },
+      { title: 'Statistics', icon: statsChartOutline, path: '/player/stats' },
+      { title: 'Profile', icon: personOutline, path: '/profile' },
     ],
   },
 ];
 
 const ownerMenuGroups: MenuGroup[] = [
   {
-    title: "Management",
+    title: 'Management',
     items: [
-      { title: "Dashboard", icon: homeOutline, path: "/dashboard" },
-      { title: "Grounds", icon: locationOutline, path: "/owner/grounds" },
+      { title: 'Dashboard', icon: homeOutline, path: '/dashboard' },
+      { title: 'Grounds', icon: locationOutline, path: '/owner/grounds' },
       {
-        title: "Bookings",
+        title: 'Bookings',
         icon: timeOutline,
-        path: "/owner/bookings",
+        path: '/owner/bookings',
         badge: 3,
       },
-      { title: "Revenue", icon: walletOutline, path: "/owner/revenue" },
+      { title: 'Revenue', icon: walletOutline, path: '/owner/revenue' },
     ],
   },
   {
-    title: "Organization",
+    title: 'Organization',
     items: [
-      { title: "Teams", icon: peopleOutline, path: "/teams" },
-      { title: "Events", icon: calendarOutline, path: "/events" },
+      { title: 'Teams', icon: peopleOutline, path: '/teams' },
+      { title: 'Events', icon: calendarOutline, path: '/events' },
     ],
   },
 ];
@@ -145,7 +145,7 @@ const ownerMenuGroups: MenuGroup[] = [
               />
             </div>
             <div class="user-details">
-              <h3 class="user-name">{{ authStore.user?.name || "User" }}</h3>
+              <h3 class="user-name">{{ authStore.user?.name || 'User' }}</h3>
               <p class="user-role">Player</p>
             </div>
           </div>
