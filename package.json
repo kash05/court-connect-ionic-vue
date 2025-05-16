@@ -10,13 +10,11 @@
     "lint": "eslint --ext .js,.mjs,.cjs,.ts,.vue --parser vue-eslint-parser src/",
     "format": "prettier --write \"src/**/*.{js,ts,vue,scss,css,json,md}\"",
     "typecheck": "tsc --noEmit",
-    "ionic:serve": "vite",
-    "ionic:build": "vue-tsc -b && vite build",
-    "cap:add": "cap add",
-    "cap:copy": "cap copy",
-    "cap:sync": "cap sync",
-    "cap:open:ios": "cap open ios",
-    "cap:open:android": "cap open android"
+    "add": "npx cap add",
+    "copy": "npx cap copy",
+    "sync": "npx cap sync",
+    "open:ios": "npx cap open ios",
+    "open:android": "npx cap open android"
   },
   "dependencies": {
     "@capacitor/android": "^7.2.0",
