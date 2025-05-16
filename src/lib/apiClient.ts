@@ -1,4 +1,6 @@
-import axios from 'axios';
+import axios from "axios";
+
+const API_VERSION = import.meta.env.VITE_API_VERSION ?? "";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -6,19 +8,21 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token');
+  const token = localStorage.getItem("access_token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  if (config.url && !config.url.startsWith(`/${API_VERSION}`)) {
+    config.url = `/${API_VERSION}${config.url}`;
+  }
+
   return config;
 });
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    // Optional: Handle global errors here
-    return Promise.reject(error);
-  },
+  (error) => Promise.reject(error)
 );
 
 export default api;
