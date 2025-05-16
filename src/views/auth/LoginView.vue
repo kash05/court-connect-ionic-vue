@@ -20,6 +20,9 @@ import { z } from 'zod';
 
 const router = useRouter();
 
+const CLIENTID = import.meta.env.VITE_CLIENT_ID;
+const CLIENTSECRET = import.meta.env.VITE_CLIENT_SECRET;
+
 const loginSchema = toTypedSchema(
   z.object({
     email: z.string().email('Please enter a valid email'),
@@ -38,6 +41,9 @@ const onSubmit = handleSubmit((values) => {
   const loginData = {
     email: values.email,
     password: values.password,
+    client_id: CLIENTID,
+    client_secret: CLIENTSECRET,
+    grant_type: 'password',
   };
 
   loadingService.withLoading(

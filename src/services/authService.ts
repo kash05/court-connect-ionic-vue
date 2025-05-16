@@ -1,8 +1,8 @@
 import api from '@/lib/apiClient';
 import type {
-  User,
   LoginCredentials,
   RegisterInterface,
+  TokenResponse,
 } from '@/types/authInterface';
 
 export const fetchUser = () =>
@@ -15,7 +15,7 @@ export const fetchUser = () =>
 
 export const login = (data: LoginCredentials) =>
   api
-    .post<{ user: User; token: string }>('/user/login', data)
+    .post<TokenResponse>('/oauth/token', data)
     .then((response) => {
       return response.data;
     })
@@ -45,7 +45,7 @@ export const resetPassword = (data: any) =>
 
 export const validateToken = () =>
   api
-    .get<{ user: User }>('/user/validate-token')
+    .get('/user/validate-token')
     .then((response) => response.data)
     .catch((error) => {
       throw error;
