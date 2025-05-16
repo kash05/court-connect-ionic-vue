@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { IonIcon, IonMenu, IonRouterOutlet, IonSplitPane } from "@ionic/vue";
+import {
+  IonIcon,
+  IonMenu,
+  IonRouterOutlet,
+  IonSplitPane,
+  menuController,
+} from "@ionic/vue";
 import {
   homeOutline,
   personOutline,
@@ -15,7 +21,7 @@ import {
 } from "ionicons/icons";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useRouter, useRoute } from "vue-router";
-import { computed } from "vue";
+import { computed, onMounted, watch } from "vue";
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -34,6 +40,39 @@ interface MenuGroup {
   title: string;
   items: MenuItem[];
 }
+
+const EXCLUDED_ROUTES: string[] = ["/login", "/register"];
+
+onMounted(() => {
+  checkRoute();
+});
+
+async function enableMenu() {
+  return await menuController.enable(true, "primaryMenu");
+}
+
+async function disableMenu() {
+  return await menuController.enable(false, "primaryMenu");
+}
+
+function checkRoute() {
+  const shouldEnableMenu = !EXCLUDED_ROUTES.some((excluded) =>
+    router.currentRoute.value.path.startsWith(excluded)
+  );
+
+  if (shouldEnableMenu) {
+    enableMenu();
+  } else {
+    disableMenu();
+  }
+}
+
+watch(
+  () => router.currentRoute.value.path,
+  () => {
+    checkRoute();
+  }
+);
 
 const playerMenuGroups: MenuGroup[] = [
   {
