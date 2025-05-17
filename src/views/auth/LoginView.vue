@@ -70,7 +70,7 @@ const handleGoogleLogin = () => {
         <div class="login-container">
           <div class="logo-container">
             <div class="logo">
-              <img src="../../assets/favicon.webp" alt="logo" />
+              <img src="../../assets/smallLogoWhite.webp" alt="logo" />
             </div>
           </div>
 
@@ -200,8 +200,8 @@ ion-content::part(background) {
   justify-content: center;
 
   img {
-    width: 60%;
-    height: 60%;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
   }
 }
