@@ -282,7 +282,6 @@ const handleGoogleRegistration = () => {
   max-width: 340px;
   width: 100%;
   background-color: var(--bg-card, #ffffff);
-  border-radius: var(--radius-lg, 20px);
   box-shadow: var(--shadow-md, 0 4px 20px rgba(0, 0, 0, 0.06));
   padding: 32px 24px;
   margin: 16px;
@@ -297,7 +296,6 @@ const handleGoogleRegistration = () => {
   width: 64px;
   height: 64px;
   background-color: var(--ion-color-primary);
-  border-radius: 16px;
   margin: 0 auto;
 }
 

@@ -3,13 +3,13 @@ import { login } from '@/services/authService';
 import { loadingService } from '@/services/loadingService';
 import { toastService } from '@/services/toastService';
 import {
-  IonButton,
-  IonContent,
-  IonPage,
-  IonInput,
-  IonItem,
-  IonIcon,
-  IonText,
+	IonButton,
+	IonContent,
+	IonPage,
+	IonInput,
+	IonItem,
+	IonIcon,
+	IonText,
 } from '@ionic/vue';
 import { toTypedSchema } from '@vee-validate/zod';
 import { ErrorMessage, useField, useForm } from 'vee-validate';
@@ -172,7 +172,6 @@ const handleGoogleLogin = () => {
   max-width: 340px;
   width: 100%;
   background-color: var(--bg-card, #ffffff);
-  border-radius: var(--radius-lg, 20px);
   box-shadow: var(--shadow-md, 0 4px 20px rgba(0, 0, 0, 0.06));
   padding: 32px 24px;
   margin: 16px;
@@ -187,7 +186,6 @@ const handleGoogleLogin = () => {
   width: 64px;
   height: 64px;
   background-color: var(--ion-color-primary);
-  border-radius: 16px;
   margin: 0 auto;
 }
 

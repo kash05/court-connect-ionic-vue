@@ -6,6 +6,7 @@ import {
   IonIcon,
   IonLabel,
   IonRouterOutlet,
+  IonRippleEffect,
 } from '@ionic/vue';
 import { useWindowSize } from '@vueuse/core';
 import {
@@ -14,11 +15,30 @@ import {
   peopleOutline,
   calendarOutline,
 } from 'ionicons/icons';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import { useRoute } from 'vue-router';
 
 const { width } = useWindowSize();
-
 const isDesktop = computed(() => width.value >= 768);
+const route = useRoute();
+
+const activeTab = computed(() => {
+  const path = route.path;
+  if (path.includes('/dashboard')) return 'home';
+  if (path.includes('/teams')) return 'teams';
+  if (path.includes('/events')) return 'events';
+  if (path.includes('/profile')) return 'profile';
+  return 'home';
+});
+
+const animatingTab = ref('');
+
+const handleTabClick = (tab: string) => {
+  animatingTab.value = tab;
+  setTimeout(() => {
+    animatingTab.value = '';
+  }, 300);
+};
 </script>
 
 <template>
@@ -26,24 +46,68 @@ const isDesktop = computed(() => width.value >= 768);
     <IonRouterOutlet></IonRouterOutlet>
 
     <IonTabBar slot="bottom" v-if="!isDesktop" class="floating-tabs">
-      <IonTabButton tab="home" href="/dashboard">
-        <IonIcon :icon="homeOutline" />
+      <IonTabButton
+        tab="home"
+        href="/dashboard"
+        :class="{
+          'tab-selected': activeTab === 'home',
+          'tab-animating': animatingTab === 'home',
+        }"
+        @click="handleTabClick('home')"
+      >
+        <div class="tab-icon-container">
+          <IonIcon :icon="homeOutline" />
+        </div>
         <IonLabel>Home</IonLabel>
+        <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
 
-      <IonTabButton tab="teams" href="/teams">
-        <IonIcon :icon="peopleOutline" />
+      <IonTabButton
+        tab="teams"
+        href="/teams"
+        :class="{
+          'tab-selected': activeTab === 'teams',
+          'tab-animating': animatingTab === 'teams',
+        }"
+        @click="handleTabClick('teams')"
+      >
+        <div class="tab-icon-container">
+          <IonIcon :icon="peopleOutline" />
+        </div>
         <IonLabel>Teams</IonLabel>
+        <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
 
-      <IonTabButton tab="events" href="/events">
-        <IonIcon :icon="calendarOutline" />
+      <IonTabButton
+        tab="events"
+        href="/events"
+        :class="{
+          'tab-selected': activeTab === 'events',
+          'tab-animating': animatingTab === 'events',
+        }"
+        @click="handleTabClick('events')"
+      >
+        <div class="tab-icon-container">
+          <IonIcon :icon="calendarOutline" />
+        </div>
         <IonLabel>Events</IonLabel>
+        <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
 
-      <IonTabButton tab="profile" href="/profile">
-        <IonIcon :icon="personOutline" />
+      <IonTabButton
+        tab="profile"
+        href="/profile"
+        :class="{
+          'tab-selected': activeTab === 'profile',
+          'tab-animating': animatingTab === 'profile',
+        }"
+        @click="handleTabClick('profile')"
+      >
+        <div class="tab-icon-container">
+          <IonIcon :icon="personOutline" />
+        </div>
         <IonLabel>Profile</IonLabel>
+        <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
     </IonTabBar>
   </IonTabs>
@@ -53,34 +117,82 @@ const isDesktop = computed(() => width.value >= 768);
 @use '@/theme/variables.scss' as *;
 
 .floating-tabs {
-  --background-color: var(--ion-color-medium-tint);
-  padding: 5px;
+  --background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  height: 60px;
+  margin: 0 10px 10px;
+  padding-top: 3px;
 }
 
 ion-tab-button {
   position: relative;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: visible;
+  margin: 0 4px;
+  --color: var(--ion-color-medium);
+  --color-selected: var(--ion-color-primary);
+
+  .tab-icon-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  ion-icon {
+    font-size: 20px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+  }
+
+  ion-label {
+    font-size: 11px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 400;
+  }
+
+  &.tab-selected {
+    .tab-icon-container {
+      background-color: var(--ion-color-primary-tint);
+    }
+
+    ion-icon {
+      color: var(--ion-color-light);
+      transform: translateY(-2px);
+    }
+
+    ion-label {
+      color: var(--ion-color-primary);
+      font-weight: 600;
+      transform: translateY(-1px);
+    }
+  }
+
+  &.tab-animating {
+    ion-icon {
+      animation: pulse 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  }
 }
 
-ion-tab-button ion-icon {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: var(--ion-color-medium);
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
-ion-tab-button ion-label {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 12px;
-  margin-top: 4px;
-  color: var(--ion-color-medium);
-}
-
-// ion-tab-button.tab-selected {
-// }
-
-ion-tab-button.tab-selected ion-label,
-ion-tab-button.tab-selected ion-icon {
+ion-ripple-effect {
   color: var(--ion-color-primary);
-  font-weight: 600;
 }
 </style>

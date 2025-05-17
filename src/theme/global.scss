@@ -23,7 +23,6 @@ ion-page {
 
 ion-input {
   background-color: #e8ecf4;
-  border-radius: 10px;
   --padding-start: 12px !important;
   --padding-end: 12px !important;
 }
@@ -45,7 +44,6 @@ ion-item::part(native) {
 ion-button {
   padding: 0 !important;
   margin: 0;
-  --border-radius: 10px;
   text-align: center;
   transition: background-color 0.3s ease;
 }
