@@ -69,7 +69,9 @@ const handleGoogleLogin = () => {
       <div class="page-container slide-in">
         <div class="login-container">
           <div class="logo-container">
-            <div class="logo"></div>
+            <div class="logo">
+              <img src="../../assets/favicon.webp" alt="logo" />
+            </div>
           </div>
 
           <h1
@@ -191,6 +193,17 @@ ion-content::part(background) {
   height: 64px;
   background-color: var(--ion-color-primary);
   margin: 0 auto;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 60%;
+    height: 60%;
+    object-fit: cover;
+  }
 }
 
 .title {
