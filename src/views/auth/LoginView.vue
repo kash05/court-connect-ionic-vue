@@ -175,11 +175,11 @@ ion-content::part(background) {
 .login-container {
   display: flex;
   flex-direction: column;
-  max-width: 340px;
+  max-width: 500px;
   width: 100%;
   background-color: var(--bg-card, #ffffff);
   box-shadow: var(--shadow-md, 0 4px 20px rgba(0, 0, 0, 0.06));
-  padding: 32px 24px;
+  padding: 20px 24px;
   margin: 16px;
 }
 

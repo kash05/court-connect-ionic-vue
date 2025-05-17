@@ -15,10 +15,8 @@ import {
   IonPage,
   IonText,
   IonRadio,
-  IonRadioGroup,
   IonLabel,
-  IonList,
-  IonListHeader,
+  IonRadioGroup,
 } from '@ionic/vue';
 import { logoGoogle } from 'ionicons/icons';
 import { ref } from 'vue';
@@ -213,23 +211,18 @@ const handleGoogleRegistration = () => {
               <ErrorMessage name="confirmPassword" />
             </ion-text>
 
-            <ion-list class="form-item">
-              <ion-radio-group v-model="gender">
-                <ion-list-header>
-                  <ion-label>Gender</ion-label>
-                </ion-list-header>
-
-                <ion-item>
-                  <ion-label>Male</ion-label>
-                  <ion-radio value="male"></ion-radio>
-                </ion-item>
-
-                <ion-item>
-                  <ion-label>Female</ion-label>
-                  <ion-radio slot="end" value="female"></ion-radio>
-                </ion-item>
-              </ion-radio-group>
-            </ion-list>
+            <ion-radio-group
+              v-model="gender"
+              class="flex flex-col space-y-1 my-4"
+            >
+              <ion-label class="text-md">Select Your Gender</ion-label>
+              <ion-radio value="male" aria-label="none" class="text-sm"
+                >Male</ion-radio
+              >
+              <ion-radio value="female" aria-label="none" class="text-sm"
+                >Female</ion-radio
+              >
+            </ion-radio-group>
 
             <ion-text color="danger" class="error-text" v-if="errors.gender">
               <ErrorMessage name="gender" />
@@ -285,11 +278,11 @@ ion-content::part(background) {
 .registration-container {
   display: flex;
   flex-direction: column;
-  max-width: 340px;
+  max-width: 500px;
   width: 100%;
   background-color: var(--bg-card, #ffffff);
   box-shadow: var(--shadow-md, 0 4px 20px rgba(0, 0, 0, 0.06));
-  padding: 32px 24px;
+  padding: 20px 24px;
   margin: 16px;
 }
 
@@ -380,6 +373,24 @@ ion-content::part(background) {
   --border-color: var(--ion-color-danger);
   --border-width: 1px;
   --border-style: solid;
+}
+
+ion-radio {
+  --border-radius: 4px;
+  --inner-border-radius: 4px;
+  --color-checked: var(--ion-color-primary);
+}
+
+ion-radio.ios::part(container) {
+  width: 20px;
+  height: 20px;
+
+  border: 2px solid var(--ion-color-medium-tint);
+  border-radius: 4px;
+}
+
+.radio-checked.ios::part(container) {
+  border-color: var(--ion-color-primary);
 }
 
 .error-text {
