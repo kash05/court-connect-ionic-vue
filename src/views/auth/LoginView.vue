@@ -3,13 +3,13 @@ import { login } from '@/services/authService';
 import { loadingService } from '@/services/loadingService';
 import { toastService } from '@/services/toastService';
 import {
-	IonButton,
-	IonContent,
-	IonPage,
-	IonInput,
-	IonItem,
-	IonIcon,
-	IonText,
+  IonButton,
+  IonContent,
+  IonPage,
+  IonInput,
+  IonItem,
+  IonIcon,
+  IonText,
 } from '@ionic/vue';
 import { toTypedSchema } from '@vee-validate/zod';
 import { ErrorMessage, useField, useForm } from 'vee-validate';
@@ -158,12 +158,16 @@ const handleGoogleLogin = () => {
 </template>
 
 <style scoped lang="scss">
+ion-content::part(background) {
+  background-image: url('@/assets/auth/bg.webp');
+  background-size: cover;
+  background-position: center;
+}
 .page-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100%;
-  background-color: var(--bg-light, var(--ion-color-light));
 }
 
 .login-container {

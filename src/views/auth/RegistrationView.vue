@@ -268,12 +268,16 @@ const handleGoogleRegistration = () => {
 </template>
 
 <style scoped lang="scss">
+ion-content::part(background) {
+  background-image: url('@/assets/auth/bg.webp');
+  background-size: cover;
+  background-position: center;
+}
 .page-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100%;
-  background-color: var(--bg-light, var(--ion-color-light));
 }
 
 .registration-container {
