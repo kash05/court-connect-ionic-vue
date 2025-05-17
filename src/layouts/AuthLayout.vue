@@ -1,15 +1,11 @@
 <script setup lang="ts">
-import { IonPage, IonContent } from '@ionic/vue';
+import { IonPage, IonContent, IonRouterOutlet } from '@ionic/vue';
 </script>
 
 <template>
   <IonPage>
     <IonContent>
-      <router-view v-slot="{ Component }">
-        <transition name="fade" mode="out-in">
-          <component :is="Component" />
-        </transition>
-      </router-view>
+      <IonRouterOutlet />
     </IonContent>
   </IonPage>
 </template>
