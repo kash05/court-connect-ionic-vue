@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { IonPage, IonContent } from '@ionic/vue';
 import PageHeaderComponent from '@/components/PageHeaderComponent.vue';
+import PageTabBarComponent from '@/components/PageTabBarComponent.vue';
 </script>
 
 <template>
@@ -12,6 +13,7 @@ import PageHeaderComponent from '@/components/PageHeaderComponent.vue';
         <p>Events view content will go here.</p>
       </div>
     </IonContent>
+    <PageTabBarComponent />
   </IonPage>
 </template>
 

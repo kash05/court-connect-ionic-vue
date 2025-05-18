@@ -26,16 +26,13 @@ const handleLogout = () => {
     <div class="profile-header">
       <div class="profile-info">
         <div class="profile-avatar">
-          <img src="@/assets/icon.webp" alt="Profile" class="avatar-image" />
+          <img src="@/assets/appIcon.webp" alt="Profile" class="avatar-image" />
         </div>
         <div class="profile-details">
           <h4 class="profile-name">John Smith</h4>
           <p class="profile-email">john.smith@example.com</p>
         </div>
       </div>
-      <button class="view-profile-btn" @click="navigateTo('/profile')">
-        View Profile
-      </button>
     </div>
 
     <div class="menu-items">
@@ -91,17 +88,19 @@ const handleLogout = () => {
   position: absolute;
   top: 50px;
   right: 0;
-  width: 280px;
+  width: fit-content !important;
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   z-index: 100;
-  overflow: hidden;
 }
 
 .profile-header {
-  padding: 16px;
-  background: #f9f9f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f1f1f1;
 }
 
 .profile-info {
