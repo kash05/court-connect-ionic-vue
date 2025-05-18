@@ -10,7 +10,7 @@ import {
 } from '@ionic/vue';
 import { notificationsOutline, chevronBackOutline } from 'ionicons/icons';
 import { onClickOutside } from '@vueuse/core';
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ProfilePopoverComponent from '@/components/ProfilePopoverComponent.vue';
 import { UserRole } from '@/types/enums/UserEnum';
@@ -80,6 +80,14 @@ const onToggleClick = async () => {
   await alert.present();
 };
 
+watch(
+  () => route.fullPath,
+  () => {
+    showProfileMenu.value = false;
+    showNotifications.value = false;
+  },
+);
+
 onClickOutside(profileMenuRef, () => {
   showProfileMenu.value = false;
 });
@@ -113,6 +121,35 @@ const notifications = ref([
   { id: 2, text: 'Game scheduled tomorrow', time: '1h ago' },
   { id: 3, text: 'Payment receipt', time: '5h ago' },
 ]);
+
+const notificationsPosition = ref({ top: 30, right: 10 });
+const profilePosition = ref({ top: 30, right: 10 });
+
+const toggleNotifications = () => {
+  const button = (
+    notificationsRef.value as unknown as HTMLElement
+  )?.getBoundingClientRect();
+  if (button) {
+    notificationsPosition.value = {
+      top: button.bottom + window.scrollY,
+      right: window.innerWidth - button.right + 16,
+    };
+  }
+  showNotifications.value = !showNotifications.value;
+};
+
+const toggleProfileMenu = () => {
+  const button = (
+    profileMenuRef.value as unknown as HTMLElement
+  )?.getBoundingClientRect();
+  if (button) {
+    profilePosition.value = {
+      top: button.bottom + window.scrollY,
+      right: window.innerWidth - button.right + 16,
+    };
+  }
+  showProfileMenu.value = !showProfileMenu.value;
+};
 </script>
 
 <template>
@@ -155,52 +192,54 @@ const notifications = ref([
           </div>
 
           <div class="relative" v-if="showNotificationsIcon">
-            <IonButton
-              class="notification-btn"
-              @click="showNotifications = !showNotifications"
-            >
+            <IonButton class="notification-btn" @click="toggleNotifications">
               <div class="notification-container">
                 <IonIcon
                   :icon="notificationsOutline"
                   class="notification-icon"
                 />
                 <ion-badge color="danger" class="notification-badge">
-                  {{ notifications.length }}
+                  {{ notifications.length > 99 ? '99+' : notifications.length }}
                 </ion-badge>
               </div>
             </IonButton>
 
-            <div
-              v-if="showNotifications"
-              class="notifications-menu"
-              ref="notificationsRef"
-            >
-              <div class="notifications-header">
-                <h3>Notifications</h3>
-                <IonButton fill="clear" size="small">Mark all read</IonButton>
-              </div>
-              <div class="notifications-list">
-                <div
-                  v-for="notification in notifications"
-                  :key="notification.id"
-                  class="notification-item"
-                >
-                  <div class="notification-content">
-                    <p class="notification-text">{{ notification.text }}</p>
-                    <span class="notification-time">{{
-                      notification.time
-                    }}</span>
+            <teleport to="body">
+              <div
+                v-if="showNotifications"
+                class="notifications-menu"
+                ref="notificationsRef"
+                :style="{
+                  top: `${notificationsPosition.top}px`,
+                  right: `${notificationsPosition.right}px`,
+                  position: 'absolute',
+                  zIndex: 1000,
+                }"
+              >
+                <div class="notifications-header">
+                  <h3>Notifications</h3>
+                  <IonButton fill="clear" size="small">Mark all read</IonButton>
+                </div>
+                <div class="notifications-list">
+                  <div
+                    v-for="notification in notifications"
+                    :key="notification.id"
+                    class="notification-item"
+                  >
+                    <div class="notification-content">
+                      <p class="notification-text">{{ notification.text }}</p>
+                      <span class="notification-time">{{
+                        notification.time
+                      }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </teleport>
           </div>
 
           <div v-if="showProfilePopover" class="relative">
-            <IonButton
-              class="profile-btn"
-              @click="showProfileMenu = !showProfileMenu"
-            >
+            <IonButton class="profile-btn" @click="toggleProfileMenu">
               <div class="profile-container">
                 <img
                   src="@/assets/appIcon.webp"
@@ -210,10 +249,18 @@ const notifications = ref([
               </div>
             </IonButton>
 
-            <ProfilePopoverComponent
-              v-if="showProfileMenu"
-              ref="profileMenuRef"
-            />
+            <teleport to="body">
+              <ProfilePopoverComponent
+                v-if="showProfileMenu"
+                ref="profileMenuRef"
+                :style="{
+                  top: `${profilePosition.top}px`,
+                  right: `${profilePosition.right}px`,
+                  position: 'absolute',
+                  zIndex: 1000,
+                }"
+              />
+            </teleport>
           </div>
         </div>
       </div>
@@ -331,6 +378,7 @@ ion-toggle.toggle-checked::part(track) {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 .notifications-menu {
@@ -383,6 +431,9 @@ ion-toggle.toggle-checked::part(track) {
     margin: 0 0 4px;
     font-size: 14px;
     color: var(--ion-color-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .notification-time {

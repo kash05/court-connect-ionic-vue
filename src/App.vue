@@ -5,7 +5,6 @@ import { toastService } from './services/toastService';
 import { initializeApp } from './services/appInitializationService';
 import { loadingService } from './services/loadingService';
 import { SplashScreen } from '@capacitor/splash-screen';
-import PageTabBarComponent from '@/components/PageTabBarComponent.vue';
 
 onMounted(async () => {
   SplashScreen.hide();
@@ -25,7 +24,6 @@ onMounted(async () => {
 <template>
   <IonApp mode="ios">
     <IonRouterOutlet />
-    <PageTabBarComponent />
   </IonApp>
 </template>
 

@@ -8,6 +8,7 @@ import {
 } from '@ionic/vue';
 import { ref } from 'vue';
 import PageHeaderComponent from '@/components/PageHeaderComponent.vue';
+import PageTabBarComponent from '@/components/PageTabBarComponent.vue';
 
 // const authStore = useAuthStore();
 const selectedTab = ref('live');
@@ -296,6 +297,7 @@ function formatDate(dateString: string) {
         </div>
       </div>
     </IonContent>
+    <PageTabBarComponent />
   </IonPage>
 </template>
 

@@ -49,74 +49,74 @@ const router = createRouter({
   routes,
 });
 
-// router.beforeEach(async (to, _from, next) => {
-//   const authStore = useAuthStore();
-//   await initializeAuthStore(authStore);
+router.beforeEach(async (to, _from, next) => {
+  const authStore = useAuthStore();
+  await initializeAuthStore(authStore);
 
-//   const { requiresAuth, requiresGuest, requiresRole } =
-//     getRouteRequirements(to);
+  const { requiresAuth, requiresGuest, requiresRole } =
+    getRouteRequirements(to);
 
-//   if (shouldRedirectToLogin(requiresAuth, authStore.isAuthenticated())) {
-//     return next({ name: 'Login', query: { redirect: to.fullPath } });
-//   }
+  if (shouldRedirectToLogin(requiresAuth, authStore.isAuthenticated())) {
+    return next({ name: 'Login', query: { redirect: to.fullPath } });
+  }
 
-//   if (shouldRedirectToDashboard(requiresGuest, authStore.isAuthenticated())) {
-//     return next('/login');
-//   }
+  if (shouldRedirectToDashboard(requiresGuest, authStore.isAuthenticated())) {
+    return next('/login');
+  }
 
-//   if (hasRoleMismatch(requiresRole, to.meta.role, authStore)) {
-//     return next('/dashboard');
-//   }
+  if (hasRoleMismatch(requiresRole, to.meta.role, authStore)) {
+    return next('/dashboard');
+  }
 
-//   next();
-// });
+  next();
+});
 
-// async function initializeAuthStore(authStore: any) {
-//   if (!authStore.isInitialized) {
-//     await authStore.initializeAuth().catch((error: any) => {
-//       console.error('Auth initialization failed:', error);
-//     });
-//   }
-// }
+async function initializeAuthStore(authStore: any) {
+  if (!authStore.isInitialized) {
+    await authStore.initializeAuth().catch((error: any) => {
+      console.error('Auth initialization failed:', error);
+    });
+  }
+}
 
-// function getRouteRequirements(to: any) {
-//   return {
-//     requiresAuth: to.matched.some(
-//       (record: { meta: { requiresAuth: any } }) => record.meta.requiresAuth,
-//     ),
-//     requiresGuest: to.matched.some(
-//       (record: { meta: { requiresGuest: any } }) => record.meta.requiresGuest,
-//     ),
-//     requiresRole: to.matched.some(
-//       (record: { meta: { role: any } }) => record.meta.role,
-//     ),
-//   };
-// }
+function getRouteRequirements(to: any) {
+  return {
+    requiresAuth: to.matched.some(
+      (record: { meta: { requiresAuth: any } }) => record.meta.requiresAuth,
+    ),
+    requiresGuest: to.matched.some(
+      (record: { meta: { requiresGuest: any } }) => record.meta.requiresGuest,
+    ),
+    requiresRole: to.matched.some(
+      (record: { meta: { role: any } }) => record.meta.role,
+    ),
+  };
+}
 
-// function shouldRedirectToLogin(
-//   requiresAuth: boolean,
-//   isAuthenticated: boolean,
-// ) {
-//   return requiresAuth && !isAuthenticated;
-// }
+function shouldRedirectToLogin(
+  requiresAuth: boolean,
+  isAuthenticated: boolean,
+) {
+  return requiresAuth && !isAuthenticated;
+}
 
-// function shouldRedirectToDashboard(
-//   requiresGuest: boolean,
-//   isAuthenticated: boolean,
-// ) {
-//   return requiresGuest && isAuthenticated;
-// }
+function shouldRedirectToDashboard(
+  requiresGuest: boolean,
+  isAuthenticated: boolean,
+) {
+  return requiresGuest && isAuthenticated;
+}
 
-// function hasRoleMismatch(
-//   requiresRole: boolean,
-//   requiredRole: any,
-//   authStore: any,
-// ) {
-//   return (
-//     requiresRole &&
-//     authStore.isAuthenticated &&
-//     authStore.user?.role !== requiredRole
-//   );
-// }
+function hasRoleMismatch(
+  requiresRole: boolean,
+  requiredRole: any,
+  authStore: any,
+) {
+  return (
+    requiresRole &&
+    authStore.isAuthenticated &&
+    authStore.user?.role !== requiredRole
+  );
+}
 
 export default router;

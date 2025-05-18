@@ -6,6 +6,7 @@ import { useForm } from 'vee-validate';
 import { z } from 'zod';
 import PageHeaderComponent from '@/components/PageHeaderComponent.vue';
 import { toTypedSchema } from '@vee-validate/zod';
+import PageTabBarComponent from '@/components/PageTabBarComponent.vue';
 
 const authStore = useAuthStore();
 
@@ -426,6 +427,7 @@ const toggleEditMode = () => {
         </div>
       </div>
     </IonContent>
+		<PageTabBarComponent />
   </IonPage>
 </template>
 
