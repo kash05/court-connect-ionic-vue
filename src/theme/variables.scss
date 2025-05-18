@@ -15,7 +15,6 @@ $MobileSelectors: '.plt-capacitor, .plt-mobile';
   --light-color: #f5f7fa; /* Light gray for backgrounds */
   --dark-color: #263238; /* Dark blue-gray for primary text */
   --contrast-color: #ffffff; /* White for contrast text */
-  --orange-color: #ff5f15; /* Orange for some touched like toggle in header */
 
   /* Subtle Background Colors */
   --bg-light: #f5f7fa; /* Light background */
@@ -26,10 +25,6 @@ $MobileSelectors: '.plt-capacitor, .plt-mobile';
   --text-primary: #263238; /* Primary text */
   --text-secondary: #546e7a; /* Secondary text */
   --text-muted: #78909c; /* Muted text */
-
-  /* Border & Divider Colors */
-  --border-color: #e0e0e0; /* Standard border */
-  --divider-color: #eeeeee; /* Divider color */
 
   /* Shadow */
   --shadow-color: rgba(0, 0, 0, 0.06);
@@ -87,8 +82,6 @@ $MobileSelectors: '.plt-capacitor, .plt-mobile';
   --ion-color-dark-shade: #1e272c;
   --ion-color-dark-tint: #455a64;
 
-  --ion-color-orange: var(--orange-color);
-
   /* Background and text */
   --ion-background-color: var(--bg-light);
   --ion-text-color: var(--text-primary);
@@ -97,6 +90,43 @@ $MobileSelectors: '.plt-capacitor, .plt-mobile';
   --ion-item-background: var(--bg-card);
 
   /* Font settings */
+  --ion-font-family:
+    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+:root.dark {
+  --primary-color: #90caf9; /* Light blue */
+  --secondary-color: #80deea; /* Cyan */
+  --tertiary-color: #9fa8da; /* Light indigo */
+  --success-color: #81c784; /* Light green */
+  --warning-color: #ffe082; /* Light amber */
+  --danger-color: #ef9a9a; /* Light red */
+  --medium-color: #b0bec5; /* Light gray */
+  --light-color: #121212; /* Dark background */
+  --dark-color: #eceff1; /* Light text */
+  --contrast-color: #000000; /* Dark for contrast text */
+
+  /* Backgrounds */
+  --bg-light: #121212;
+  --bg-card: #1e1e1e;
+  --bg-input: rgba(255, 255, 255, 0.05);
+
+  /* Text */
+  --text-primary: #eceff1;
+  --text-secondary: #b0bec5;
+  --text-muted: #90a4ae;
+
+  /* Borders */
+  --border-color: #37474f;
+  --divider-color: #263238;
+
+  /* Shadows (lighten a bit in dark mode) */
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 8px var(--shadow-color);
+  --shadow-md: 0 4px 16px var(--shadow-color);
+
+  /* Font and layout settings remain the same */
   --ion-font-family:
     'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;

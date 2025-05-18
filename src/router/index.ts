@@ -37,6 +37,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Events',
     component: () => import('../views/EventsView.vue'),
   },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: () => import('../views/SettingsView.vue'),
+  },
 
   {
     path: '/:pathMatch(.*)*',

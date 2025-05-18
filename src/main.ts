@@ -21,6 +21,8 @@ import '@/theme/global.scss';
 // Variables CSS
 import '@/theme/variables.scss';
 
+import '@ionic/vue/css/ionic.bundle.css';
+
 import App from './App.vue';
 
 const pinia = createPinia();

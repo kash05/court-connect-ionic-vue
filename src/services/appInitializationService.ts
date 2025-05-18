@@ -3,8 +3,8 @@ import { useAuthStore } from '@/stores/useAuthStore';
 /**
  * Service responsible for initializing the application.
  */
-export const initializeApp = () => {
-  authenticateUser();
+export const initializeApp = async () => {
+  await authenticateUser();
 };
 
 async function authenticateUser() {

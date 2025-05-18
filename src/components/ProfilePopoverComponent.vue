@@ -40,35 +40,35 @@ const handleLogout = () => {
         <div class="menu-icon">
           <IonIcon :icon="personOutline" />
         </div>
-        <span>My Profile</span>
+        <span class="menu-text">My Profile</span>
       </div>
 
       <div class="menu-item" @click="navigateTo('/payments')">
         <div class="menu-icon">
           <IonIcon :icon="cardOutline" />
         </div>
-        <span>Payments</span>
+        <span class="menu-text">Payments</span>
       </div>
 
       <div class="menu-item" @click="navigateTo('/settings')">
         <div class="menu-icon">
           <IonIcon :icon="settingsOutline" />
         </div>
-        <span>Settings</span>
+        <span class="menu-text">Settings</span>
       </div>
 
       <div class="menu-item" @click="navigateTo('/security')">
         <div class="menu-icon">
           <IonIcon :icon="lockClosedOutline" />
         </div>
-        <span>Security</span>
+        <span class="menu-text">Security</span>
       </div>
 
       <div class="menu-item" @click="navigateTo('/help')">
         <div class="menu-icon">
           <IonIcon :icon="helpCircleOutline" />
         </div>
-        <span>Help & Support</span>
+        <span class="menu-text">Help & Support</span>
       </div>
 
       <div class="menu-divider"></div>
@@ -89,7 +89,7 @@ const handleLogout = () => {
   top: 50px;
   right: 0;
   width: fit-content !important;
-  background: white;
+  background: var(--ion-color-light);
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   z-index: 100;
@@ -115,7 +115,7 @@ const handleLogout = () => {
   border-radius: 24px;
   overflow: hidden;
   margin-right: 12px;
-  border: 2px solid white;
+  border: 2px solid var(--ion-color-light);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -170,7 +170,7 @@ const handleLogout = () => {
   transition: background 0.2s;
 
   &:hover {
-    background: #f5f5f5;
+    background: var(--ion-color-medium);
   }
 }
 
@@ -184,9 +184,15 @@ const handleLogout = () => {
   color: var(--ion-color-medium);
 }
 
+.menu-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ion-color-dark);
+}
+
 .menu-divider {
   height: 1px;
-  background: #f1f1f1;
+  background: var(--ion-color-medium);
   margin: 8px 0;
 }
 

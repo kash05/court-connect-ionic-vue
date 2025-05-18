@@ -1,0 +1,51 @@
+:root.dark {
+  ion-alert {
+    --background: var(--bg-card);
+    --color: var(--text-primary);
+
+    .alert-title,
+    .alert-sub-title {
+      color: var(--text-primary);
+    }
+
+    .alert-message {
+      color: var(--text-secondary);
+    }
+
+    .alert-button {
+      color: var(--primary-color);
+    }
+
+    .alert-button.alert-button-cancel {
+      color: var(--medium-color);
+    }
+
+    .alert-input {
+      background: var(--bg-input);
+      color: var(--text-primary);
+    }
+  }
+
+  ion-loading {
+    --background: var(--bg-card);
+    --spinner-color: var(--primary-color);
+    --color: var(--text-primary);
+  }
+
+  ion-toast {
+    --background: var(--bg-card);
+    --color: var(--text-primary);
+    --button-color: var(--primary-color);
+  }
+
+  ion-action-sheet {
+    --background: var(--bg-card);
+    --button-color: var(--text-primary);
+    --button-color-selected: var(--primary-color);
+  }
+
+  ion-modal {
+    --background: var(--bg-card);
+    --color: var(--text-primary);
+  }
+}

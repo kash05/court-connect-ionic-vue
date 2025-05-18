@@ -386,7 +386,7 @@ ion-toggle.toggle-checked::part(track) {
   top: 50px;
   right: 0;
   width: 300px;
-  background: white;
+  background: var(--ion-color-light);
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   z-index: 100;
@@ -397,12 +397,13 @@ ion-toggle.toggle-checked::part(track) {
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  border-bottom: 1px solid #f1f1f1;
+  border-bottom: 1px solid var(--ion-color-medium);
 
   h3 {
     margin: 0;
     font-size: 16px;
     font-weight: 600;
+    color: var(--ion-color-dark);
   }
 }
 
@@ -413,12 +414,12 @@ ion-toggle.toggle-checked::part(track) {
 
 .notification-item {
   padding: 12px 16px;
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: 1px solid var(--ion-color-medium);
   cursor: pointer;
   transition: background 0.2s;
 
   &:hover {
-    background: #f9f9f9;
+    background: var(--ion-color-medium);
   }
 
   &:last-child {

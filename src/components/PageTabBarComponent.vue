@@ -32,7 +32,7 @@ const activeTab = computed(() => {
   if (path.includes('/teams')) return 'teams';
   if (path.includes('/events')) return 'events';
   if (path.includes('/profile')) return 'profile';
-  return 'home';
+  return '';
 });
 
 const animatingTab = ref('');

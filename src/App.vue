@@ -5,17 +5,22 @@ import { toastService } from './services/toastService';
 import { initializeApp } from './services/appInitializationService';
 import { loadingService } from './services/loadingService';
 import { SplashScreen } from '@capacitor/splash-screen';
+import { themeService } from '@/services/themeService';
 
 onMounted(async () => {
-  SplashScreen.hide();
+  SplashScreen.show();
+  await themeService.initialize();
+
   loadingService.withLoading(async () => {
     try {
-      initializeApp();
+      await initializeApp();
     } catch (err) {
       console.error('App failed to initialize', err);
       toastService.dangerMessage(
         'Failed to initialize the app. Please try again.',
       );
+    } finally {
+      SplashScreen.hide();
     }
   }, 'Please wait...');
 });
@@ -26,11 +31,3 @@ onMounted(async () => {
     <IonRouterOutlet />
   </IonApp>
 </template>
-
-<style scoped lang="scss">
-ion-tab-bar {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-}
-</style>
