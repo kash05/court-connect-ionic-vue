@@ -5,8 +5,10 @@ import { toastService } from './services/toastService';
 import { initializeApp } from './services/appInitializationService';
 import { loadingService } from './services/loadingService';
 import SideMenu from './components/layout/SideMenu.vue';
+import { SplashScreen } from '@capacitor/splash-screen';
 
 onMounted(async () => {
+  SplashScreen.hide();
   loadingService.withLoading(async () => {
     try {
       initializeApp();
