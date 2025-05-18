@@ -112,7 +112,7 @@ const handleGoogleRegistration = () => {
         <div class="registration-container">
           <div class="logo-container">
             <div class="logo">
-              <img src="../../assets/smallLogoWhite.webp" alt="logo" />
+              <img src="../../assets/appIcon.webp" alt="logo" />
             </div>
           </div>
 

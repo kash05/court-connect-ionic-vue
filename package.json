@@ -1,5 +1,5 @@
 {
-  "name": "sports-app",
+  "name": "courtconnect",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -14,7 +14,9 @@
     "copy": "npx cap copy",
     "sync": "npx cap sync",
     "open:ios": "npx cap open ios",
-    "open:android": "npx cap open android"
+    "open:android": "npx cap open android",
+    "res:android": "cordova-res android --skip-config --copy",
+    "res:ios": "cordova-res ios --skip-config --copy"
   },
   "dependencies": {
     "@capacitor/android": "^7.2.0",

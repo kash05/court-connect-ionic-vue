@@ -70,7 +70,7 @@ const handleGoogleLogin = () => {
         <div class="login-container">
           <div class="logo-container">
             <div class="logo">
-              <img src="../../assets/smallLogoWhite.webp" alt="logo" />
+              <img src="../../assets/appIcon.webp" alt="logo" />
             </div>
           </div>
 
