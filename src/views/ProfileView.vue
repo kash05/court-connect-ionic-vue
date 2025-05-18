@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { ref, computed } from 'vue';
 import { useForm } from 'vee-validate';
 import { z } from 'zod';
+import PageHeaderComponent from '@/components/PageHeaderComponent.vue';
 import { toTypedSchema } from '@vee-validate/zod';
 
 const authStore = useAuthStore();
@@ -89,6 +90,7 @@ const toggleEditMode = () => {
 
 <template>
   <IonPage>
+    <PageHeaderComponent />
     <IonContent>
       <div class="page-container">
         <div class="profile-header">

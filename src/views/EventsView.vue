@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { IonPage, IonContent } from '@ionic/vue';
+import PageHeaderComponent from '@/components/PageHeaderComponent.vue';
 </script>
 
 <template>
   <IonPage>
+    <PageHeaderComponent />
     <IonContent>
       <div class="page-container">
         <h1 class="page-title">Events</h1>
