@@ -7,6 +7,7 @@ import {
   IonLabel,
 } from '@ionic/vue';
 import { ref } from 'vue';
+import PageHeaderComponent from '@/components/PageHeaderComponent.vue';
 
 // const authStore = useAuthStore();
 const selectedTab = ref('live');
@@ -110,6 +111,7 @@ function formatDate(dateString: string) {
 
 <template>
   <IonPage>
+    <PageHeaderComponent />
     <IonContent>
       <div class="page-container">
         <!-- Header Section -->
@@ -299,7 +301,7 @@ function formatDate(dateString: string) {
 
 <style scoped>
 .page-container {
-  @apply p-6;
+  padding: 20px;
 }
 
 ion-segment {

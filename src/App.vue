@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { IonApp } from '@ionic/vue';
+import { IonApp, IonRouterOutlet } from '@ionic/vue';
 import { onMounted } from 'vue';
 import { toastService } from './services/toastService';
 import { initializeApp } from './services/appInitializationService';
 import { loadingService } from './services/loadingService';
-import SideMenu from './components/layout/SideMenu.vue';
 import { SplashScreen } from '@capacitor/splash-screen';
+import PageTabBarComponent from '@/components/PageTabBarComponent.vue';
 
 onMounted(async () => {
   SplashScreen.hide();
@@ -24,6 +24,15 @@ onMounted(async () => {
 
 <template>
   <IonApp mode="ios">
-    <SideMenu />
+    <IonRouterOutlet />
+    <PageTabBarComponent />
   </IonApp>
 </template>
+
+<style scoped lang="scss">
+ion-tab-bar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+</style>
