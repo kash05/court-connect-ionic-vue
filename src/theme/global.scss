@@ -23,31 +23,8 @@ ion-page {
   --padding-start: 20px;
 }
 
-ion-input {
-  background-color: var(--ion-color-light);
-  --padding-start: 12px !important;
-  --padding-end: 12px !important;
-}
-
-ion-label {
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
-}
-
-ion-item {
-  --border-color: transparent;
-}
-
 ion-item::part(native) {
   background-color: inherit;
-}
-
-ion-button {
-  padding: 0 !important;
-  margin: 0;
-  text-align: center;
-  transition: background-color 0.3s ease;
 }
 
 //****Animations****/

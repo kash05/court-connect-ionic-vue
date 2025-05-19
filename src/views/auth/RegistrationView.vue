@@ -17,6 +17,7 @@ import {
   IonRadio,
   IonLabel,
   IonRadioGroup,
+  IonInputPasswordToggle,
 } from '@ionic/vue';
 import { logoGoogle } from 'ionicons/icons';
 import { ref } from 'vue';
@@ -186,6 +187,9 @@ const handleGoogleRegistration = () => {
                 placeholder="Password"
                 v-model="password"
                 class="ion-no-padding"
+                ><ion-input-password-toggle
+                  slot="end"
+                ></ion-input-password-toggle
               ></ion-input>
             </ion-item>
             <ion-text color="danger" class="error-text" v-if="errors.password">
@@ -201,6 +205,9 @@ const handleGoogleRegistration = () => {
                 placeholder="Confirm password"
                 v-model="confirmPassword"
                 class="ion-no-padding"
+                ><ion-input-password-toggle
+                  slot="end"
+                ></ion-input-password-toggle
               ></ion-input>
             </ion-item>
             <ion-text
@@ -216,12 +223,14 @@ const handleGoogleRegistration = () => {
               class="flex flex-col space-y-1 my-4"
             >
               <ion-label class="text-md">Select Your Gender</ion-label>
-              <ion-radio value="male" aria-label="none" class="text-sm"
-                >Male</ion-radio
-              >
-              <ion-radio value="female" aria-label="none" class="text-sm"
-                >Female</ion-radio
-              >
+              <div>
+                <ion-radio value="male" aria-label="none" class="text-sm"
+                  >Male</ion-radio
+                >
+                <ion-radio value="female" aria-label="none" class="text-sm"
+                  >Female</ion-radio
+                >
+              </div>
             </ion-radio-group>
 
             <ion-text color="danger" class="error-text" v-if="errors.gender">
@@ -280,7 +289,7 @@ ion-content::part(background) {
   flex-direction: column;
   max-width: 500px;
   width: 100%;
-  background-color: var(--bg-card, #ffffff);
+  background-color: var(--bg-card);
   box-shadow: var(--shadow-md, 0 4px 20px rgba(0, 0, 0, 0.06));
   padding: 20px 24px;
   margin: 16px;
@@ -318,8 +327,8 @@ ion-content::part(background) {
 }
 
 .google-btn {
-  --background: white;
-  --color: #333;
+  --background: var(--ion-color-primary);
+  color: var(--ion-color-light);
   --border-radius: var(--radius-md, 12px);
   --border-color: var(--border-color, #e0e0e0);
   --border-style: solid;
@@ -344,7 +353,7 @@ ion-content::part(background) {
 .divider::after {
   content: '';
   flex: 1;
-  border-bottom: 1px solid var(--divider-color, #e0e0e0);
+  border-bottom: 1px solid var(--divider-color);
 }
 
 .divider span {
@@ -359,17 +368,26 @@ ion-content::part(background) {
 
 .form-item {
   --border-radius: var(--radius-md, 12px);
-  --background: var(--bg-input, rgba(0, 0, 0, 0.03));
+  --background: var(--ion-color-light);
   --padding: 0;
   --inner-padding-end: 0;
   --border-color: transparent;
   --highlight-height: 0;
   margin-bottom: 4px;
   transition: all 0.2s ease;
+
+  ion-input {
+    background-color: var(--ion-color-light);
+    color: var(--ion-color-dark);
+    --padding-start: 12px !important;
+    --padding-end: 12px !important;
+  }
+  ion-input-password-toggle {
+    background-color: transparent;
+  }
 }
 
 .form-item.has-error {
-  --background: rgba(235, 68, 90, 0.05);
   --border-color: var(--ion-color-danger);
   --border-width: 1px;
   --border-style: solid;
@@ -379,17 +397,17 @@ ion-radio {
   --border-radius: 4px;
   --inner-border-radius: 4px;
   --color-checked: var(--ion-color-primary);
+  margin-right: 10px;
 }
 
-ion-radio.ios::part(container) {
+ion-radio::part(container) {
   width: 20px;
   height: 20px;
-
   border: 2px solid var(--ion-color-medium-tint);
   border-radius: 4px;
 }
 
-.radio-checked.ios::part(container) {
+.radio-checked::part(container) {
   border-color: var(--ion-color-primary);
 }
 
@@ -400,8 +418,25 @@ ion-radio.ios::part(container) {
   display: block;
 }
 
+ion-checkbox {
+  --border-radius: 4px;
+  --inner-border-radius: 4px;
+  --color-checked: var(--ion-color-primary);
+}
+
+ion-checkbox::part(container) {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--ion-color-medium-tint);
+  border-radius: 4px;
+}
+
+.checkbox-checked::part(container) {
+  border-color: var(--ion-color-primary);
+}
+
 .terms-link {
-  color: var(--primary-color);
+  color: var(--ion-color-primary);
   text-decoration: none;
   font-weight: 500;
 

@@ -1,42 +1,44 @@
-/* Ionic Variables and Theming. For more info, please see:
-http://ionicframework.com/docs/theming/ */
-
 $MobileSelectors: '.plt-capacitor, .plt-mobile';
 
-/** Ionic CSS Variables **/
+/* ======= Light Theme ======= */
 :root {
-  --primary-color: #1e88e5; /* Modern blue */
-  --secondary-color: #00acc1; /* Turquoise */
-  --tertiary-color: #3949ab; /* Deep blue */
-  --success-color: #43a047; /* Green  */
-  --warning-color: #ffb300; /* Amber  */
-  --danger-color: #e53935; /* Red  */
-  --medium-color: #757575; /* Gray  */
-  --light-color: #f5f7fa; /* Light gray for backgrounds */
-  --dark-color: #263238; /* Dark blue-gray for primary text */
-  --contrast-color: #ffffff; /* White for contrast text */
+  /* === Custom Colors === */
+  --primary-color: #1e88e5;
+  --secondary-color: #00acc1;
+  --tertiary-color: #3949ab;
+  --success-color: #43a047;
+  --warning-color: #ffb300;
+  --danger-color: #e53935;
+  --medium-color: #757575;
+  --light-color: #f5f7fa;
+  --dark-color: #263238;
+  --contrast-color: #ffffff;
 
-  /* Subtle Background Colors */
-  --bg-light: #f5f7fa; /* Light background */
-  --bg-card: #ffffff; /* Card background */
-  --bg-input: rgba(0, 0, 0, 0.03); /* Input background */
+  /* === Backgrounds === */
+  --bg-light: #f5f7fa;
+  --bg-card: #ffffff;
+  --bg-input: rgba(0, 0, 0, 0.03);
 
-  /* Text Colors */
-  --text-primary: #263238; /* Primary text */
-  --text-secondary: #546e7a; /* Secondary text */
-  --text-muted: #78909c; /* Muted text */
+  /* === Text Colors === */
+  --text-primary: #263238;
+  --text-secondary: #546e7a;
+  --text-muted: #78909c;
 
-  /* Shadow */
+  /* === Shadow === */
   --shadow-color: rgba(0, 0, 0, 0.06);
   --shadow-sm: 0 2px 8px var(--shadow-color);
   --shadow-md: 0 4px 16px var(--shadow-color);
 
-  /* Border Radius */
+  /* === Radius === */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 20px;
 
-  /* ===== Ionic Theming Aliases ===== */
+  /* === Ionic Theme Mapping === */
+  --ion-font-family:
+    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
   --ion-color-primary: var(--primary-color);
   --ion-color-primary-contrast: var(--contrast-color);
   --ion-color-primary-shade: #1976d2;
@@ -82,52 +84,95 @@ $MobileSelectors: '.plt-capacitor, .plt-mobile';
   --ion-color-dark-shade: #1e272c;
   --ion-color-dark-tint: #455a64;
 
-  /* Background and text */
   --ion-background-color: var(--bg-light);
   --ion-text-color: var(--text-primary);
-
-  /* Item styling */
   --ion-item-background: var(--bg-card);
-
-  /* Font settings */
-  --ion-font-family:
-    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
+/* ======= Dark Theme ======= */
 :root.dark {
-  --primary-color: #90caf9; /* Light blue */
-  --secondary-color: #80deea; /* Cyan */
-  --tertiary-color: #9fa8da; /* Light indigo */
-  --success-color: #81c784; /* Light green */
-  --warning-color: #ffe082; /* Light amber */
-  --danger-color: #ef9a9a; /* Light red */
-  --medium-color: #b0bec5; /* Light gray */
-  --light-color: #121212; /* Dark background */
-  --dark-color: #eceff1; /* Light text */
-  --contrast-color: #000000; /* Dark for contrast text */
+  /* === Custom Dark Colors === */
+  --primary-color: #90caf9;
+  --secondary-color: #80deea;
+  --tertiary-color: #9fa8da;
+  --success-color: #81c784;
+  --warning-color: #ffe082;
+  --danger-color: #ef9a9a;
+  --medium-color: #b0bec5;
+  --light-color: #121212;
+  --dark-color: #eceff1;
+  --contrast-color: #000000;
 
-  /* Backgrounds */
+  /* === Backgrounds === */
   --bg-light: #121212;
   --bg-card: #1e1e1e;
   --bg-input: rgba(255, 255, 255, 0.05);
 
-  /* Text */
+  /* === Text Colors === */
   --text-primary: #eceff1;
   --text-secondary: #b0bec5;
   --text-muted: #90a4ae;
 
-  /* Borders */
+  /* === Border/Divider === */
   --border-color: #37474f;
   --divider-color: #263238;
 
-  /* Shadows (lighten a bit in dark mode) */
+  /* === Shadow === */
   --shadow-color: rgba(0, 0, 0, 0.3);
   --shadow-sm: 0 2px 8px var(--shadow-color);
   --shadow-md: 0 4px 16px var(--shadow-color);
 
-  /* Font and layout settings remain the same */
+  /* === Ionic Dark Mapping === */
   --ion-font-family:
     'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+  --ion-color-primary: var(--primary-color);
+  --ion-color-primary-contrast: var(--contrast-color);
+  --ion-color-primary-shade: #64b5f6;
+  --ion-color-primary-tint: #a6d4fa;
+
+  --ion-color-secondary: var(--secondary-color);
+  --ion-color-secondary-contrast: var(--contrast-color);
+  --ion-color-secondary-shade: #4dd0e1;
+  --ion-color-secondary-tint: #b2ebf2;
+
+  --ion-color-tertiary: var(--tertiary-color);
+  --ion-color-tertiary-contrast: var(--contrast-color);
+  --ion-color-tertiary-shade: #7986cb;
+  --ion-color-tertiary-tint: #c5cae9;
+
+  --ion-color-success: var(--success-color);
+  --ion-color-success-contrast: var(--contrast-color);
+  --ion-color-success-shade: #66bb6a;
+  --ion-color-success-tint: #a5d6a7;
+
+  --ion-color-warning: var(--warning-color);
+  --ion-color-warning-contrast: var(--dark-color);
+  --ion-color-warning-shade: #ffca28;
+  --ion-color-warning-tint: #ffe57f;
+
+  --ion-color-danger: var(--danger-color);
+  --ion-color-danger-contrast: var(--contrast-color);
+  --ion-color-danger-shade: #e57373;
+  --ion-color-danger-tint: #ffcdd2;
+
+  --ion-color-medium: var(--medium-color);
+  --ion-color-medium-contrast: var(--contrast-color);
+  --ion-color-medium-shade: #90a4ae;
+  --ion-color-medium-tint: #cfd8dc;
+
+  --ion-color-light: var(--light-color);
+  --ion-color-light-contrast: var(--dark-color);
+  --ion-color-light-shade: #1e1e1e;
+  --ion-color-light-tint: #2e2e2e;
+
+  --ion-color-dark: var(--dark-color);
+  --ion-color-dark-contrast: var(--contrast-color);
+  --ion-color-dark-shade: #cfd8dc;
+  --ion-color-dark-tint: #eceff1;
+
+  --ion-background-color: var(--bg-light);
+  --ion-text-color: var(--text-primary);
+  --ion-item-background: var(--bg-card);
 }

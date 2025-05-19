@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { login } from '@/services/authService';
 import { loadingService } from '@/services/loadingService';
 import { toastService } from '@/services/toastService';
 import {
@@ -10,15 +9,19 @@ import {
   IonItem,
   IonIcon,
   IonText,
+  IonInputPasswordToggle,
 } from '@ionic/vue';
 import { toTypedSchema } from '@vee-validate/zod';
 import { ErrorMessage, useField, useForm } from 'vee-validate';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { z } from 'zod';
 import { logoGoogle } from 'ionicons/icons';
 import { ref } from 'vue';
+import { useAuthStore } from '@/stores/useAuthStore';
 
+const authStore = useAuthStore();
 const router = useRouter();
+const route = useRoute();
 const formError = ref('');
 
 const loginSchema = toTypedSchema(
@@ -40,9 +43,14 @@ const onSubmit = handleSubmit((values) => {
 
   loadingService.withLoading(
     () =>
-      login(values)
+      authStore
+        .login(values)
         .then(() => {
-          router.push('/dashboard');
+          const redirectPath = route.query.redirect
+            ? String(route.query.redirect)
+            : '/dashboard';
+
+          router.push(redirectPath);
         })
         .catch((error) => {
           formError.value =
@@ -130,6 +138,9 @@ const handleGoogleLogin = () => {
                 placeholder="Password"
                 v-model="password"
                 class="ion-no-padding"
+                ><ion-input-password-toggle
+                  slot="end"
+                ></ion-input-password-toggle
               ></ion-input>
             </ion-item>
             <ion-text color="danger" class="error-text" v-if="errors.password">
@@ -215,10 +226,9 @@ ion-content::part(background) {
 }
 
 .google-btn {
-  --background: white;
-  --color: #333;
+  --background: var(--ion-color-primary);
+  color: var(--ion-color-light);
   --border-radius: var(--radius-md, 12px);
-  --border-color: var(--border-color, #e0e0e0);
   --border-style: solid;
   --border-width: 1px;
   --box-shadow: none;
@@ -241,7 +251,7 @@ ion-content::part(background) {
 .divider::after {
   content: '';
   flex: 1;
-  border-bottom: 1px solid var(--divider-color, #e0e0e0);
+  border-bottom: 1px solid var(--divider-color);
 }
 
 .divider span {
@@ -256,17 +266,26 @@ ion-content::part(background) {
 
 .form-item {
   --border-radius: var(--radius-md, 12px);
-  --background: var(--bg-input, rgba(0, 0, 0, 0.03));
+  --background: var(--ion-color-light);
   --padding: 0;
   --inner-padding-end: 0;
   --border-color: transparent;
   --highlight-height: 0;
   margin-bottom: 4px;
   transition: all 0.2s ease;
+
+  ion-input {
+    --background: var(--ion-color-light) !important;
+    color: var(--ion-color-dark);
+    --padding-start: 12px !important;
+    --padding-end: 12px !important;
+  }
+  ion-input-password-toggle {
+    background-color: transparent;
+  }
 }
 
 .form-item.has-error {
-  --background: rgba(235, 68, 90, 0.05);
   --border-color: var(--ion-color-danger);
   --border-width: 1px;
   --border-style: solid;

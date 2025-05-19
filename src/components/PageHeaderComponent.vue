@@ -14,6 +14,9 @@ import { computed, ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ProfilePopoverComponent from '@/components/ProfilePopoverComponent.vue';
 import { UserRole } from '@/types/enums/UserEnum';
+import { useAuthStore } from '@/stores/useAuthStore';
+
+const { user } = useAuthStore();
 
 interface Props {
   title?: string;
@@ -242,10 +245,14 @@ const toggleProfileMenu = () => {
             <IonButton class="profile-btn" @click="toggleProfileMenu">
               <div class="profile-container">
                 <img
+                  v-if="user.profileImage"
                   src="@/assets/appIcon.webp"
                   alt="Profile"
                   class="profile-image"
                 />
+                <span v-else class="avatar-placeholder">{{
+                  user.full_name[0]
+                }}</span>
               </div>
             </IonButton>
 
@@ -446,9 +453,19 @@ ion-toggle.toggle-checked::part(track) {
 .profile-container {
   width: 32px;
   height: 32px;
-  border-radius: 16px;
-  border: 1px solid var(--ion-color-primary);
+  border-radius: 24px;
+  border: 2px solid var(--ion-color-light);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-placeholder {
+  color: var(--ion-color-primary);
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .profile-image {

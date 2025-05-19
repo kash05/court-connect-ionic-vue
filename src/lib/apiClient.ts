@@ -1,27 +1,53 @@
+import { Preferences } from '@capacitor/preferences';
 import axios from 'axios';
 
 const API_VERSION = import.meta.env.VITE_API_VERSION ?? '';
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token');
+export const setAuthToken = (token: string | null) => {
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete api.defaults.headers.common['Authorization'];
   }
+};
 
-  if (config.url && !config.url.startsWith(`/${API_VERSION}`)) {
-    config.url = `/${API_VERSION}${config.url}`;
-  }
+api.interceptors.request.use(
+  async (config) => {
+    const { value: token } = await Preferences.get({ key: 'token' });
 
-  return config;
-});
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    if (config.url && !config.url.startsWith(`/${API_VERSION}`)) {
+      config.url = `/${API_VERSION}${config.url}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => Promise.reject(error),
+  async (error) => {
+    if (error.response && error.response.status === 401) {
+      await Preferences.remove({ key: 'token' });
+      await Preferences.remove({ key: 'user' });
+
+      window.location.href = '/login';
+    }
+
+    return Promise.reject(error);
+  },
 );
 
 export default api;

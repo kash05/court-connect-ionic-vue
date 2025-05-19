@@ -10,7 +10,6 @@ import { ref } from 'vue';
 import PageHeaderComponent from '@/components/PageHeaderComponent.vue';
 import PageTabBarComponent from '@/components/PageTabBarComponent.vue';
 
-// const authStore = useAuthStore();
 const selectedTab = ref('live');
 
 const liveMatches = ref([
