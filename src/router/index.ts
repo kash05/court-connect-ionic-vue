@@ -22,6 +22,12 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: guestGuard,
   },
   {
+    path: '/switch-mode/:mode',
+    name: 'SwitchMode',
+    component: () => import('@/views/SwitchModeSplashView.vue'),
+    props: true,
+  },
+  {
     path: '/player',
     name: 'PlayerDashboard',
     meta: { requiredRole: UserRole.PLAYER },
