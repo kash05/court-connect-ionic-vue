@@ -1,11 +1,13 @@
 import { authGuard, guestGuard } from '@/guards/authGuard';
+import { roleGuard } from '@/guards/roleGuard';
+import { UserRole } from '@/types/enums/UserEnum';
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/dashboard',
+    redirect: '/login',
   },
   {
     path: '/login',
@@ -20,39 +22,50 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: guestGuard,
   },
   {
-    path: '/dashboard',
-    name: 'Dashboard',
-    component: () => import('@/views/DashboardView.vue'),
-    beforeEnter: authGuard,
+    path: '/player',
+    name: 'PlayerDashboard',
+    meta: { requiredRole: UserRole.PLAYER },
+    component: () => import('@/views/player/DashboardView.vue'),
+    beforeEnter: [authGuard, roleGuard],
   },
   {
     path: '/profile',
     name: 'Profile',
     component: () => import('../views/ProfileView.vue'),
-    beforeEnter: authGuard,
+    beforeEnter: [authGuard, roleGuard],
   },
   {
     path: '/teams',
     name: 'Teams',
-    component: () => import('../views/TeamsView.vue'),
-    beforeEnter: authGuard,
+    meta: { requiredRole: UserRole.PLAYER },
+    component: () => import('../views/player/TeamsView.vue'),
+    beforeEnter: [authGuard, roleGuard],
   },
   {
     path: '/events',
     name: 'Events',
-    component: () => import('../views/EventsView.vue'),
-    beforeEnter: authGuard,
+    meta: { requiredRole: UserRole.PLAYER },
+    component: () => import('../views/player/EventsView.vue'),
+    beforeEnter: [authGuard, roleGuard],
   },
   {
     path: '/settings',
     name: 'Settings',
-    component: () => import('../views/SettingsView.vue'),
-    beforeEnter: authGuard,
+    meta: { requiredRole: UserRole.PLAYER },
+    component: () => import('../views/player/SettingsView.vue'),
+    beforeEnter: [authGuard, roleGuard],
+  },
+  {
+    path: '/owner',
+    name: 'OwnerDashboard',
+    meta: { requiredRole: UserRole.OWNER },
+    component: () => import('@/views/owner/DashboardView.vue'),
+    beforeEnter: [authGuard, roleGuard],
   },
 
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/dashboard',
+    redirect: '/',
   },
 ];
 

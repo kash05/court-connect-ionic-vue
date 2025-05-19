@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/stores/useAuthStore';
+import { UserRole } from '@/types/enums/UserEnum';
 import { NavigationGuardNext, RouteLocationNormalized } from 'vue-router';
 
 /**
@@ -42,7 +43,12 @@ export const guestGuard = async (
   }
 
   if (authStore.isAuthenticated()) {
-    next('/dashboard');
+    const isOwner = authStore.activeRole === UserRole.OWNER;
+    if (isOwner) {
+      next('/owner');
+    } else {
+      next('/player');
+    }
   } else {
     next();
   }

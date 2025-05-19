@@ -6,7 +6,8 @@ import { useForm } from 'vee-validate';
 import { z } from 'zod';
 import PageHeaderComponent from '@/components/PageHeaderComponent.vue';
 import { toTypedSchema } from '@vee-validate/zod';
-import PageTabBarComponent from '@/components/PageTabBarComponent.vue';
+import PlayerTabBarComponent from '@/components/tabbar/PlayerTabBarComponent.vue';
+import OwnerTabBarComponent from '@/components/tabbar/OwnerTabBarComponent.vue';
 
 const authStore = useAuthStore();
 
@@ -25,8 +26,8 @@ const profileData = ref({
   },
 });
 
-const isPlayer = computed(() => authStore.isPlayer);
-const isOwner = computed(() => authStore.isOwner);
+const isPlayer = computed(() => authStore.isCurrentRolePlayer);
+const isOwner = computed(() => authStore.isCurrentRoleOwner);
 
 const profileSchema = toTypedSchema(
   z.object({
@@ -124,9 +125,7 @@ const toggleEditMode = () => {
                     {{ profileData.name }}
                   </h1>
                   <p class="text-gray-600">
-                    {{
-                      isPlayer() ? 'Player' : isOwner() ? 'Team Owner' : 'User'
-                    }}
+                    {{ isPlayer ? 'Player' : isOwner ? 'Team Owner' : 'User' }}
                   </p>
                 </div>
               </div>
@@ -253,7 +252,7 @@ const toggleEditMode = () => {
             </div>
 
             <!-- Player Statistics (only for players) -->
-            <div v-if="isPlayer()" class="card mt-6">
+            <div v-if="isPlayer" class="card mt-6">
               <h2 class="mb-6 text-xl font-bold">Player Statistics</h2>
 
               <div class="grid grid-cols-2 gap-6 sm:grid-cols-3">
@@ -427,7 +426,8 @@ const toggleEditMode = () => {
         </div>
       </div>
     </IonContent>
-    <PageTabBarComponent />
+    <PlayerTabBarComponent v-if="isPlayer" />
+    <OwnerTabBarComponent v-if="isOwner" />
   </IonPage>
 </template>
 

@@ -21,19 +21,13 @@ import { useRoute } from 'vue-router';
 
 const ionRouter = useIonRouter();
 
-const hideTabBarRoutes = ['/login', '/register'];
-
-const isTabBarVisible = computed(() => {
-  return !hideTabBarRoutes.some((path) => route.path.startsWith(path));
-});
-
 const { width } = useWindowSize();
 const isDesktop = computed(() => width.value >= 768);
 const route = useRoute();
 
 const activeTab = computed(() => {
   const path = route.path;
-  if (path.includes('/dashboard')) return 'home';
+  if (path.includes('/player')) return 'home';
   if (path.includes('/teams')) return 'teams';
   if (path.includes('/events')) return 'events';
   if (path.includes('/profile')) return 'profile';
@@ -42,21 +36,30 @@ const activeTab = computed(() => {
 
 const animatingTab = ref('');
 
-const handleTabClick = (tab: string) => {
+type TabKey = 'home' | 'teams' | 'events' | 'profile';
+
+const tabRoutes: Record<TabKey, string> = {
+  home: '/player',
+  teams: '/teams',
+  events: '/events',
+  profile: '/profile',
+};
+
+const handleTabClick = (tab: TabKey) => {
   animatingTab.value = tab;
   setTimeout(() => {
     animatingTab.value = '';
   }, 300);
-  ionRouter.push(tab);
+  ionRouter.push(tabRoutes[tab]);
 };
 </script>
 
 <template>
-  <ion-tabs v-if="!isDesktop && isTabBarVisible">
+  <ion-tabs v-if="!isDesktop">
     <ion-tab tab="fail"></ion-tab>
     <IonTabBar slot="bottom">
       <IonTabButton
-        href="/dashboard"
+        href="/player"
         :class="{
           'tab-selected': activeTab === 'home',
           'tab-animating': animatingTab === 'home',

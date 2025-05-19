@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { IonPage, IonContent } from '@ionic/vue';
 import PageHeaderComponent from '@/components/PageHeaderComponent.vue';
-import PageTabBarComponent from '@/components/PageTabBarComponent.vue';
+import PageTabBarComponent from '@/components/tabbar/PlayerTabBarComponent.vue';
 </script>
 
 <template>
@@ -9,9 +9,8 @@ import PageTabBarComponent from '@/components/PageTabBarComponent.vue';
     <PageHeaderComponent />
     <IonContent>
       <div class="page-container">
-        <h1 class="page-title">Teams</h1>
-
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
+        <h1 class="page-title">Events</h1>
+        <p>Events view content will go here.</p>
       </div>
     </IonContent>
     <PageTabBarComponent />

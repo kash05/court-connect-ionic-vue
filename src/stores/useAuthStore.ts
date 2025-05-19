@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import {
   login as loginService,
   registerUser,
@@ -17,132 +17,107 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref<UserInterface | null>(null);
   const token = ref<string | null>(null);
   const initialized = ref(false);
+  const activeRole = ref<UserRole>(UserRole.PLAYER);
   const router = useRouter();
-
-  async function setAuth(newUser: UserInterface, newToken: string) {
-    user.value = newUser;
-    token.value = newToken;
-
-    setAuthToken(newToken);
-
-    await Preferences.set({
-      key: 'token',
-      value: newToken,
-    });
-
-    await Preferences.set({
-      key: 'user',
-      value: JSON.stringify(newUser),
-    });
-  }
-
-  async function clearAuth() {
-    user.value = null;
-    token.value = null;
-
-    setAuthToken(null);
-
-    await Preferences.remove({ key: 'token' });
-    await Preferences.remove({ key: 'user' });
-  }
 
   function isAuthenticated() {
     return !!token.value && !!user.value;
   }
 
-  function isPlayer() {
-    return user.value?.role === UserRole.PLAYER;
-  }
-
-  function isOwner() {
-    return user.value?.role === UserRole.OWNER;
-  }
-
-  async function initializeAuth() {
-    if (initialized.value) {
-      return Promise.resolve();
-    }
-
-    try {
-      const tokenResult = await Preferences.get({ key: 'token' });
-      const storedToken = tokenResult.value;
-
-      if (!storedToken) {
-        initialized.value = true;
-        return Promise.resolve();
-      }
-      token.value = storedToken;
-      setAuthToken(storedToken);
-      const userResult = await Preferences.get({ key: 'user' });
-      if (userResult.value) {
-        try {
-          user.value = JSON.parse(userResult.value);
-        } catch (e) {
-          console.error('Failed to parse stored user data:', e);
-        }
-      }
-
-      try {
-        const userData = await currentUser();
-        user.value = userData;
-        await Preferences.set({
-          key: 'user',
-          value: JSON.stringify(userData),
-        });
-      } catch (error) {
-        console.error('Failed to fetch current user:', error);
-        await clearAuth();
-      }
-    } catch (error) {
-      console.error('Authentication initialization failed:', error);
-      await clearAuth();
-    } finally {
-      initialized.value = true;
-    }
-
-    return Promise.resolve();
-  }
-
+  // ——————————————————————————————————————————————
+  // Persist user + token + default role on login
   async function login(credentials: { email: string; password: string }) {
-    const response = await loginService(credentials);
-
-    if (response?.access_token) {
-      token.value = response.access_token;
-      setAuthToken(response.access_token);
-      const userData = await currentUser();
-      await setAuth(userData, response.access_token);
-      return userData;
-    } else {
-      throw new Error('Login failed: Invalid response');
+    const resp = await loginService(credentials);
+    if (!resp?.access_token) {
+      throw new Error('Login failed');
     }
+
+    token.value = resp.access_token;
+    setAuthToken(resp.access_token);
+    const userData = await currentUser();
+    user.value = userData;
+
+    await Preferences.set({ key: 'token', value: token.value });
+    await Preferences.set({ key: 'user', value: JSON.stringify(userData) });
+
+    activeRole.value = UserRole.PLAYER;
+    await Preferences.set({ key: 'activeRole', value: UserRole.PLAYER });
+
+    return userData;
   }
 
+  // ——————————————————————————————————————————————
+  // Restore from Preferences on app start
+  async function initializeAuth() {
+    if (initialized.value) return;
+
+    const [{ value: t }, { value: u }] = await Promise.all([
+      Preferences.get({ key: 'token' }),
+      Preferences.get({ key: 'user' }),
+    ]);
+    if (t && u) {
+      token.value = t;
+      setAuthToken(t);
+      try {
+        user.value = JSON.parse(u);
+      } catch {
+        user.value = null;
+      }
+    }
+
+    const { value: storedRole } = await Preferences.get({ key: 'activeRole' });
+    activeRole.value = (storedRole as UserRole) || UserRole.PLAYER;
+
+    initialized.value = true;
+  }
+
+  // ——————————————————————————————————————————————
   async function logout() {
     try {
-      if (token.value) {
-        logoutService();
-      }
-    } catch (error) {
-      console.error('Logout service error:', error);
+      if (token.value) await logoutService();
     } finally {
-      await clearAuth();
+      // clear everything
+      user.value = null;
+      token.value = null;
+      activeRole.value = UserRole.PLAYER;
+      setAuthToken(null);
+      await Preferences.clear();
       router.push('/login');
     }
   }
+
+  // ——————————————————————————————————————————————
+  // Toggle between PLAYER ↔ OWNER
+  async function toggleRole() {
+    activeRole.value =
+      activeRole.value === UserRole.PLAYER ? UserRole.OWNER : UserRole.PLAYER;
+    await Preferences.set({
+      key: 'activeRole',
+      value: activeRole.value,
+    });
+  }
+
+  // ——————————————————————————————————————————————
+  const isCurrentRolePlayer = computed(
+    () => activeRole.value === UserRole.PLAYER,
+  );
+  const isCurrentRoleOwner = computed(
+    () => activeRole.value === UserRole.OWNER,
+  );
 
   return {
     user,
     token,
     initialized,
-    setAuth,
-    clearAuth,
-    isAuthenticated,
-    isPlayer,
-    isOwner,
+    activeRole,
+    isCurrentRolePlayer,
+    isCurrentRoleOwner,
     login,
     logout,
+    isAuthenticated,
     registerUser,
     resetPassword,
     initializeAuth,
+    toggleRole,
   };
 });

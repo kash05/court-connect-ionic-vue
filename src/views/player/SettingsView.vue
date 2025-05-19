@@ -10,7 +10,7 @@ import {
 } from '@ionic/vue';
 import { ref, onMounted } from 'vue';
 import PageHeaderComponent from '@/components/PageHeaderComponent.vue';
-import PageTabBarComponent from '@/components/PageTabBarComponent.vue';
+import PageTabBarComponent from '@/components/tabbar/PlayerTabBarComponent.vue';
 import { themeService, type ThemeMode } from '@/services/themeService';
 import { loadingService } from '@/services/loadingService';
 

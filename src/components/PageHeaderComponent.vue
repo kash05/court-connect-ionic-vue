@@ -36,52 +36,60 @@ const props = withDefaults(defineProps<Props>(), {
   showToggleRole: true,
 });
 
+const authStore = useAuthStore();
+const route = useRoute();
+const router = useRouter();
+
 const profileMenuRef = ref(null);
 const showProfileMenu = ref(false);
 const showNotifications = ref(false);
 const notificationsRef = ref(null);
-const route = useRoute();
-const router = useRouter();
-const userRole = ref<UserRole>(UserRole.PLAYER);
+const displayedIsOwner = ref(false);
 
-const isOwner = ref(userRole.value === UserRole.OWNER);
-
-onMounted(() => {
-  const savedRole = localStorage.getItem('userRole');
-  if (savedRole === UserRole.PLAYER || savedRole === UserRole.OWNER) {
-    userRole.value = savedRole;
-    isOwner.value = savedRole === UserRole.OWNER;
+onMounted(async () => {
+  if (!authStore.initialized) {
+    await authStore.initializeAuth();
   }
 });
 
-const onToggleClick = async () => {
-  const targetRole = isOwner.value ? UserRole.PLAYER : UserRole.OWNER;
+const onToggleClick = async (event: MouseEvent) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  displayedIsOwner.value = !authStore.isCurrentRoleOwner;
+
+  const targetRole = authStore.isCurrentRoleOwner
+    ? UserRole.PLAYER
+    : UserRole.OWNER;
 
   const alert = await alertController.create({
     header: `Switch role to ${targetRole}?`,
-    message: 'Your role will be remembered for future sessions.',
+    message: 'Your choice will be remembered.',
     backdropDismiss: false,
     buttons: [
       {
         text: 'Yes',
         handler: () => {
-          userRole.value = targetRole;
-          isOwner.value = targetRole === UserRole.OWNER;
-          localStorage.setItem('userRole', targetRole);
+          authStore.toggleRole();
         },
       },
       {
         text: 'Cancel',
         role: 'cancel',
-        handler: () => {
-          isOwner.value = userRole.value === UserRole.OWNER;
-        },
       },
     ],
   });
 
   await alert.present();
 };
+
+watch(
+  () => authStore.isCurrentRoleOwner,
+  () => {
+    displayedIsOwner.value = authStore.isCurrentRoleOwner;
+  },
+  { immediate: true },
+);
 
 watch(
   () => route.fullPath,
@@ -184,14 +192,20 @@ const toggleProfileMenu = () => {
 
         <div class="action-buttons">
           <div class="role-toggle-container capitalize" v-if="showToggleRole">
-            <ion-badge :color="userRole === 'player' ? 'primary' : 'secondary'">
-              {{ userRole }}
+            <ion-badge
+              :color="
+                authStore.activeRole === UserRole.PLAYER
+                  ? 'primary'
+                  : 'secondary'
+              "
+            >
+              {{ authStore.activeRole }}
             </ion-badge>
             <IonToggle
-              v-model="isOwner"
-              @click.prevent="onToggleClick"
+              v-model="displayedIsOwner"
+              @click="onToggleClick($event)"
               class="role-toggle"
-            />
+            ></IonToggle>
           </div>
 
           <div class="relative" v-if="showNotificationsIcon">
