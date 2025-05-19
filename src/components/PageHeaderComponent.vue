@@ -7,6 +7,7 @@ import {
   IonToggle,
   alertController,
   IonBadge,
+  useIonRouter,
 } from '@ionic/vue';
 import { notificationsOutline, chevronBackOutline } from 'ionicons/icons';
 import { onClickOutside } from '@vueuse/core';
@@ -17,6 +18,7 @@ import { UserRole } from '@/types/enums/UserEnum';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 const { user } = useAuthStore();
+const ionRouter = useIonRouter();
 
 interface Props {
   title?: string;
@@ -71,6 +73,12 @@ const onToggleClick = async (event: MouseEvent) => {
         text: 'Yes',
         handler: () => {
           authStore.toggleRole();
+          ionRouter.push({
+            path: `/switch-mode/${targetRole}`,
+            query: {
+              redirectTo: `/${targetRole}`,
+            },
+          });
         },
       },
       {
