@@ -8,7 +8,7 @@ import { SplashScreen } from '@capacitor/splash-screen';
 import { themeService } from '@/services/themeService';
 
 onMounted(async () => {
-  SplashScreen.show();
+  SplashScreen.hide();
   await themeService.initialize();
 
   loadingService.withLoading(async () => {
@@ -19,8 +19,6 @@ onMounted(async () => {
       toastService.dangerMessage(
         'Failed to initialize the app. Please try again.',
       );
-    } finally {
-      SplashScreen.hide();
     }
   }, 'Please wait...');
 });
