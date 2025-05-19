@@ -1,11 +1,15 @@
+import { UserRole } from './enums/UserEnum';
+
 export interface UserInterface {
   id: number | string;
   full_name: string;
   email: string;
   gender: string;
   agree_terms: boolean;
+  role: UserRole;
   createdAt: string;
   updatedAt: string;
+  profileImage?: string;
 }
 
 export interface UserSettings {

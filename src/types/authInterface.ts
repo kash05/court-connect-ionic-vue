@@ -1,11 +1,3 @@
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'player' | 'owner';
-  profileImage?: string;
-}
-
 export interface TokenResponse {
   access_token: string;
   expires_at: string;

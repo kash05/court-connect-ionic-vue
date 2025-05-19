@@ -7,19 +7,19 @@ import {
   logout as logoutService,
   currentUser,
 } from '@/services/authService';
-import type { User } from '@/types/authInterface';
+import type { UserInterface } from '@/types/userInterface';
 import { UserRole } from '@/types/enums/UserEnum';
 import { Preferences } from '@capacitor/preferences';
 import { useRouter } from 'vue-router';
 import { setAuthToken } from '@/lib/apiClient';
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref<User | null>(null);
+  const user = ref<UserInterface | null>(null);
   const token = ref<string | null>(null);
   const initialized = ref(false);
   const router = useRouter();
 
-  async function setAuth(newUser: User, newToken: string) {
+  async function setAuth(newUser: UserInterface, newToken: string) {
     user.value = newUser;
     token.value = newToken;
 

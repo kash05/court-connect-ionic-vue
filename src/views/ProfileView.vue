@@ -11,7 +11,7 @@ import PageTabBarComponent from '@/components/PageTabBarComponent.vue';
 const authStore = useAuthStore();
 
 const profileData = ref({
-  name: authStore.user?.name || '',
+  name: authStore.user?.full_name || '',
   email: authStore.user?.email || '',
   phone: '(123) 456-7890',
   birthdate: '1990-01-01',
@@ -427,7 +427,7 @@ const toggleEditMode = () => {
         </div>
       </div>
     </IonContent>
-		<PageTabBarComponent />
+    <PageTabBarComponent />
   </IonPage>
 </template>
 

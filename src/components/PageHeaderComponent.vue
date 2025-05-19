@@ -245,13 +245,13 @@ const toggleProfileMenu = () => {
             <IonButton class="profile-btn" @click="toggleProfileMenu">
               <div class="profile-container">
                 <img
-                  v-if="user.profileImage"
+                  v-if="user?.profileImage"
                   src="@/assets/appIcon.webp"
                   alt="Profile"
                   class="profile-image"
                 />
                 <span v-else class="avatar-placeholder">{{
-                  user.full_name[0]
+                  user?.full_name[0]
                 }}</span>
               </div>
             </IonButton>

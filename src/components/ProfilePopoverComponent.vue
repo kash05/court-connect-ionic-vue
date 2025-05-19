@@ -29,16 +29,18 @@ const handleLogout = () => {
       <div class="profile-info">
         <div class="profile-avatar">
           <img
-            v-if="user.profileImage"
+            v-if="user?.profileImage"
             src="@/assets/appIcon.webp"
             alt="Profile"
             class="avatar-image"
           />
-          <span v-else class="avatar-placeholder">{{ user.full_name[0] }}</span>
+          <span v-else class="avatar-placeholder">{{
+            user?.full_name[0]
+          }}</span>
         </div>
         <div class="profile-details">
-          <h4 class="profile-name">{{ user.full_name }}</h4>
-          <p class="profile-email">{{ user.email }}</p>
+          <h4 class="profile-name">{{ user?.full_name }}</h4>
+          <p class="profile-email">{{ user?.email }}</p>
         </div>
       </div>
     </div>

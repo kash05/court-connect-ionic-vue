@@ -145,7 +145,9 @@ const ownerMenuGroups: MenuGroup[] = [
               />
             </div>
             <div class="user-details">
-              <h3 class="user-name">{{ authStore.user?.name || 'User' }}</h3>
+              <h3 class="user-name">
+                {{ authStore.user?.full_name || 'User' }}
+              </h3>
               <p class="user-role">Player</p>
             </div>
           </div>
