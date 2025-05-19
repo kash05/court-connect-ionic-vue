@@ -5,6 +5,9 @@ import {
   IonIcon,
   IonLabel,
   IonRippleEffect,
+  IonTabs,
+  IonTab,
+  useIonRouter,
 } from '@ionic/vue';
 import { useWindowSize } from '@vueuse/core';
 import {
@@ -15,6 +18,8 @@ import {
 } from 'ionicons/icons';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
+
+const ionRouter = useIonRouter();
 
 const hideTabBarRoutes = ['/login', '/register'];
 
@@ -42,89 +47,96 @@ const handleTabClick = (tab: string) => {
   setTimeout(() => {
     animatingTab.value = '';
   }, 300);
+  ionRouter.push(tab);
 };
 </script>
 
 <template>
-  <IonTabBar
-    slot="bottom"
-    v-if="!isDesktop && isTabBarVisible"
-    class="floating-tabs"
-  >
-    <IonTabButton
-      tab="home"
-      href="/dashboard"
-      :class="{
-        'tab-selected': activeTab === 'home',
-        'tab-animating': animatingTab === 'home',
-      }"
-      @click="handleTabClick('home')"
-    >
-      <div class="tab-icon-container">
-        <IonIcon :icon="homeOutline" />
-      </div>
-      <IonLabel>Home</IonLabel>
-      <IonRippleEffect type="unbounded"></IonRippleEffect>
-    </IonTabButton>
+  <ion-tabs v-if="!isDesktop && isTabBarVisible">
+    <ion-tab tab="fail"></ion-tab>
+    <IonTabBar slot="bottom">
+      <IonTabButton
+        href="/dashboard"
+        :class="{
+          'tab-selected': activeTab === 'home',
+          'tab-animating': animatingTab === 'home',
+        }"
+        @click="handleTabClick('home')"
+      >
+        <div class="tab-icon-container">
+          <IonIcon :icon="homeOutline" />
+        </div>
+        <IonLabel>Home</IonLabel>
+        <IonRippleEffect type="unbounded"></IonRippleEffect>
+      </IonTabButton>
 
-    <IonTabButton
-      tab="teams"
-      href="/teams"
-      :class="{
-        'tab-selected': activeTab === 'teams',
-        'tab-animating': animatingTab === 'teams',
-      }"
-      @click="handleTabClick('teams')"
-    >
-      <div class="tab-icon-container">
-        <IonIcon :icon="peopleOutline" />
-      </div>
-      <IonLabel>Teams</IonLabel>
-      <IonRippleEffect type="unbounded"></IonRippleEffect>
-    </IonTabButton>
+      <IonTabButton
+        href="/teams"
+        :class="{
+          'tab-selected': activeTab === 'teams',
+          'tab-animating': animatingTab === 'teams',
+        }"
+        @click="handleTabClick('teams')"
+      >
+        <div class="tab-icon-container">
+          <IonIcon :icon="peopleOutline" />
+        </div>
+        <IonLabel>Teams</IonLabel>
+        <IonRippleEffect type="unbounded"></IonRippleEffect>
+      </IonTabButton>
 
-    <IonTabButton
-      tab="events"
-      href="/events"
-      :class="{
-        'tab-selected': activeTab === 'events',
-        'tab-animating': animatingTab === 'events',
-      }"
-      @click="handleTabClick('events')"
-    >
-      <div class="tab-icon-container">
-        <IonIcon :icon="calendarOutline" />
-      </div>
-      <IonLabel>Events</IonLabel>
-      <IonRippleEffect type="unbounded"></IonRippleEffect>
-    </IonTabButton>
+      <IonTabButton
+        href="/events"
+        :class="{
+          'tab-selected': activeTab === 'events',
+          'tab-animating': animatingTab === 'events',
+        }"
+        @click="handleTabClick('events')"
+      >
+        <div class="tab-icon-container">
+          <IonIcon :icon="calendarOutline" />
+        </div>
+        <IonLabel>Events</IonLabel>
+        <IonRippleEffect type="unbounded"></IonRippleEffect>
+      </IonTabButton>
 
-    <IonTabButton
-      tab="profile"
-      href="/profile"
-      :class="{
-        'tab-selected': activeTab === 'profile',
-        'tab-animating': animatingTab === 'profile',
-      }"
-      @click="handleTabClick('profile')"
-    >
-      <div class="tab-icon-container">
-        <IonIcon :icon="personOutline" />
-      </div>
-      <IonLabel>Profile</IonLabel>
-      <IonRippleEffect type="unbounded"></IonRippleEffect>
-    </IonTabButton>
-  </IonTabBar>
+      <IonTabButton
+        href="/profile"
+        :class="{
+          'tab-selected': activeTab === 'profile',
+          'tab-animating': animatingTab === 'profile',
+        }"
+        @click="handleTabClick('profile')"
+      >
+        <div class="tab-icon-container">
+          <IonIcon :icon="personOutline" />
+        </div>
+        <IonLabel>Profile</IonLabel>
+        <IonRippleEffect type="unbounded"></IonRippleEffect>
+      </IonTabButton>
+    </IonTabBar>
+  </ion-tabs>
 </template>
 
 <style scoped lang="scss">
 @use '@/theme/variables.scss' as *;
 
-.floating-tabs {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  --background: var(--ion-color-light);
+ion-tabs {
+  padding-top: var(--padding-top, 0);
+  display: block;
+  position: static;
   height: 60px;
-  padding-top: 3px;
+
+  ion-tab-bar {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+    --background: var(--ion-color-light);
+    height: 60px;
+  }
+}
+
+ion-tab {
+  display: none;
 }
 
 ion-tab-button {

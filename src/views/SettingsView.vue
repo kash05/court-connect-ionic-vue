@@ -12,6 +12,7 @@ import { ref, onMounted } from 'vue';
 import PageHeaderComponent from '@/components/PageHeaderComponent.vue';
 import PageTabBarComponent from '@/components/PageTabBarComponent.vue';
 import { themeService, type ThemeMode } from '@/services/themeService';
+import { loadingService } from '@/services/loadingService';
 
 const themeMode = ref<ThemeMode>('system');
 
@@ -20,7 +21,9 @@ onMounted(async () => {
 });
 
 const updateTheme = async () => {
-  await themeService.setTheme(themeMode.value);
+  loadingService.withLoading(async () => {
+    await themeService.setTheme(themeMode.value);
+  }, 'Setting theme...');
 };
 </script>
 
@@ -28,19 +31,27 @@ const updateTheme = async () => {
   <IonPage>
     <PageHeaderComponent />
     <IonContent>
-      <IonList>
-        <IonRadioGroup v-model="themeMode" @ionChange="updateTheme">
+      <IonList class="py-2">
+        <IonRadioGroup
+          v-model="themeMode"
+          @ionChange="updateTheme"
+          helper-text="Select your preferred theme"
+        >
           <IonItem>
             <IonLabel>Light</IonLabel>
-            <IonRadio value="light" aria-label="light-theme" />
+            <IonRadio value="light" aria-label="light-theme" slot="end" />
           </IonItem>
           <IonItem>
             <IonLabel>Dark</IonLabel>
-            <IonRadio value="dark" aria-label="dark-theme" />
+            <IonRadio value="dark" aria-label="dark-theme" slot="end" />
           </IonItem>
           <IonItem>
             <IonLabel>System</IonLabel>
-            <IonRadio value="system" aria-label="system-preference" />
+            <IonRadio
+              value="system"
+              aria-label="system-preference"
+              slot="end"
+            />
           </IonItem>
         </IonRadioGroup>
       </IonList>

@@ -8,7 +8,8 @@ import type {
 const CLIENTID = import.meta.env.VITE_CLIENT_ID;
 const CLIENTSECRET = import.meta.env.VITE_CLIENT_SECRET;
 
-export const fetchUser = () => api.get('/user').then((res) => res.data);
+export const currentUser = () =>
+  api.get('/users/profile').then((res) => res.data);
 
 export const login = (data: Pick<LoginCredentials, 'email' | 'password'>) => {
   const loginData = {

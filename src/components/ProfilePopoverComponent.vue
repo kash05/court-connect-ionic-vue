@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useAuthStore } from '@/stores/useAuthStore';
 import { IonIcon } from '@ionic/vue';
 import {
   personOutline,
@@ -11,6 +12,7 @@ import {
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
+const { user } = useAuthStore();
 
 const navigateTo = (path: string) => {
   router.push(path);
@@ -26,11 +28,17 @@ const handleLogout = () => {
     <div class="profile-header">
       <div class="profile-info">
         <div class="profile-avatar">
-          <img src="@/assets/appIcon.webp" alt="Profile" class="avatar-image" />
+          <img
+            v-if="user.profileImage"
+            src="@/assets/appIcon.webp"
+            alt="Profile"
+            class="avatar-image"
+          />
+          <span v-else class="avatar-placeholder">{{ user.full_name[0] }}</span>
         </div>
         <div class="profile-details">
-          <h4 class="profile-name">John Smith</h4>
-          <p class="profile-email">john.smith@example.com</p>
+          <h4 class="profile-name">{{ user.full_name }}</h4>
+          <p class="profile-email">{{ user.email }}</p>
         </div>
       </div>
     </div>
@@ -117,6 +125,15 @@ const handleLogout = () => {
   margin-right: 12px;
   border: 2px solid var(--ion-color-light);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-placeholder {
+  color: var(--ion-color-primary);
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .avatar-image {

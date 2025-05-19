@@ -1,20 +1,11 @@
-export interface UserProfile {
-  id: string;
+export interface UserInterface {
+  id: number | string;
+  full_name: string;
   email: string;
-  name: string;
-  phone?: string;
-  birthdate?: string;
-  bio?: string;
-  address?: {
-    street: string;
-    city: string;
-    state: string;
-    zip: string;
-    country: string;
-  };
-  profileImage?: string;
-  sports?: string[];
-  position?: string;
+  gender: string;
+  agree_terms: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface UserSettings {
@@ -29,6 +20,5 @@ export interface UserSettings {
   };
   theme: {
     mode: 'light' | 'dark' | 'system';
-    color: string;
   };
 }
