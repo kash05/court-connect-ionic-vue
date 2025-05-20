@@ -48,13 +48,14 @@ const onSubmit = handleSubmit((values) => {
         .then(() => {
           const redirectPath = route.query.redirect
             ? String(route.query.redirect)
-            : '/dashboard';
+            : '/player';
 
           router.push(redirectPath);
         })
         .catch((error) => {
           formError.value =
-            error.response?.data?.message || 'Login failed, please try again.';
+            error.response?.data?.errors.credentials[0] ||
+            'Login failed, please try again.';
           console.error('Signin failed:', error);
         }),
     'Logging you in...',

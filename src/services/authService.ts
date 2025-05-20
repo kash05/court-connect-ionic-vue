@@ -26,7 +26,7 @@ export const login = (data: Pick<LoginCredentials, 'email' | 'password'>) => {
 };
 
 export const registerUser = (data: RegisterInterface) =>
-  api.post<RegisterInterface>('/user/register', data).then((response) => {
+  api.post<RegisterInterface>('/users/register', data).then((response) => {
     return response.data;
   });
 

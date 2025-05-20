@@ -6,10 +6,18 @@ export interface UserInterface {
   email: string;
   gender: string;
   agree_terms: boolean;
-  role: UserRole;
+  role: UserRoleInterface;
   createdAt: string;
   updatedAt: string;
   profileImage?: string;
+}
+
+export interface UserRoleInterface {
+  id: number;
+  name: UserRole;
+  display_name: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface UserSettings {
