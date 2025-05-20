@@ -8,6 +8,7 @@ import {
   alertController,
   IonBadge,
   useIonRouter,
+  IonAvatar,
 } from '@ionic/vue';
 import { notificationsOutline, chevronBackOutline } from 'ionicons/icons';
 import { onClickOutside } from '@vueuse/core';
@@ -128,7 +129,12 @@ const displayTitle = computed(() => {
     return props.title;
   }
 
-  if (route.name === 'Dashboard' || route.path.includes('/dashboard')) {
+  if (
+    route.name === 'player' ||
+    route.path.includes('/player') ||
+    route.path.includes('/owner') ||
+    route.name === 'owner'
+  ) {
     return 'CourtConnect';
   }
 
@@ -201,11 +207,7 @@ const toggleProfileMenu = () => {
         <div class="action-buttons">
           <div class="role-toggle-container capitalize" v-if="showToggleRole">
             <ion-badge
-              :color="
-                authStore.activeRole === UserRole.PLAYER
-                  ? 'primary'
-                  : 'secondary'
-              "
+              :color="authStore.isCurrentRolePlayer ? 'primary' : 'secondary'"
             >
               {{ authStore.activeRole }}
             </ion-badge>
@@ -265,7 +267,7 @@ const toggleProfileMenu = () => {
 
           <div v-if="showProfilePopover" class="relative">
             <IonButton class="profile-btn" @click="toggleProfileMenu">
-              <div class="profile-container">
+              <ion-avatar class="profile-container">
                 <img
                   v-if="user?.profileImage"
                   src="@/assets/appIcon.webp"
@@ -275,7 +277,7 @@ const toggleProfileMenu = () => {
                 <span v-else class="avatar-placeholder">{{
                   user?.full_name[0]
                 }}</span>
-              </div>
+              </ion-avatar>
             </IonButton>
 
             <teleport to="body">

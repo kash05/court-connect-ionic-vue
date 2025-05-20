@@ -20,8 +20,8 @@
 </template>
 
 <script setup lang="ts">
-import { IonPage, useIonRouter } from '@ionic/vue';
-import { onMounted, ref, computed } from 'vue';
+import { IonPage, onIonViewWillEnter, useIonRouter } from '@ionic/vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import lottie from 'lottie-web';
 
@@ -70,8 +70,15 @@ onMounted(() => {
       animationData: animData,
     });
   }
+});
 
+onIonViewWillEnter(() => {
+  progress.value = 0;
   animateProgress();
+});
+
+onBeforeUnmount(() => {
+  lottie.destroy();
 });
 </script>
 

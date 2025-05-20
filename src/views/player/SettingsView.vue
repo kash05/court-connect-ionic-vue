@@ -10,11 +10,15 @@ import {
 } from '@ionic/vue';
 import { ref, onMounted } from 'vue';
 import PageHeaderComponent from '@/components/PageHeaderComponent.vue';
-import PageTabBarComponent from '@/components/tabbar/PlayerTabBarComponent.vue';
 import { themeService, type ThemeMode } from '@/services/themeService';
 import { loadingService } from '@/services/loadingService';
+import PlayerTabBarComponent from '@/components/tabbar/PlayerTabBarComponent.vue';
+import OwnerTabBarComponent from '@/components/tabbar/OwnerTabBarComponent.vue';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 const themeMode = ref<ThemeMode>('system');
+
+const authStore = useAuthStore();
 
 onMounted(async () => {
   themeMode.value = await themeService.getThemeMode();
@@ -56,6 +60,7 @@ const updateTheme = async () => {
         </IonRadioGroup>
       </IonList>
     </IonContent>
-    <PageTabBarComponent />
+    <PlayerTabBarComponent v-if="authStore.isCurrentRolePlayer" />
+    <OwnerTabBarComponent v-if="authStore.isCurrentRoleOwner" />
   </IonPage>
 </template>

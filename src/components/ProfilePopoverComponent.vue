@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/useAuthStore';
-import { IonIcon } from '@ionic/vue';
+import { IonIcon, IonAvatar } from '@ionic/vue';
 import {
   personOutline,
   settingsOutline,
@@ -27,7 +27,7 @@ const handleLogout = () => {
   <div class="profile-menu">
     <div class="profile-header">
       <div class="profile-info">
-        <div class="profile-avatar">
+        <ion-avatar class="profile-avatar">
           <img
             v-if="user?.profileImage"
             src="@/assets/appIcon.webp"
@@ -37,7 +37,7 @@ const handleLogout = () => {
           <span v-else class="avatar-placeholder">{{
             user?.full_name[0]
           }}</span>
-        </div>
+        </ion-avatar>
         <div class="profile-details">
           <h4 class="profile-name">{{ user?.full_name }}</h4>
           <p class="profile-email">{{ user?.email }}</p>

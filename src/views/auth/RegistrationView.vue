@@ -6,18 +6,18 @@ import { z } from 'zod';
 import { registerUser } from '@/services/authService';
 import { loadingService } from '@/services/loadingService';
 import {
-  IonInput,
-  IonCheckbox,
-  IonButton,
-  IonItem,
-  IonIcon,
-  IonContent,
-  IonPage,
-  IonText,
-  IonRadio,
-  IonLabel,
-  IonRadioGroup,
-  IonInputPasswordToggle,
+	IonInput,
+	IonCheckbox,
+	IonButton,
+	IonItem,
+	IonIcon,
+	IonContent,
+	IonPage,
+	IonText,
+	IonRadio,
+	IonLabel,
+	IonRadioGroup,
+	IonInputPasswordToggle,
 } from '@ionic/vue';
 import { logoGoogle } from 'ionicons/icons';
 import { ref } from 'vue';
@@ -31,13 +31,7 @@ const registerSchema = toTypedSchema(
     .object({
       fullName: z.string().min(2, 'Name must be at least 2 characters'),
       email: z.string().email('Please enter a valid email'),
-      password: z
-        .string()
-        .min(8, 'Password must be at least 8 characters')
-        .regex(
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])/,
-          'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
-        ),
+      password: z.string().min(6, 'Password must be at least 6 characters'),
       confirmPassword: z.string(),
       gender: z.string().min(2, 'Gender is required'),
       agreeTerms: z.boolean().refine((val) => val, {
@@ -123,7 +117,8 @@ const handleGoogleRegistration = () => {
               'mb-2': formError,
             }"
           >
-            Registeration
+            CourtConnect
+            <span class="text-primary-600 text-md block">Registration</span>
           </h1>
 
           <GlobalMessage v-if="formError" type="error" :message="formError" />
@@ -277,11 +272,11 @@ ion-content::part(background) {
   background-size: cover;
   background-position: center;
 }
+
 .page-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100%;
 }
 
 .registration-container {
@@ -319,9 +314,9 @@ ion-content::part(background) {
 }
 
 .title {
+  margin: 0 0 24px;
   font-size: 24px;
   font-weight: 600;
-  margin-bottom: 24px;
   text-align: center;
   color: var(--text-primary, var(--ion-color-dark));
 }
@@ -394,8 +389,6 @@ ion-content::part(background) {
 }
 
 ion-radio {
-  --border-radius: 4px;
-  --inner-border-radius: 4px;
   --color-checked: var(--ion-color-primary);
   margin-right: 10px;
 }
@@ -404,7 +397,7 @@ ion-radio::part(container) {
   width: 20px;
   height: 20px;
   border: 2px solid var(--ion-color-medium-tint);
-  border-radius: 4px;
+  border-radius: 50%;
 }
 
 .radio-checked::part(container) {
@@ -419,8 +412,6 @@ ion-radio::part(container) {
 }
 
 ion-checkbox {
-  --border-radius: 4px;
-  --inner-border-radius: 4px;
   --color-checked: var(--ion-color-primary);
 }
 
@@ -428,7 +419,7 @@ ion-checkbox::part(container) {
   width: 20px;
   height: 20px;
   border: 2px solid var(--ion-color-medium-tint);
-  border-radius: 4px;
+  border-radius: 50%;
 }
 
 .checkbox-checked::part(container) {

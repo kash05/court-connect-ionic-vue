@@ -8,6 +8,8 @@ import {
   IonTabs,
   IonTab,
   useIonRouter,
+  IonFab,
+  IonFabButton,
 } from '@ionic/vue';
 import { useWindowSize } from '@vueuse/core';
 import {
@@ -15,6 +17,7 @@ import {
   personOutline,
   businessOutline,
   barChartOutline,
+  add,
 } from 'ionicons/icons';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
@@ -52,6 +55,10 @@ const handleTabClick = (tab: TabKey) => {
   }, 300);
   ionRouter.push(tabRoutes[tab]);
 };
+
+const addProperty = () => {
+  console.log('Add property clicked');
+};
 </script>
 
 <template>
@@ -74,7 +81,7 @@ const handleTabClick = (tab: TabKey) => {
       </IonTabButton>
 
       <IonTabButton
-        href="/teams"
+        href="/properties"
         :class="{
           'tab-selected': activeTab === 'properties',
           'tab-animating': animatingTab === 'properties',
@@ -88,8 +95,19 @@ const handleTabClick = (tab: TabKey) => {
         <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
 
+      <IonTabButton @click="addProperty()">
+        <div class="add-tab-icon">
+          <ion-fab>
+            <ion-fab-button size="small" color="primary">
+              <ion-icon :icon="add"></ion-icon>
+            </ion-fab-button>
+          </ion-fab>
+        </div>
+        <IonRippleEffect type="unbounded"></IonRippleEffect>
+      </IonTabButton>
+
       <IonTabButton
-        href="/events"
+        href="/stats"
         :class="{
           'tab-selected': activeTab === 'stats',
           'tab-animating': animatingTab === 'stats',
@@ -159,6 +177,22 @@ ion-tab-button {
     height: 36px;
     border-radius: 50%;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .add-tab-icon {
+    background-color: var(--ion-color-primary);
+    color: var(--ion-color-light);
+    border-radius: 50%;
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+
+    ion-icon {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
   }
 
   ion-icon {

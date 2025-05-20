@@ -57,7 +57,6 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/settings',
     name: 'Settings',
-    meta: { requiredRole: UserRole.PLAYER },
     component: () => import('../views/player/SettingsView.vue'),
     beforeEnter: [authGuard, roleGuard],
   },

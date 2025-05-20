@@ -88,7 +88,8 @@ const handleGoogleLogin = () => {
               'mb-2': formError,
             }"
           >
-            Sign In
+            CourtConnect
+            <span class="text-primary-600 text-md block">LogIn</span>
           </h1>
 
           <GlobalMessage v-if="formError" type="error" :message="formError" />
