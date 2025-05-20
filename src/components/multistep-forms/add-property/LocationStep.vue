@@ -32,17 +32,18 @@ const schema = z.object({
   address: z.string().min(5, 'Address is required'),
 });
 
-const props = defineProps<{ formData: { address: string } }>();
-const emit = defineEmits<{
-  (e: 'update-form', payload: { address: string }): void;
-}>();
+type FormValues = z.infer<typeof schema>;
+
+const props = defineProps<{ formData: FormValues }>();
+const emit =
+  defineEmits<(e: 'update-form', payload: { address: string }) => void>();
 
 const { values } = useForm({
   validationSchema: toTypedSchema(schema),
   initialValues: props.formData,
 });
 
-watch(values, (val) => emit('update-form', val), { deep: true });
+watch(values, (val) => emit('update-form', val as FormValues), { deep: true });
 
 function inputClass(error: string | undefined, value: string) {
   return { 'ion-invalid': !!error, 'ion-valid': !error && value };

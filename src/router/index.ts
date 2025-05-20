@@ -70,6 +70,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/add-property',
     name: 'AddProperty',
+    meta: { requiredRole: UserRole.OWNER },
     component: () => import('../views/owner/AddProperty.vue'),
     beforeEnter: [authGuard, roleGuard],
   },

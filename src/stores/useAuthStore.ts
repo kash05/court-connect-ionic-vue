@@ -40,8 +40,15 @@ export const useAuthStore = defineStore('auth', () => {
     await Preferences.set({ key: 'token', value: token.value });
     await Preferences.set({ key: 'user', value: JSON.stringify(userData) });
 
-    activeRole.value = UserRole.PLAYER;
-    await Preferences.set({ key: 'activeRole', value: UserRole.PLAYER });
+    const storedRole = await Preferences.get({ key: 'activeRole' });
+    const role = storedRole.value as UserRole | null;
+
+    if (role && Object.values(UserRole).includes(role)) {
+      activeRole.value = role;
+    } else {
+      activeRole.value = UserRole.PLAYER;
+      await Preferences.set({ key: 'activeRole', value: UserRole.PLAYER });
+    }
 
     return userData;
   }

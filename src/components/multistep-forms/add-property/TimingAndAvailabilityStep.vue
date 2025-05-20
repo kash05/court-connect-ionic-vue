@@ -49,6 +49,8 @@ const schema = z.object({
   sportSlots: z.record(z.any()).optional(),
 });
 
+type FormValues = z.infer<typeof schema>;
+
 const props = defineProps<{
   formData: {
     openingTime: string;
@@ -57,16 +59,15 @@ const props = defineProps<{
     isAvailable: boolean;
   };
 }>();
-const emit = defineEmits<{
-  (e: 'update-form', payload: (typeof props)['formData']): void;
-}>();
+
+const emit = defineEmits<(e: 'update-form', payload: FormValues) => void>();
 
 const { values } = useForm({
   validationSchema: toTypedSchema(schema),
   initialValues: props.formData,
 });
 
-watch(values, (val) => emit('update-form', val), { deep: true });
+watch(values, (val) => emit('update-form', val as FormValues), { deep: true });
 
 function inputClass(error: string | undefined, value: string) {
   return { 'ion-invalid': !!error, 'ion-valid': !error && value };
