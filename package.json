@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@capacitor/android": "^7.2.0",
+    "@capacitor/camera": "^7.0.1",
     "@capacitor/core": "^7.2.0",
     "@capacitor/ios": "^7.2.0",
     "@capacitor/preferences": "^7.0.1",
@@ -35,6 +36,7 @@
     "lottie-web": "^5.12.2",
     "pinia": "^2.3.1",
     "pinia-plugin-persistedstate": "^3.2.0",
+    "swiper": "^11.2.7",
     "ts-enum-util": "^4.1.0",
     "vee-validate": "^4.15.0",
     "vue": "^3.5.14",
