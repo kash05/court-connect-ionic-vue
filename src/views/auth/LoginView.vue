@@ -2,14 +2,14 @@
 import { loadingService } from '@/services/loadingService';
 import { toastService } from '@/services/toastService';
 import {
-	IonButton,
-	IonContent,
-	IonPage,
-	IonInput,
-	IonItem,
-	IonIcon,
-	IonText,
-	IonInputPasswordToggle,
+  IonButton,
+  IonContent,
+  IonPage,
+  IonInput,
+  IonItem,
+  IonIcon,
+  IonText,
+  IonInputPasswordToggle,
 } from '@ionic/vue';
 import { toTypedSchema } from '@vee-validate/zod';
 import { ErrorMessage, useField, useForm } from 'vee-validate';

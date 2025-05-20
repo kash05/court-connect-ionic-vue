@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { IonHeader, IonToolbar, IonButton, IonTitle } from '@ionic/vue';
+
+const emit = defineEmits(['cancel']);
+
+function cancel() {
+  emit('cancel');
+}
 </script>
 
 <template>
   <IonHeader class="ion-no-border ion-no-padding">
     <IonToolbar>
       <div>
-        <IonButton size="small" fill="clear">Cancel</IonButton>
+        <IonButton size="small" fill="clear" @click="cancel">Cancel</IonButton>
         <IonTitle>Add Your Property</IonTitle>
       </div>
     </IonToolbar>
