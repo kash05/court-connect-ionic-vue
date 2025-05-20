@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { IonPage, IonContent, IonButton, IonIcon } from '@ionic/vue';
-import { arrowBack, arrowForward, checkmark } from 'ionicons/icons';
+import { IonPage, IonContent } from '@ionic/vue';
 import { useFormStore } from '@/stores/useFormStore';
 
 import BasicInfoStep from '@/components/multistep-forms/add-property/BasicInfoStep.vue';
@@ -14,6 +13,7 @@ import AmenitiesPoliciesStep from '@/components/multistep-forms/add-property/Amm
 import MediaStep from '@/components/multistep-forms/add-property/MediaStep.vue';
 import HeaderComponent from '@/components/multistep-forms/add-property/HeaderComponent.vue';
 import StepIndicator from '@/components/multistep-forms/add-property/StepIndicator.vue';
+import FooterComponent from '@/components/multistep-forms/add-property/FooterComponent.vue';
 
 const formStore = useFormStore();
 
@@ -59,18 +59,6 @@ const canProceed = computed(() => {
       return false;
   }
 });
-
-const nextStep = () => {
-  if (currentStep.value < totalSteps) {
-    currentStep.value++;
-  }
-};
-
-const prevStep = () => {
-  if (currentStep.value > 1) {
-    currentStep.value--;
-  }
-};
 
 const submitForm = async () => {
   try {
@@ -145,31 +133,14 @@ onMounted(() => {
         @update-form="formStore.updateMedia"
       />
 
-      <div class="navigation-buttons ion-padding">
-        <ion-button v-if="currentStep > 1" fill="outline" @click="prevStep">
-          <ion-icon slot="start" :icon="arrowBack" />
-          Previous
-        </ion-button>
-
-        <ion-button
-          v-if="currentStep < totalSteps"
-          @click="nextStep"
-          :disabled="!canProceed"
-        >
-          Next
-          <ion-icon slot="end" :icon="arrowForward" />
-        </ion-button>
-
-        <ion-button
-          v-if="currentStep === totalSteps"
-          color="success"
-          @click="submitForm"
-          :disabled="!canProceed"
-        >
-          Submit
-          <ion-icon slot="end" :icon="checkmark" />
-        </ion-button>
-      </div>
+      <FooterComponent
+        :current-step="currentStep"
+        :total-steps="totalSteps"
+        :can-proceed="canProceed"
+        @prev="currentStep--"
+        @next="currentStep++"
+        @submit="submitForm"
+      />
     </ion-content>
     <HeaderComponent />
   </ion-page>
