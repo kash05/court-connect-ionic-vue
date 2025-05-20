@@ -1,55 +1,9 @@
-<template>
-  <div class="personal-details-form">
-    <h2>Basic Info</h2>
-
-    <ion-list>
-      <ion-item>
-        <ion-label position="floating">Facility Name*</ion-label>
-        <Field name="propertyName" v-slot="{ field, errorMessage }">
-          <ion-input
-            v-bind="field"
-            :value="field.value"
-            :class="inputClass(errorMessage, field.value)"
-            @ionInput="field.onInput"
-            type="text"
-          />
-          <ion-note slot="helper">
-            Your facility’s name (e.g. Spartan Arena)
-          </ion-note>
-          <ion-note slot="error" v-if="errorMessage">{{
-            errorMessage
-          }}</ion-note>
-        </Field>
-      </ion-item>
-      <!-- Description -->
-      <ion-item>
-        <ion-label position="floating">Description*</ion-label>
-        <Field name="description" v-slot="{ field, errorMessage }">
-          <ion-input
-            v-bind="field"
-            :value="field.value"
-            :class="inputClass(errorMessage, field.value)"
-            @ionInput="field.onInput"
-            type="text"
-          />
-          <ion-note slot="helper">
-            A short summary of your property and offerings
-          </ion-note>
-          <ion-note slot="error" v-if="errorMessage">{{
-            errorMessage
-          }}</ion-note>
-        </Field>
-      </ion-item>
-    </ion-list>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { Field, useForm } from 'vee-validate';
+import { useForm, useField } from 'vee-validate';
 import { z } from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
-import { IonList, IonItem, IonLabel, IonInput, IonNote } from '@ionic/vue';
-import { watch } from 'vue';
+import { IonItem, IonInput, IonText, IonNote, IonLabel } from '@ionic/vue';
+import { watch, computed } from 'vue';
 
 const schema = z.object({
   propertyName: z
@@ -65,42 +19,83 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 const props = defineProps<{
-  formData: {
-    propertyName: string;
-    description: string;
-  };
+  formData: FormValues;
 }>();
-const emit = defineEmits<(e: 'update-form', payload: FormValues) => void>();
 
-const { values } = useForm({
+const emit = defineEmits<{
+  'update-form': [payload: FormValues];
+  'validation-change': [isValid: boolean];
+}>();
+
+const { errors, values, meta } = useForm({
   validationSchema: toTypedSchema(schema),
   initialValues: props.formData,
 });
 
-watch(
-  values,
-  (val) => {
-    emit('update-form', val as FormValues);
-  },
-  { deep: true },
-);
+const { value: propertyName } = useField<string>('propertyName');
+const { value: description } = useField<string>('description');
 
-function inputClass(error: string | undefined, value: string) {
-  return {
-    'ion-invalid': !!error,
-    'ion-valid': !error && value,
-  };
-}
+watch(values, (val) => emit('update-form', val as FormValues), {
+  deep: true,
+});
+
+const isFormValid = computed(() => {
+  return meta.value.valid;
+});
+
+watch(
+  isFormValid,
+  (valid) => {
+    emit('validation-change', valid);
+  },
+  { immediate: true },
+);
 </script>
 
-<style scoped>
-.personal-details-form {
-  margin-bottom: 20px;
-}
+<template>
+  <div class="personal-details-form">
+    <h2>Basic Info</h2>
 
-h2 {
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  color: var(--ion-color-primary);
-}
+    <IonItem class="form-item ion-no-padding">
+      <div class="w-full">
+        <IonLabel>Property Name</IonLabel>
+        <IonNote class="helper-text"
+          >Your property's name (e.g. Spartan Arena)</IonNote
+        >
+        <IonInput
+          type="text"
+          placeholder="Property Name"
+          v-model="propertyName"
+          class="ion-no-padding"
+        />
+
+        <IonText color="danger" class="form-error" v-if="errors.propertyName">
+          {{ errors.propertyName }}
+        </IonText>
+      </div>
+    </IonItem>
+
+    <IonItem class="form-item ion-no-padding">
+      <div class="w-full">
+        <IonLabel>Description</IonLabel>
+        <IonNote class="helper-text"
+          >Your property's name (e.g. Spartan Arena)</IonNote
+        >
+        <IonInput
+          type="text"
+          placeholder="Description"
+          v-model="description"
+          class="description"
+        />
+
+        <IonText color="danger" class="form-error" v-if="errors.description">
+          {{ errors.description }}
+        </IonText>
+      </div>
+    </IonItem>
+  </div>
+</template>
+
+<style scoped lang="scss">
+@use '@/theme/addPropertyForm.scss';
 </style>
