@@ -62,19 +62,15 @@ const schema = z.object({
     .nonempty('Description is required'),
 });
 
+type FormValues = z.infer<typeof schema>;
+
 const props = defineProps<{
   formData: {
     propertyName: string;
     description: string;
   };
 }>();
-const emit =
-  defineEmits<
-    (
-      e: 'update-form',
-      payload: { propertyName: string; description: string },
-    ) => void
-  >();
+const emit = defineEmits<(e: 'update-form', payload: FormValues) => void>();
 
 const { values } = useForm({
   validationSchema: toTypedSchema(schema),
@@ -84,7 +80,7 @@ const { values } = useForm({
 watch(
   values,
   (val) => {
-    emit('update-form', val);
+    emit('update-form', val as FormValues);
   },
   { deep: true },
 );

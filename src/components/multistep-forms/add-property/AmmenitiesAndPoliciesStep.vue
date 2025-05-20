@@ -32,19 +32,19 @@ const schema = z.object({
   cancellationPolicy: z.string().min(5, 'Cancellation policy is required'),
 });
 
+type FormValues = z.infer<typeof schema>;
+
 const props = defineProps<{
-  formData: { amenities: string[]; cancellationPolicy: string };
+  formData: { amenities: string[]; cancellationPolicy?: string };
 }>();
-const emit = defineEmits<{
-  (e: 'update-form', payload: (typeof props)['formData']): void;
-}>();
+const emit = defineEmits<(e: 'update-form', payload: FormValues) => void>();
 
 const { values } = useForm({
   validationSchema: toTypedSchema(schema),
   initialValues: props.formData,
 });
 
-watch(values, (val) => emit('update-form', val), { deep: true });
+watch(values, (val) => emit('update-form', val as FormValues), { deep: true });
 
 function inputClass(error: string | undefined, value: string) {
   return { 'ion-invalid': !!error, 'ion-valid': !error && value };

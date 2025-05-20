@@ -11,18 +11,17 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ formData: { images: string[] } }>();
-const emit = defineEmits<{
-  (e: 'update-form', payload: { images: string[] }): void;
-}>();
+defineProps<{ formData: { images: string[] } }>();
+const emit =
+  defineEmits<(e: 'update-form', payload: { images: string[] }) => void>();
 
 function handleFileUpload(event: Event) {
   const files = (event.target as HTMLInputElement).files;
   if (!files) return;
 
   const urls: string[] = [];
-  for (let i = 0; i < files.length; i++) {
-    urls.push(URL.createObjectURL(files[i]));
+  for (const element of files) {
+    urls.push(URL.createObjectURL(element));
   }
 
   emit('update-form', { images: urls });

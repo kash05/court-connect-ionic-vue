@@ -2,14 +2,14 @@
 import { loadingService } from '@/services/loadingService';
 import { toastService } from '@/services/toastService';
 import {
-  IonButton,
-  IonContent,
-  IonPage,
-  IonInput,
-  IonItem,
-  IonIcon,
-  IonText,
-  IonInputPasswordToggle,
+	IonButton,
+	IonContent,
+	IonPage,
+	IonInput,
+	IonItem,
+	IonIcon,
+	IonText,
+	IonInputPasswordToggle,
 } from '@ionic/vue';
 import { toTypedSchema } from '@vee-validate/zod';
 import { ErrorMessage, useField, useForm } from 'vee-validate';
@@ -48,7 +48,7 @@ const onSubmit = handleSubmit((values) => {
         .then(() => {
           const redirectPath = route.query.redirect
             ? String(route.query.redirect)
-            : '/player';
+            : getRoute();
 
           router.push(redirectPath);
         })
@@ -61,6 +61,13 @@ const onSubmit = handleSubmit((values) => {
     'Logging you in...',
   );
 });
+
+const getRoute = () => {
+  if (authStore.isCurrentRoleOwner) {
+    return '/owner';
+  }
+  return '/player';
+};
 
 const goToRegister = () => {
   router.push('/register');
