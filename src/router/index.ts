@@ -64,7 +64,13 @@ const routes: Array<RouteRecordRaw> = [
     path: '/owner',
     name: 'OwnerDashboard',
     meta: { requiredRole: UserRole.OWNER },
-    component: () => import('@/views/owner/DashboardView.vue'),
+    component: () => import('../views/owner/DashboardView.vue'),
+    beforeEnter: [authGuard, roleGuard],
+  },
+  {
+    path: '/add-property',
+    name: 'AddProperty',
+    component: () => import('../views/owner/AddProperty.vue'),
     beforeEnter: [authGuard, roleGuard],
   },
 

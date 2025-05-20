@@ -20,9 +20,10 @@ import {
   add,
 } from 'ionicons/icons';
 import { computed, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 const ionRouter = useIonRouter();
+const router = useRouter();
 
 const { width } = useWindowSize();
 const isDesktop = computed(() => width.value >= 768);
@@ -57,7 +58,7 @@ const handleTabClick = (tab: TabKey) => {
 };
 
 const addProperty = () => {
-  console.log('Add property clicked');
+  router.push('/add-property');
 };
 </script>
 
@@ -95,7 +96,7 @@ const addProperty = () => {
         <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
 
-      <IonTabButton @click="addProperty()">
+      <IonTabButton @click="addProperty()" href="/add-property">
         <div class="add-tab-icon">
           <ion-fab>
             <ion-fab-button size="small" color="primary">
