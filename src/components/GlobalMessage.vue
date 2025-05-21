@@ -22,6 +22,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  errors: {
+    type: Object as () => Record<string, string[]>,
+    default: null,
+  },
   autoClose: {
     type: Number,
     default: 0,
@@ -38,6 +42,11 @@ if (props.autoClose > 0) {
     emit('close');
   }, props.autoClose);
 }
+
+const errorMessages = computed(() => {
+  if (!props.errors) return [];
+  return Object.values(props.errors).flat();
+});
 
 const getIcon = computed(() => {
   switch (props.type) {
@@ -60,6 +69,17 @@ const handleClose = () => {
 <template>
   <div class="message-box" :class="[type]" v-if="show">
     <ion-icon :icon="getIcon" class="message-icon"></ion-icon>
+
+    <ul class="message-list" v-if="errorMessages.length > 0">
+      <li
+        v-for="(msg, index) in errorMessages"
+        :key="index"
+        class="message-text"
+      >
+        {{ msg }}
+      </li>
+    </ul>
+
     <span class="message-text">{{ message }}</span>
     <ion-icon
       v-if="dismissible"
@@ -70,7 +90,7 @@ const handleClose = () => {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .message-box {
   display: flex;
   align-items: center;
@@ -90,6 +110,17 @@ const handleClose = () => {
 .message-text {
   font-size: 14px;
   flex: 1;
+}
+
+.message-list {
+  padding-left: 1rem;
+  margin: 0;
+  list-style-type: disc;
+
+  .message-text {
+    display: list-item;
+    list-style-position: inside;
+  }
 }
 
 .close-icon {

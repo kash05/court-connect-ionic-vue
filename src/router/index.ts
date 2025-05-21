@@ -22,6 +22,12 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: guestGuard,
   },
   {
+    path: '/register/:roleType',
+    name: 'RegisterationForm',
+    component: () => import('../views/auth/RegisterationForm.vue'),
+    beforeEnter: guestGuard,
+  },
+  {
     path: '/switch-mode/:mode',
     name: 'SwitchMode',
     component: () => import('@/views/SwitchModeSplashView.vue'),

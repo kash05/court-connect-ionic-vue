@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/useAuthStore';
 import {
   IonTabBar,
   IonTabButton,
@@ -9,7 +8,6 @@ import {
   IonTabs,
   IonTab,
   useIonRouter,
-  IonActionSheet,
 } from '@ionic/vue';
 import { useWindowSize } from '@vueuse/core';
 import {
@@ -17,12 +15,12 @@ import {
   peopleOutline,
   calendarOutline,
   repeatOutline,
+  searchSharp,
 } from 'ionicons/icons';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const ionRouter = useIonRouter();
-const authStore = useAuthStore();
 
 const { width } = useWindowSize();
 const isDesktop = computed(() => width.value >= 768);
@@ -54,31 +52,9 @@ const handleTabClick = (tab: TabKey) => {
   ionRouter.push(tabRoutes[tab]);
 };
 
-function switchMode(event: CustomEvent) {
-  if (event.detail.role === 'cancel') {
-    return;
-  }
-  authStore.toggleRole();
-  ionRouter.push({
-    path: `/switch-mode/owner`,
-    query: {
-      redirectTo: `/owner`,
-    },
-  });
-}
-
-const actionSheetButtons = [
-  {
-    text: 'Switch',
-  },
-  {
-    text: 'Cancel',
-    role: 'cancel',
-    data: {
-      action: 'cancel',
-    },
-  },
-];
+const findPlayers = () => {
+  console.log('find players clicked');
+};
 </script>
 
 <template>
@@ -115,6 +91,13 @@ const actionSheetButtons = [
         <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
 
+      <IonTabButton @click="findPlayers" href="/find/players">
+        <div class="find-tab-icon">
+          <ion-icon :icon="searchSharp"></ion-icon>
+        </div>
+        <IonRippleEffect type="unbounded"></IonRippleEffect>
+      </IonTabButton>
+
       <IonTabButton
         href="/events"
         :class="{
@@ -139,15 +122,6 @@ const actionSheetButtons = [
       </IonTabButton>
     </IonTabBar>
   </ion-tabs>
-  <IonActionSheet
-    trigger="open-action-sheet-player"
-    header="Switch to Owner mode?"
-    :buttons="actionSheetButtons"
-    sub-header="Your choice will be saved."
-    backdrop-dismiss="false"
-    keyboard-close="true"
-    @didDismiss="switchMode"
-  ></IonActionSheet>
 </template>
 
 <style scoped lang="scss">
@@ -223,6 +197,22 @@ ion-tab-button {
     ion-icon {
       animation: pulse 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+  }
+}
+
+.find-tab-icon {
+  background-color: var(--ion-orange-primary) !important;
+  color: var(--ion-color-light);
+  border-radius: 50%;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 13px;
+
+  ion-icon {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 

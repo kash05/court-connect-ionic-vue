@@ -13,6 +13,7 @@ $MobileSelectors: '.plt-capacitor, .plt-mobile';
   --light-color: #f5f7fa;
   --dark-color: #263238;
   --contrast-color: #ffffff;
+  --orange-primary: #f97316;
 
   /* === Backgrounds === */
   --bg-light: #f5f7fa;
@@ -87,6 +88,8 @@ $MobileSelectors: '.plt-capacitor, .plt-mobile';
   --ion-background-color: var(--bg-light);
   --ion-text-color: var(--text-primary);
   --ion-item-background: var(--bg-card);
+
+  --ion-orange-primary: var(--orange-primary);
 }
 
 /* ======= Dark Theme ======= */
@@ -102,6 +105,7 @@ $MobileSelectors: '.plt-capacitor, .plt-mobile';
   --light-color: #121212;
   --dark-color: #eceff1;
   --contrast-color: #000000;
+  --orange-primary: #fb923c;
 
   /* === Backgrounds === */
   --bg-light: #121212;
@@ -175,4 +179,5 @@ $MobileSelectors: '.plt-capacitor, .plt-mobile';
   --ion-background-color: var(--bg-light);
   --ion-text-color: var(--text-primary);
   --ion-item-background: var(--bg-card);
+  --ion-orange-primary: var(--orange-primary);
 }

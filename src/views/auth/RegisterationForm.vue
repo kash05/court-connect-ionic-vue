@@ -1,57 +1,93 @@
 <script setup lang="ts">
+import { useRoute } from 'vue-router';
+import { ErrorMessage, useField, useForm } from 'vee-validate';
+import { toTypedSchema } from '@vee-validate/zod';
+import { z } from 'zod';
+import { registerUser } from '@/services/authService';
 import { loadingService } from '@/services/loadingService';
-import { toastService } from '@/services/toastService';
 import {
-  IonButton,
-  IonContent,
-  IonPage,
   IonInput,
+  IonCheckbox,
+  IonButton,
   IonItem,
   IonIcon,
+  IonContent,
+  IonPage,
   IonText,
+  IonRadio,
+  IonLabel,
+  IonRadioGroup,
   IonInputPasswordToggle,
+  useIonRouter,
 } from '@ionic/vue';
-import { toTypedSchema } from '@vee-validate/zod';
-import { ErrorMessage, useField, useForm } from 'vee-validate';
-import { useRoute, useRouter } from 'vue-router';
-import { z } from 'zod';
 import { logoGoogle } from 'ionicons/icons';
-import { ref } from 'vue';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { onMounted, ref } from 'vue';
+import { toastService } from '@/services/toastService';
 
-const authStore = useAuthStore();
-const router = useRouter();
-const route = useRoute();
+const router = useIonRouter();
 const formError = ref<string | null>();
 const formErrors = ref<string | null>();
+const forRole = ref();
+const route = useRoute();
 
-const loginSchema = toTypedSchema(
-  z.object({
-    email: z.string().email('Please enter a valid email'),
-    password: z.string().min(1, 'Password is required'),
-  }),
+const registerSchema = toTypedSchema(
+  z
+    .object({
+      fullName: z.string().min(2, 'Name must be at least 2 characters'),
+      email: z.string().email('Please enter a valid email'),
+      password: z.string().min(6, 'Password must be at least 6 characters'),
+      confirmPassword: z.string(),
+      gender: z.string().min(2, 'Gender is required'),
+      agreeTerms: z.boolean().refine((val) => val, {
+        message: 'You must agree to terms and conditions',
+      }),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: "Passwords don't match",
+      path: ['confirmPassword'],
+    }),
 );
 
-const { handleSubmit, errors } = useForm({
-  validationSchema: loginSchema,
+onMounted(() => {
+  forRole.value = route.params.roleType;
 });
 
+const { handleSubmit, errors } = useForm({
+  validationSchema: registerSchema,
+  initialValues: {
+    fullName: '',
+    email: '',
+    password: '',
+    gender: '',
+    confirmPassword: '',
+    agreeTerms: false,
+  },
+});
+
+const { value: fullName } = useField<string>('fullName');
 const { value: email } = useField<string>('email');
 const { value: password } = useField<string>('password');
+const { value: confirmPassword } = useField<string>('confirmPassword');
+const { value: gender } = useField<string>('gender');
+const { value: agreeTerms } = useField<boolean>('agreeTerms');
 
 const onSubmit = handleSubmit((values) => {
   formError.value = '';
 
+  const registrationData = {
+    email: values.email,
+    password: values.password,
+    full_name: values.fullName,
+    gender: values.gender,
+    agree_terms: values.agreeTerms,
+    role: forRole.value,
+  };
+
   loadingService.withLoading(
     () =>
-      authStore
-        .login(values)
+      registerUser(registrationData)
         .then(() => {
-          const redirectPath = route.query.redirect
-            ? String(route.query.redirect)
-            : getRoute();
-
-          router.push(redirectPath);
+          router.push('/login');
         })
         .catch((error) => {
           const response = error.response?.data;
@@ -64,22 +100,15 @@ const onSubmit = handleSubmit((values) => {
             formErrors.value = null;
           }
         }),
-    'Logging you in...',
+    'Registering your account...',
   );
 });
 
-const getRoute = () => {
-  if (authStore.isCurrentRoleOwner) {
-    return '/owner';
-  }
-  return '/player';
+const goToLogin = () => {
+  router.push('/login');
 };
 
-const goToRegister = () => {
-  router.push('/register');
-};
-
-const handleGoogleLogin = () => {
+const handleGoogleRegistration = () => {
   console.log('Google login clicked');
   toastService.informationMessage('Google login feature is in development.');
 };
@@ -89,7 +118,7 @@ const handleGoogleLogin = () => {
   <ion-page>
     <ion-content class="ion-padding">
       <div class="page-container slide-in">
-        <div class="login-container">
+        <div class="registration-container">
           <div class="logo-container">
             <div class="logo">
               <img src="../../assets/appIcon.webp" alt="logo" />
@@ -103,7 +132,9 @@ const handleGoogleLogin = () => {
             }"
           >
             CourtConnect
-            <span class="text-primary-600 text-md block">LogIn</span>
+            <span class="text-primary-600 text-md block capitalize"
+              >{{ forRole }} Registration</span
+            >
           </h1>
 
           <GlobalMessage
@@ -116,7 +147,7 @@ const handleGoogleLogin = () => {
           <ion-button
             expand="block"
             class="google-btn"
-            @click="handleGoogleLogin"
+            @click="handleGoogleRegistration"
             :class="{
               'mt-2': formError || formErrors,
             }"
@@ -133,7 +164,21 @@ const handleGoogleLogin = () => {
             <span>or</span>
           </div>
 
-          <form class="login-form" @submit.prevent="onSubmit">
+          <form class="registration-form" @submit.prevent="onSubmit">
+            <ion-item
+              class="form-item ion-no-padding"
+              :class="{ 'has-error': errors.fullName }"
+            >
+              <ion-input
+                placeholder="Full Name"
+                v-model="fullName"
+                class="ion-no-padding"
+              ></ion-input>
+            </ion-item>
+            <ion-text color="danger" class="error-text" v-if="errors.fullName">
+              <ErrorMessage name="fullName" />
+            </ion-text>
+
             <ion-item
               class="form-item ion-no-padding"
               :class="{ 'has-error': errors.email }"
@@ -167,22 +212,74 @@ const handleGoogleLogin = () => {
               <ErrorMessage name="password" />
             </ion-text>
 
-            <div class="forgot-password">
-              <ion-button fill="clear" size="small"
-                >Forgot password?</ion-button
-              >
-            </div>
+            <ion-item
+              class="form-item ion-no-padding"
+              :class="{ 'has-error': errors.confirmPassword }"
+            >
+              <ion-input
+                type="password"
+                placeholder="Confirm password"
+                v-model="confirmPassword"
+                class="ion-no-padding"
+                ><ion-input-password-toggle
+                  slot="end"
+                ></ion-input-password-toggle
+              ></ion-input>
+            </ion-item>
+            <ion-text
+              color="danger"
+              class="error-text"
+              v-if="errors.confirmPassword"
+            >
+              <ErrorMessage name="confirmPassword" />
+            </ion-text>
+
+            <ion-radio-group
+              v-model="gender"
+              class="flex flex-col space-y-1 my-4"
+            >
+              <ion-label class="text-md">Select Your Gender</ion-label>
+              <div>
+                <ion-radio value="male" aria-label="none" class="text-sm"
+                  >Male</ion-radio
+                >
+                <ion-radio value="female" aria-label="none" class="text-sm"
+                  >Female</ion-radio
+                >
+              </div>
+            </ion-radio-group>
+
+            <ion-text color="danger" class="error-text" v-if="errors.gender">
+              <ErrorMessage name="gender" />
+            </ion-text>
+
+            <ion-item class="form-item ion-no-padding">
+              <div class="flex flex-col space-y-1">
+                <ion-checkbox v-model="agreeTerms"></ion-checkbox>
+                <ion-text class="text-sm">
+                  <span>I agree to the</span>
+                  <a href="#" class="terms-link"> Terms of Service</a>
+                  and
+                  <a href="#" class="terms-link"> Privacy Policy</a>
+                </ion-text>
+              </div>
+            </ion-item>
+            <ion-text
+              color="danger"
+              class="error-text"
+              v-if="errors.agreeTerms"
+            >
+              <ErrorMessage name="agreeTerms" />
+            </ion-text>
 
             <ion-button expand="block" type="submit" class="submit-btn">
-              Sign In
+              Create Account
             </ion-button>
           </form>
 
           <div class="create-account">
-            <span>Don't have an account?</span>
-            <ion-button fill="clear" @click="goToRegister"
-              >Create Account</ion-button
-            >
+            <span>Already have an account?</span>
+            <ion-button fill="clear" @click="goToLogin">Sign in</ion-button>
           </div>
         </div>
       </div>
@@ -196,19 +293,19 @@ ion-content::part(background) {
   background-size: cover;
   background-position: center;
 }
+
 .page-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100%;
 }
 
-.login-container {
+.registration-container {
   display: flex;
   flex-direction: column;
   max-width: 500px;
   width: 100%;
-  background-color: var(--bg-card, #ffffff);
+  background-color: var(--bg-card);
   box-shadow: var(--shadow-md, 0 4px 20px rgba(0, 0, 0, 0.06));
   padding: 20px 24px;
   margin: 16px;
@@ -238,9 +335,9 @@ ion-content::part(background) {
 }
 
 .title {
+  margin: 0 0 24px;
   font-size: 24px;
   font-weight: 600;
-  margin-bottom: 24px;
   text-align: center;
   color: var(--text-primary, var(--ion-color-dark));
 }
@@ -249,6 +346,7 @@ ion-content::part(background) {
   --background: var(--ion-color-primary);
   color: var(--ion-color-light);
   --border-radius: var(--radius-md, 12px);
+  --border-color: var(--border-color, #e0e0e0);
   --border-style: solid;
   --border-width: 1px;
   --box-shadow: none;
@@ -280,7 +378,7 @@ ion-content::part(background) {
   font-size: 14px;
 }
 
-.login-form {
+.registration-form {
   width: 100%;
 }
 
@@ -295,7 +393,7 @@ ion-content::part(background) {
   transition: all 0.2s ease;
 
   ion-input {
-    --background: var(--ion-color-light) !important;
+    background-color: var(--ion-color-light);
     color: var(--ion-color-dark);
     --padding-start: 12px !important;
     --padding-end: 12px !important;
@@ -311,6 +409,22 @@ ion-content::part(background) {
   --border-style: solid;
 }
 
+ion-radio {
+  --color-checked: var(--ion-color-primary);
+  margin-right: 10px;
+}
+
+ion-radio::part(container) {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--ion-color-medium-tint);
+  border-radius: 50%;
+}
+
+.radio-checked::part(container) {
+  border-color: var(--ion-color-primary);
+}
+
 .error-text {
   font-size: 12px;
   margin: 4px 0 16px 4px;
@@ -318,17 +432,29 @@ ion-content::part(background) {
   display: block;
 }
 
-.forgot-password {
-  text-align: right;
-  margin: 4px 0 24px;
+ion-checkbox {
+  --color-checked: var(--ion-color-primary);
 }
 
-.forgot-password ion-button {
-  --color: var(--ion-color-primary);
-  font-size: 13px;
-  --padding-start: 4px;
-  --padding-end: 4px;
-  margin: 0;
+ion-checkbox::part(container) {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--ion-color-medium-tint);
+  border-radius: 50%;
+}
+
+.checkbox-checked::part(container) {
+  border-color: var(--ion-color-primary);
+}
+
+.terms-link {
+  color: var(--ion-color-primary);
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .submit-btn {
