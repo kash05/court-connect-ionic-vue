@@ -12,6 +12,7 @@ import { UserRole } from '@/types/enums/UserEnum';
 import { Preferences } from '@capacitor/preferences';
 import { useRouter } from 'vue-router';
 import { setAuthToken } from '@/lib/apiClient';
+import { toastService } from '@/services/toastService';
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<UserInterface | null>(null);
@@ -34,7 +35,10 @@ export const useAuthStore = defineStore('auth', () => {
 
     token.value = resp.access_token;
     setAuthToken(resp.access_token);
-    const userData = await currentUser();
+    const userData = await currentUser().catch(() => {
+      resetStore();
+      toastService.dangerMessage('Unable to fetch user details');
+    });
     user.value = userData;
 
     await Preferences.set({ key: 'token', value: token.value });
@@ -83,13 +87,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       if (token.value) await logoutService();
     } finally {
-      // clear everything
-      user.value = null;
-      token.value = null;
-      activeRole.value = UserRole.PLAYER;
-      setAuthToken(null);
-      await Preferences.clear();
-      router.push('/login');
+      resetStore();
     }
   }
 
@@ -112,6 +110,16 @@ export const useAuthStore = defineStore('auth', () => {
     () => activeRole.value === UserRole.OWNER,
   );
 
+  // ——————————————————————————————————————————————
+  async function resetStore() {
+    user.value = null;
+    token.value = null;
+    activeRole.value = UserRole.PLAYER;
+    setAuthToken(null);
+    await Preferences.clear();
+    router.push('/login');
+  }
+
   return {
     user,
     token,
@@ -126,5 +134,6 @@ export const useAuthStore = defineStore('auth', () => {
     resetPassword,
     initializeAuth,
     toggleRole,
+    resetStore,
   };
 });
