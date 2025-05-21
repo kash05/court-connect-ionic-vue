@@ -54,7 +54,10 @@ const handleTabClick = (tab: TabKey) => {
   ionRouter.push(tabRoutes[tab]);
 };
 
-function switchMode() {
+function switchMode(event: CustomEvent) {
+  if (event.detail.role === 'cancel') {
+    return;
+  }
   authStore.toggleRole();
   ionRouter.push({
     path: `/switch-mode/owner`,
@@ -127,7 +130,7 @@ const actionSheetButtons = [
         <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
 
-      <IonTabButton id="open-action-sheet">
+      <IonTabButton id="open-action-sheet-player">
         <div class="tab-icon-container">
           <IonIcon :icon="repeatOutline" color="secondary" size="large" />
         </div>
@@ -137,13 +140,13 @@ const actionSheetButtons = [
     </IonTabBar>
   </ion-tabs>
   <IonActionSheet
-    trigger="open-action-sheet"
+    trigger="open-action-sheet-player"
     header="Switch to Owner mode?"
     :buttons="actionSheetButtons"
     sub-header="Your choice will be saved."
     backdrop-dismiss="false"
     keyboard-close="true"
-    @didDismiss="switchMode()"
+    @didDismiss="switchMode"
   ></IonActionSheet>
 </template>
 
