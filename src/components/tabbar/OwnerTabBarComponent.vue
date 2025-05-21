@@ -1,25 +1,25 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/useAuthStore';
 import {
-  IonTabBar,
-  IonTabButton,
-  IonIcon,
-  IonLabel,
-  IonRippleEffect,
-  IonTabs,
-  IonTab,
-  useIonRouter,
-  IonFab,
-  IonFabButton,
-  IonActionSheet,
+	IonTabBar,
+	IonTabButton,
+	IonIcon,
+	IonLabel,
+	IonRippleEffect,
+	IonTabs,
+	IonTab,
+	useIonRouter,
+	IonFab,
+	IonFabButton,
+	IonActionSheet,
 } from '@ionic/vue';
 import { useWindowSize } from '@vueuse/core';
 import {
-  homeOutline,
-  businessOutline,
-  barChartOutline,
-  add,
-  repeatOutline,
+	homeOutline,
+	businessOutline,
+	barChartOutline,
+	add,
+	repeatOutline,
 } from 'ionicons/icons';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
@@ -58,7 +58,10 @@ const handleTabClick = (tab: TabKey) => {
   ionRouter.push(tabRoutes[tab]);
 };
 
-function switchMode() {
+function switchMode(event: CustomEvent) {
+  if (event.detail.role === 'cancel') {
+    return;
+  }
   authStore.toggleRole();
   ionRouter.push({
     path: `/switch-mode/player`,
@@ -146,7 +149,7 @@ const actionSheetButtons = [
         <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
 
-      <IonTabButton id="open-action-sheet">
+      <IonTabButton id="open-action-sheet-owner">
         <div class="tab-icon-container">
           <IonIcon :icon="repeatOutline" color="primary" size="large" />
         </div>
@@ -157,13 +160,13 @@ const actionSheetButtons = [
   </ion-tabs>
 
   <IonActionSheet
-    trigger="open-action-sheet"
+    trigger="open-action-sheet-owner"
     header="Switch to Player mode?"
     :buttons="actionSheetButtons"
     sub-header="Your choice will be saved."
     backdrop-dismiss="false"
     keyboard-close="true"
-    @didDismiss="switchMode()"
+    @didDismiss="switchMode"
   ></IonActionSheet>
 </template>
 

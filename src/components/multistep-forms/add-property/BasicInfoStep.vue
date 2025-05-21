@@ -8,10 +8,7 @@ import {
   IonText,
   IonNote,
   IonLabel,
-  IonButton,
   IonModal,
-  IonHeader,
-  IonToolbar,
   IonTextarea,
 } from '@ionic/vue';
 import { watch, onMounted, ref } from 'vue';
@@ -55,7 +52,7 @@ onMounted(async () => {
   emit('validation-change', meta.value.valid);
 });
 
-const { errors, values, meta, resetForm } = useForm({
+const { errors, values, meta } = useForm({
   validationSchema: toTypedSchema(schema),
   initialValues: props.formData,
 });
@@ -74,16 +71,6 @@ watch(
     emit('update-form', val as BasicInfoForm);
   },
   { deep: true },
-);
-
-watch(
-  () => props.formData,
-  (newVal) => {
-    resetForm({
-      values: newVal,
-    });
-  },
-  { deep: true, immediate: true },
 );
 
 watch(
@@ -109,10 +96,6 @@ const handleLocationSelected = (location: {
   latitude.value = location.latitude;
   longitude.value = location.longitude;
   address.value = location.address;
-};
-
-const confirmLocationSelection = () => {
-  closeAddressModal();
 };
 </script>
 
@@ -217,24 +200,12 @@ const confirmLocationSelection = () => {
     class="location-modal"
     backdrop-dismiss="false"
   >
-    <IonHeader class="ion-no-border ion-no-padding">
-      <IonToolbar>
-        <div class="flex w-full justify-between">
-          <IonButton size="small" fill="clear" @click="closeAddressModal"
-            >Cancel</IonButton
-          >
-          <IonButton size="small" fill="clear" @click="confirmLocationSelection"
-            >Save</IonButton
-          >
-        </div>
-      </IonToolbar>
-    </IonHeader>
-
     <LocationMapComponent
       :initial-latitude="latitude"
       :initial-longitude="longitude"
       :initial-address="address"
       @location-selected="handleLocationSelected"
+      @close="closeAddressModal"
     />
   </IonModal>
 </template>
@@ -242,27 +213,13 @@ const confirmLocationSelection = () => {
 <style scoped lang="scss">
 @use '@/theme/addPropertyForm.scss';
 
+.personal-details-form {
+  max-height: calc(100vh - 240px);
+  overflow: auto;
+}
+
 .location-modal {
   --height: 100%;
   --width: 100%;
-}
-
-ion-header {
-  ion-toolbar {
-    padding-top: 5px;
-    --background: var(--ion-color-light);
-
-    ion-button {
-      font-size: 17px;
-      color: var(--ion-color-primary);
-    }
-
-    ion-title {
-      margin-top: 2px;
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--ion-color-dark);
-    }
-  }
 }
 </style>

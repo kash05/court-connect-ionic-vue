@@ -74,16 +74,16 @@ function cancelForm() {
   <ion-page>
     <HeaderComponent @cancel="cancelForm" />
     <ion-content class="ion-padding">
+      <StepIndicator
+        :current-step="currentStep - 1"
+        :step-titles="stepTitles"
+      />
+
       <div v-if="isLoading" class="loading-container">
         <ion-spinner name="bubbles"></ion-spinner>
       </div>
 
       <div v-else>
-        <StepIndicator
-          :current-step="currentStep - 1"
-          :step-titles="stepTitles"
-        />
-
         <BasicInfoStep
           v-if="currentStep === 1"
           :form-data="formStore.formData.basicInfo"

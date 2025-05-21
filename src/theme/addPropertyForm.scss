@@ -4,11 +4,6 @@ h2 {
   color: var(--ion-color-primary);
 }
 
-.personal-details-form {
-  max-height: calc(100vh - 240px);
-  overflow: auto;
-}
-
 .form-item {
   --border-color: var(--ion-color-medium-tint);
   --border-radius: 8px;

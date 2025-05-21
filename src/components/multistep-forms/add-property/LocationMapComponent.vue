@@ -1,9 +1,25 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, defineProps, defineEmits } from 'vue';
-import { IonButton, IonContent, IonIcon, IonSearchbar } from '@ionic/vue';
+import {
+	IonButton,
+	IonContent,
+	IonIcon,
+	IonSearchbar,
+	IonText,
+	IonList,
+	IonItem,
+	IonHeader,
+	IonToolbar,
+} from '@ionic/vue';
 import 'leaflet/dist/leaflet.css';
 import * as L from 'leaflet';
-import { locationSharp } from 'ionicons/icons';
+import { locationSharp, search } from 'ionicons/icons';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import { Geolocation } from '@capacitor/geolocation';
+import { Dialog } from '@capacitor/dialog';
+import { onClickOutside } from '@vueuse/core';
 
 const props = defineProps<{
   initialLatitude?: number;
@@ -15,6 +31,7 @@ const emit = defineEmits<{
   'location-selected': [
     { latitude: number; longitude: number; address: string },
   ];
+  close: [];
 }>();
 
 const mapRef = ref<HTMLElement | null>(null);
@@ -24,11 +41,37 @@ const searchQuery = ref('');
 const currentAddress = ref(props.initialAddress || '');
 const currentLatitude = ref(props.initialLatitude || 40.7128);
 const currentLongitude = ref(props.initialLongitude || -74.006);
+const searchResults = ref<any[]>([]);
+const showSearchResults = ref(false);
+const dropdownRef = ref<HTMLElement | null>(null);
+const originalLatitude = ref<number | null>(null);
+const originalLongitude = ref<number | null>(null);
+const originalAddress = ref<string | null>(null);
+
+const fixLeafletIcon = () => {
+  delete (L.Icon.Default.prototype as any)._getIconUrl;
+
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: markerIcon2x,
+    iconUrl: markerIcon,
+    shadowUrl: markerShadow,
+  });
+};
 
 onMounted(() => {
+  fixLeafletIcon();
+
+  originalLatitude.value = props.initialLatitude ?? 40.7128;
+  originalLongitude.value = props.initialLongitude ?? -74.006;
+  originalAddress.value = props.initialAddress ?? '';
+
   setTimeout(() => {
     initMap();
   }, 300);
+});
+
+onClickOutside(dropdownRef, () => {
+  showSearchResults.value = false;
 });
 
 watch(
@@ -49,9 +92,9 @@ const initMap = () => {
 
   map.value = L.map(mapRef.value).setView([defaultLat, defaultLng], 13);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors',
-  }).addTo(map.value);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(
+    map.value,
+  );
 
   marker.value = L.marker([defaultLat, defaultLng], {
     draggable: true,
@@ -112,6 +155,43 @@ const reverseGeocode = async (lat: number, lng: number) => {
   }
 };
 
+const searchLocationSuggestions = async (query: string) => {
+  if (!query) return;
+
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`,
+    );
+    const data = await response.json();
+
+    if (data && data.length > 0) {
+      searchResults.value = data;
+      showSearchResults.value = true;
+    } else {
+      searchResults.value = [];
+    }
+  } catch (error) {
+    console.error('Error fetching location suggestions:', error);
+    searchResults.value = [];
+  }
+};
+
+const selectSuggestion = (result: any) => {
+  if (!map.value) return;
+
+  const lat = parseFloat(result.lat);
+  const lng = parseFloat(result.lon);
+
+  setMarkerPosition(lat, lng);
+  currentAddress.value = result.display_name;
+  map.value.setView([lat, lng], 15);
+  emitLocationSelected();
+
+  searchResults.value = [];
+  showSearchResults.value = false;
+  searchQuery.value = result.display_name;
+};
+
 const searchLocation = async () => {
   if (!searchQuery.value || !map.value) return;
 
@@ -131,28 +211,49 @@ const searchLocation = async () => {
       map.value.setView([parseFloat(lat), parseFloat(lon)], 15);
 
       emitLocationSelected();
+
+      searchResults.value = [];
+      showSearchResults.value = false;
     }
   } catch (error) {
     console.error('Error searching location:', error);
   }
 };
 
-const useCurrentLocation = () => {
-  if (navigator.geolocation && map.value) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude: lat, longitude: lng } = position.coords;
+const useCurrentLocation = async () => {
+  try {
+    // Request permissions first
+    const permissionStatus = await Geolocation.checkPermissions();
 
-        setMarkerPosition(lat, lng);
+    if (permissionStatus.location !== 'granted') {
+      const requestResult = await Geolocation.requestPermissions();
 
-        map.value?.setView([lat, lng], 15);
-      },
-      (error) => {
-        console.error('Error getting current location:', error);
-      },
-    );
-  } else {
-    console.error('Geolocation is not supported by this browser.');
+      if (requestResult.location !== 'granted') {
+        await Dialog.alert({
+          title: 'Permission Required',
+          message: 'Location permission is required to use this feature.',
+        });
+        return;
+      }
+    }
+
+    // Get current position using Capacitor plugin
+    const position = await Geolocation.getCurrentPosition({
+      enableHighAccuracy: true,
+    });
+
+    const { latitude: lat, longitude: lng } = position.coords;
+
+    setMarkerPosition(lat, lng);
+    if (map.value) {
+      map.value.setView([lat, lng], 15);
+    }
+  } catch (error) {
+    console.error('Error getting current location:', error);
+    await Dialog.alert({
+      title: 'Location Required',
+      message: 'Please allow location access to set your current location.',
+    });
   }
 };
 
@@ -163,18 +264,91 @@ const emitLocationSelected = () => {
     address: currentAddress.value,
   });
 };
+
+const restoreOriginalLocation = () => {
+  if (
+    !originalLatitude.value ||
+    !originalLongitude.value ||
+    !originalAddress.value
+  )
+    return;
+
+  currentLatitude.value = originalLatitude.value;
+  currentLongitude.value = originalLongitude.value;
+  currentAddress.value = originalAddress.value;
+  searchQuery.value = originalAddress.value || '';
+
+  emitLocationSelected();
+
+  if (marker.value) {
+    marker.value.setLatLng([originalLatitude.value, originalLongitude.value]);
+  }
+
+  if (map.value) {
+    map.value.setView([originalLatitude.value, originalLongitude.value], 13);
+  }
+};
+
+const handleCancel = () => {
+  restoreOriginalLocation();
+  emit('close');
+};
+
+const handleSave = () => {
+  emitLocationSelected();
+  emit('close');
+};
 </script>
 
 <template>
   <IonContent>
+    <IonHeader class="ion-no-border ion-no-padding">
+      <IonToolbar>
+        <div class="flex w-full justify-between">
+          <IonButton size="small" fill="clear" @click="handleCancel"
+            >Cancel</IonButton
+          >
+          <IonButton size="small" fill="clear" @click="handleSave"
+            >Save</IonButton
+          >
+        </div>
+      </IonToolbar>
+    </IonHeader>
     <div class="location-search-container">
-      <IonSearchbar
-        type="text"
-        placeholder="Search for a location"
-        v-model="searchQuery"
-        class="search-input"
-      />
-      <IonButton @click="searchLocation" size="small" fill="clear"
+      <div class="search-container">
+        <IonSearchbar
+          type="text"
+          placeholder="Search for a location"
+          v-model="searchQuery"
+          class="search-input"
+          :debounce="300"
+          @ionInput="
+            (e) => {
+              if (e.detail.value && e.detail.value.length > 2)
+                searchLocationSuggestions(e.detail.value);
+            }
+          "
+        />
+        <div ref="dropdownRef" class="search-dropdown" v-if="showSearchResults">
+          <IonList v-if="searchResults.length > 0">
+            <IonItem
+              v-for="(result, index) in searchResults"
+              :key="index"
+              button
+              @click="selectSuggestion(result)"
+            >
+              <IonIcon :icon="search" slot="start" />
+              {{ result.display_name }}
+            </IonItem>
+          </IonList>
+          <div v-else class="no-results">No results found</div>
+        </div>
+      </div>
+      <IonButton
+        @click="searchLocation"
+        size="small"
+        fill="clear"
+        class="ion-no-padding mr-3"
         >Search</IonButton
       >
     </div>
@@ -189,30 +363,87 @@ const emitLocationSelected = () => {
 
     <div class="location-details">
       <div v-if="currentLatitude && currentLongitude" class="coordinates">
-        <p><strong>Latitude:</strong> {{ currentLatitude }}</p>
-        <p><strong>Longitude:</strong> {{ currentLongitude }}</p>
+        <IonText><strong>Latitude:</strong> {{ currentLatitude }}</IonText>
+        <IonText><strong>Longitude:</strong> {{ currentLongitude }}</IonText>
       </div>
       <div v-if="currentAddress" class="selected-address">
-        <p><strong>Selected Address:</strong> {{ currentAddress }}</p>
+        <IonText
+          ><strong>Selected Address:</strong> {{ currentAddress }}</IonText
+        >
       </div>
     </div>
   </IonContent>
 </template>
 
 <style scoped lang="scss">
+ion-header {
+  ion-toolbar {
+    padding-top: 5px;
+    --background: var(--ion-color-light);
+
+    ion-button {
+      font-size: 17px;
+      color: var(--ion-color-primary);
+    }
+
+    ion-title {
+      margin-top: 2px;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--ion-color-dark);
+    }
+  }
+}
+
 .location-search-container {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+  position: relative;
+
+  .search-container {
+    flex: 1;
+    position: relative;
+  }
 
   .search-input {
-    flex: 1;
-    --padding-start: 0.5rem;
+    --background: var(--ion-color-light-shade);
+    width: 100%;
+  }
+
+  .search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-height: 200px;
+    overflow-y: auto;
+
+    ion-item {
+      --padding-start: 8px;
+      --min-height: 40px;
+      font-size: 14px;
+
+      ion-icon {
+        font-size: 16px;
+        margin-right: 8px;
+      }
+    }
+
+    .no-results {
+      font-size: 14px;
+      color: var(--ion-color-medium);
+      padding: 10px;
+    }
   }
 }
 
 .map-container {
-  height: 60vh;
+  height: 58vh;
   width: 100%;
   z-index: 0;
 }
@@ -224,8 +455,16 @@ const emitLocationSelected = () => {
   .selected-address {
     margin-bottom: 1rem;
 
-    p {
+    ion-text {
+      display: block;
       margin: 0.25rem 0;
+      font-size: 14px;
+      color: var(--ion-color-dark);
+      strong {
+        font-weight: 600;
+        font-size: 16px;
+        color: var(--ion-color-medium);
+      }
     }
   }
 }
