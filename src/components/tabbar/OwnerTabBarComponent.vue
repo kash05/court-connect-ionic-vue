@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/useAuthStore';
-import { actionSheetController } from '@ionic/core';
 import {
   IonTabBar,
   IonTabButton,
@@ -12,6 +11,7 @@ import {
   useIonRouter,
   IonFab,
   IonFabButton,
+  IonActionSheet,
 } from '@ionic/vue';
 import { useWindowSize } from '@vueuse/core';
 import {
@@ -22,10 +22,9 @@ import {
   repeatOutline,
 } from 'ionicons/icons';
 import { computed, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 const ionRouter = useIonRouter();
-const router = useRouter();
 const authStore = useAuthStore();
 
 const { width } = useWindowSize();
@@ -59,37 +58,32 @@ const handleTabClick = (tab: TabKey) => {
   ionRouter.push(tabRoutes[tab]);
 };
 
-async function switchMode() {
-  const actionSheet = await actionSheetController.create({
-    header: 'Switch to Player mode?',
-    subHeader: 'Your choice will be saved.',
-    backdropDismiss: false,
-    buttons: [
-      {
-        text: 'Switch',
-        role: '',
-        handler: () => {
-          authStore.toggleRole();
-          ionRouter.push({
-            path: `/switch-mode/player`,
-            query: {
-              redirectTo: `/player`,
-            },
-          });
-        },
-      },
-      {
-        text: 'Cancel',
-        role: 'cancel',
-      },
-    ],
+function switchMode() {
+  authStore.toggleRole();
+  ionRouter.push({
+    path: `/switch-mode/player`,
+    query: {
+      redirectTo: `/player`,
+    },
   });
-  await actionSheet.present();
 }
 
 const addProperty = () => {
-  router.push('/add-property');
+  ionRouter.push('/add-property');
 };
+
+const actionSheetButtons = [
+  {
+    text: 'Switch',
+  },
+  {
+    text: 'Cancel',
+    role: 'cancel',
+    data: {
+      action: 'cancel',
+    },
+  },
+];
 </script>
 
 <template>
@@ -152,7 +146,7 @@ const addProperty = () => {
         <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
 
-      <IonTabButton @click="switchMode()">
+      <IonTabButton id="open-action-sheet">
         <div class="tab-icon-container">
           <IonIcon :icon="repeatOutline" color="primary" size="large" />
         </div>
@@ -161,6 +155,16 @@ const addProperty = () => {
       </IonTabButton>
     </IonTabBar>
   </ion-tabs>
+
+  <IonActionSheet
+    trigger="open-action-sheet"
+    header="Switch to Player mode?"
+    :buttons="actionSheetButtons"
+    sub-header="Your choice will be saved."
+    backdrop-dismiss="false"
+    keyboard-close="true"
+    @didDismiss="switchMode()"
+  ></IonActionSheet>
 </template>
 
 <style scoped lang="scss">
