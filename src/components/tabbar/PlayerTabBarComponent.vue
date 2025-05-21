@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/useAuthStore';
-import { actionSheetController } from '@ionic/core';
 import {
   IonTabBar,
   IonTabButton,
@@ -10,6 +9,7 @@ import {
   IonTabs,
   IonTab,
   useIonRouter,
+  IonActionSheet,
 } from '@ionic/vue';
 import { useWindowSize } from '@vueuse/core';
 import {
@@ -54,33 +54,28 @@ const handleTabClick = (tab: TabKey) => {
   ionRouter.push(tabRoutes[tab]);
 };
 
-async function switchMode() {
-  const actionSheet = await actionSheetController.create({
-    header: 'Switch to Owner mode?',
-    subHeader: 'Your choice will be saved.',
-    backdropDismiss: false,
-    buttons: [
-      {
-        text: 'Switch',
-        role: '',
-        handler: () => {
-          authStore.toggleRole();
-          ionRouter.push({
-            path: `/switch-mode/owner`,
-            query: {
-              redirectTo: `/owner`,
-            },
-          });
-        },
-      },
-      {
-        text: 'Cancel',
-        role: 'cancel',
-      },
-    ],
+function switchMode() {
+  authStore.toggleRole();
+  ionRouter.push({
+    path: `/switch-mode/owner`,
+    query: {
+      redirectTo: `/owner`,
+    },
   });
-  await actionSheet.present();
 }
+
+const actionSheetButtons = [
+  {
+    text: 'Switch',
+  },
+  {
+    text: 'Cancel',
+    role: 'cancel',
+    data: {
+      action: 'cancel',
+    },
+  },
+];
 </script>
 
 <template>
@@ -132,7 +127,7 @@ async function switchMode() {
         <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
 
-      <IonTabButton @click="switchMode()">
+      <IonTabButton id="open-action-sheet">
         <div class="tab-icon-container">
           <IonIcon :icon="repeatOutline" color="secondary" size="large" />
         </div>
@@ -141,6 +136,15 @@ async function switchMode() {
       </IonTabButton>
     </IonTabBar>
   </ion-tabs>
+  <IonActionSheet
+    trigger="open-action-sheet"
+    header="Switch to Owner mode?"
+    :buttons="actionSheetButtons"
+    sub-header="Your choice will be saved."
+    backdrop-dismiss="false"
+    keyboard-close="true"
+    @didDismiss="switchMode()"
+  ></IonActionSheet>
 </template>
 
 <style scoped lang="scss">
