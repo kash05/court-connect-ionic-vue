@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useAuthStore } from '@/stores/useAuthStore';
+import { actionSheetController } from '@ionic/core';
 import {
   IonTabBar,
   IonTabButton,
@@ -12,14 +14,15 @@ import {
 import { useWindowSize } from '@vueuse/core';
 import {
   homeOutline,
-  personOutline,
   peopleOutline,
   calendarOutline,
+  repeatOutline,
 } from 'ionicons/icons';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const ionRouter = useIonRouter();
+const authStore = useAuthStore();
 
 const { width } = useWindowSize();
 const isDesktop = computed(() => width.value >= 768);
@@ -30,19 +33,17 @@ const activeTab = computed(() => {
   if (path.includes('/player')) return 'home';
   if (path.includes('/teams')) return 'teams';
   if (path.includes('/events')) return 'events';
-  if (path.includes('/profile')) return 'profile';
   return '';
 });
 
 const animatingTab = ref('');
 
-type TabKey = 'home' | 'teams' | 'events' | 'profile';
+type TabKey = 'home' | 'teams' | 'events';
 
 const tabRoutes: Record<TabKey, string> = {
   home: '/player',
   teams: '/teams',
   events: '/events',
-  profile: '/profile',
 };
 
 const handleTabClick = (tab: TabKey) => {
@@ -52,6 +53,34 @@ const handleTabClick = (tab: TabKey) => {
   }, 300);
   ionRouter.push(tabRoutes[tab]);
 };
+
+async function switchMode() {
+  const actionSheet = await actionSheetController.create({
+    header: 'Switch to Owner mode?',
+    subHeader: 'Your choice will be saved.',
+    backdropDismiss: false,
+    buttons: [
+      {
+        text: 'Switch',
+        role: '',
+        handler: () => {
+          authStore.toggleRole();
+          ionRouter.push({
+            path: `/switch-mode/owner`,
+            query: {
+              redirectTo: `/owner`,
+            },
+          });
+        },
+      },
+      {
+        text: 'Cancel',
+        role: 'cancel',
+      },
+    ],
+  });
+  await actionSheet.present();
+}
 </script>
 
 <template>
@@ -103,18 +132,11 @@ const handleTabClick = (tab: TabKey) => {
         <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
 
-      <IonTabButton
-        href="/profile"
-        :class="{
-          'tab-selected': activeTab === 'profile',
-          'tab-animating': animatingTab === 'profile',
-        }"
-        @click="handleTabClick('profile')"
-      >
+      <IonTabButton @click="switchMode()">
         <div class="tab-icon-container">
-          <IonIcon :icon="personOutline" />
+          <IonIcon :icon="repeatOutline" color="secondary" size="large" />
         </div>
-        <IonLabel>Profile</IonLabel>
+        <IonLabel>Switch</IonLabel>
         <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
     </IonTabBar>

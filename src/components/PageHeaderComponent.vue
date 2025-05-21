@@ -4,10 +4,7 @@ import {
   IonIcon,
   IonToolbar,
   IonHeader,
-  IonToggle,
-  alertController,
   IonBadge,
-  useIonRouter,
   IonAvatar,
 } from '@ionic/vue';
 import { notificationsOutline, chevronBackOutline } from 'ionicons/icons';
@@ -15,11 +12,9 @@ import { onClickOutside } from '@vueuse/core';
 import { computed, ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ProfilePopoverComponent from '@/components/ProfilePopoverComponent.vue';
-import { UserRole } from '@/types/enums/UserEnum';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 const { user } = useAuthStore();
-const ionRouter = useIonRouter();
 
 interface Props {
   title?: string;
@@ -27,7 +22,6 @@ interface Props {
   backRoute?: string;
   showProfilePopover?: boolean;
   showNotificationsIcon?: boolean;
-  showToggleRole?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -36,7 +30,6 @@ const props = withDefaults(defineProps<Props>(), {
   backRoute: '',
   showProfilePopover: true,
   showNotificationsIcon: true,
-  showToggleRole: true,
 });
 
 const authStore = useAuthStore();
@@ -47,58 +40,12 @@ const profileMenuRef = ref(null);
 const showProfileMenu = ref(false);
 const showNotifications = ref(false);
 const notificationsRef = ref(null);
-const displayedIsOwner = ref(false);
 
 onMounted(async () => {
   if (!authStore.initialized) {
     await authStore.initializeAuth();
   }
 });
-
-const onToggleClick = async (event: MouseEvent) => {
-  event.preventDefault();
-  event.stopPropagation();
-
-  displayedIsOwner.value = !authStore.isCurrentRoleOwner;
-
-  const targetRole = authStore.isCurrentRoleOwner
-    ? UserRole.PLAYER
-    : UserRole.OWNER;
-
-  const alert = await alertController.create({
-    header: `Switch role to ${targetRole}?`,
-    message: 'Your choice will be remembered.',
-    backdropDismiss: false,
-    buttons: [
-      {
-        text: 'Yes',
-        handler: () => {
-          authStore.toggleRole();
-          ionRouter.push({
-            path: `/switch-mode/${targetRole}`,
-            query: {
-              redirectTo: `/${targetRole}`,
-            },
-          });
-        },
-      },
-      {
-        text: 'Cancel',
-        role: 'cancel',
-      },
-    ],
-  });
-
-  await alert.present();
-};
-
-watch(
-  () => authStore.isCurrentRoleOwner,
-  () => {
-    displayedIsOwner.value = authStore.isCurrentRoleOwner;
-  },
-  { immediate: true },
-);
 
 watch(
   () => route.fullPath,
@@ -201,23 +148,16 @@ const toggleProfileMenu = () => {
             </div>
           </div>
 
-          <span class="header-title ml-2">{{ displayTitle }}</span>
+          <span class="header-title ml-2 mr-2">{{ displayTitle }}</span>
+          <ion-badge
+            :color="authStore.isCurrentRolePlayer ? 'primary' : 'secondary'"
+            class="ion-no-padding role-text"
+          >
+            {{ authStore.activeRole }}
+          </ion-badge>
         </div>
 
         <div class="action-buttons">
-          <div class="role-toggle-container capitalize" v-if="showToggleRole">
-            <ion-badge
-              :color="authStore.isCurrentRolePlayer ? 'primary' : 'secondary'"
-            >
-              {{ authStore.activeRole }}
-            </ion-badge>
-            <IonToggle
-              v-model="displayedIsOwner"
-              @click="onToggleClick($event)"
-              class="role-toggle"
-            ></IonToggle>
-          </div>
-
           <div class="relative" v-if="showNotificationsIcon">
             <IonButton class="notification-btn" @click="toggleNotifications">
               <div class="notification-container">
@@ -337,43 +277,17 @@ const toggleProfileMenu = () => {
   color: var(--ion-color-dark);
 }
 
+.role-text {
+  font-size: 0.6rem;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 4px 8px;
+  color: var(--ion-color-light);
+}
+
 .action-buttons {
   display: flex;
   align-items: center;
-}
-
-.role-toggle-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.role-label {
-  font-size: 14px;
-  font-weight: 700;
-  background-color: var(--ion-color-primary);
-  border-radius: 8px;
-  padding: 2px 8px;
-  color: white;
-}
-
-.role-label-player {
-  background-color: var(--ion-color-primary);
-}
-.role-label-owner {
-  background-color: var(--ion-color-secondary);
-}
-
-.role-toggle {
-  --handle-width: 20px;
-  --handle-height: 20px;
-  --handle-spacing: 2px;
-}
-ion-toggle::part(track) {
-  background-color: var(--ion-color-primary);
-}
-ion-toggle.toggle-checked::part(track) {
-  background-color: var(--ion-color-secondary);
 }
 
 .notification-btn,
@@ -516,20 +430,6 @@ ion-toggle.toggle-checked::part(track) {
   .notifications-menu {
     width: calc(100vw - 32px);
     right: -12px;
-  }
-
-  .role-label {
-    font-size: 0.6rem;
-    font-weight: 700;
-    border-radius: 8px;
-    padding: 2px 8px;
-    color: white;
-  }
-
-  .role-toggle {
-    --handle-width: 20px;
-    --handle-height: 20px;
-    --handle-spacing: 1px;
   }
 }
 </style>

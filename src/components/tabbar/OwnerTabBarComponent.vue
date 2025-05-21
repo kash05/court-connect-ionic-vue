@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useAuthStore } from '@/stores/useAuthStore';
+import { actionSheetController } from '@ionic/core';
 import {
   IonTabBar,
   IonTabButton,
@@ -14,16 +16,17 @@ import {
 import { useWindowSize } from '@vueuse/core';
 import {
   homeOutline,
-  personOutline,
   businessOutline,
   barChartOutline,
   add,
+  repeatOutline,
 } from 'ionicons/icons';
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const ionRouter = useIonRouter();
 const router = useRouter();
+const authStore = useAuthStore();
 
 const { width } = useWindowSize();
 const isDesktop = computed(() => width.value >= 768);
@@ -34,19 +37,17 @@ const activeTab = computed(() => {
   if (path.includes('/owner')) return 'home';
   if (path.includes('/properties')) return 'properties';
   if (path.includes('/stats')) return 'stats';
-  if (path.includes('/profile')) return 'profile';
   return '';
 });
 
 const animatingTab = ref('');
 
-type TabKey = 'home' | 'properties' | 'stats' | 'profile';
+type TabKey = 'home' | 'properties' | 'stats';
 
 const tabRoutes: Record<TabKey, string> = {
   home: '/owner',
   properties: '/properties',
   stats: '/stats',
-  profile: '/profile',
 };
 
 const handleTabClick = (tab: TabKey) => {
@@ -54,8 +55,37 @@ const handleTabClick = (tab: TabKey) => {
   setTimeout(() => {
     animatingTab.value = '';
   }, 300);
+
   ionRouter.push(tabRoutes[tab]);
 };
+
+async function switchMode() {
+  const actionSheet = await actionSheetController.create({
+    header: 'Switch to Player mode?',
+    subHeader: 'Your choice will be saved.',
+    backdropDismiss: false,
+    buttons: [
+      {
+        text: 'Switch',
+        role: '',
+        handler: () => {
+          authStore.toggleRole();
+          ionRouter.push({
+            path: `/switch-mode/player`,
+            query: {
+              redirectTo: `/player`,
+            },
+          });
+        },
+      },
+      {
+        text: 'Cancel',
+        role: 'cancel',
+      },
+    ],
+  });
+  await actionSheet.present();
+}
 
 const addProperty = () => {
   router.push('/add-property');
@@ -122,18 +152,11 @@ const addProperty = () => {
         <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
 
-      <IonTabButton
-        href="/profile"
-        :class="{
-          'tab-selected': activeTab === 'profile',
-          'tab-animating': animatingTab === 'profile',
-        }"
-        @click="handleTabClick('profile')"
-      >
+      <IonTabButton @click="switchMode()">
         <div class="tab-icon-container">
-          <IonIcon :icon="personOutline" />
+          <IonIcon :icon="repeatOutline" color="primary" size="large" />
         </div>
-        <IonLabel>Profile</IonLabel>
+        <IonLabel>Switch</IonLabel>
         <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
     </IonTabBar>
