@@ -2,11 +2,24 @@
 import { useForm, useField } from 'vee-validate';
 import { z } from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
-import { IonItem, IonInput, IonText, IonNote, IonLabel } from '@ionic/vue';
-import { watch, computed } from 'vue';
+import {
+  IonItem,
+  IonInput,
+  IonText,
+  IonNote,
+  IonLabel,
+  IonButton,
+  IonModal,
+  IonHeader,
+  IonToolbar,
+  IonTextarea,
+} from '@ionic/vue';
+import { watch, onMounted, ref } from 'vue';
+import { BasicInfoForm } from '@/types/addPropertyInterface';
+import LocationMapComponent from './LocationMapComponent.vue';
 
 const schema = z.object({
-  propertyName: z
+  name: z
     .string()
     .min(2, 'Facility name must be at least 2 characters')
     .nonempty('Facility name is required'),
@@ -14,42 +27,93 @@ const schema = z.object({
     .string()
     .min(5, 'Description must be at least 5 characters')
     .nonempty('Description is required'),
+  address: z.string().nonempty('Address is required'),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
+  contactPhone: z
+    .string()
+    .min(10, 'Phone number should be at least 10 digits')
+    .nonempty('Contact phone is required'),
+  contactEmail: z
+    .string()
+    .email('Invalid email format')
+    .nonempty('Contact email is required'),
 });
 
-type FormValues = z.infer<typeof schema>;
-
 const props = defineProps<{
-  formData: FormValues;
+  formData: BasicInfoForm;
 }>();
 
 const emit = defineEmits<{
-  'update-form': [payload: FormValues];
+  'update-form': [payload: BasicInfoForm];
   'validation-change': [isValid: boolean];
 }>();
 
-const { errors, values, meta } = useForm({
+const isModalOpen = ref(false);
+
+onMounted(async () => {
+  emit('validation-change', meta.value.valid);
+});
+
+const { errors, values, meta, resetForm } = useForm({
   validationSchema: toTypedSchema(schema),
   initialValues: props.formData,
 });
 
-const { value: propertyName } = useField<string>('propertyName');
+const { value: name } = useField<string>('name');
 const { value: description } = useField<string>('description');
-
-watch(values, (val) => emit('update-form', val as FormValues), {
-  deep: true,
-});
-
-const isFormValid = computed(() => {
-  return meta.value.valid;
-});
+const { value: address } = useField<string>('address');
+const { value: latitude } = useField<number>('latitude');
+const { value: longitude } = useField<number>('longitude');
+const { value: contactPhone } = useField<string>('contactPhone');
+const { value: contactEmail } = useField<string>('contactEmail');
 
 watch(
-  isFormValid,
+  values,
+  (val) => {
+    emit('update-form', val as BasicInfoForm);
+  },
+  { deep: true },
+);
+
+watch(
+  () => props.formData,
+  (newVal) => {
+    resetForm({
+      values: newVal,
+    });
+  },
+  { deep: true, immediate: true },
+);
+
+watch(
+  () => meta.value.valid,
   (valid) => {
     emit('validation-change', valid);
   },
-  { immediate: true },
 );
+
+const openAddressModal = () => {
+  isModalOpen.value = true;
+};
+
+const closeAddressModal = () => {
+  isModalOpen.value = false;
+};
+
+const handleLocationSelected = (location: {
+  latitude: number;
+  longitude: number;
+  address: string;
+}) => {
+  latitude.value = location.latitude;
+  longitude.value = location.longitude;
+  address.value = location.address;
+};
+
+const confirmLocationSelection = () => {
+  closeAddressModal();
+};
 </script>
 
 <template>
@@ -65,12 +129,11 @@ watch(
         <IonInput
           type="text"
           placeholder="Property Name"
-          v-model="propertyName"
+          v-model="name"
           class="ion-no-padding"
         />
-
-        <IonText color="danger" class="form-error" v-if="errors.propertyName">
-          {{ errors.propertyName }}
+        <IonText color="danger" class="form-error" v-if="errors.name">
+          {{ errors.name }}
         </IonText>
       </div>
     </IonItem>
@@ -79,23 +142,127 @@ watch(
       <div class="w-full">
         <IonLabel>Description</IonLabel>
         <IonNote class="helper-text"
-          >Your property's name (e.g. Spartan Arena)</IonNote
+          >Brief description of your property</IonNote
         >
-        <IonInput
+        <IonTextarea
           type="text"
           placeholder="Description"
           v-model="description"
           class="description"
         />
-
         <IonText color="danger" class="form-error" v-if="errors.description">
           {{ errors.description }}
         </IonText>
       </div>
     </IonItem>
+
+    <IonItem class="form-item ion-no-padding">
+      <div class="w-full">
+        <IonLabel>Address</IonLabel>
+        <IonNote class="helper-text">Property location address</IonNote>
+        <IonInput
+          type="text"
+          placeholder="Click to select location"
+          v-model="address"
+          readonly
+          @click="openAddressModal"
+          class="ion-no-padding"
+        />
+        <IonText color="danger" class="form-error" v-if="errors.address">
+          {{ errors.address }}
+        </IonText>
+      </div>
+    </IonItem>
+
+    <IonItem class="form-item ion-no-padding">
+      <div class="w-full">
+        <IonLabel>Contact Phone</IonLabel>
+        <IonNote class="helper-text"
+          >Phone number for property inquiries</IonNote
+        >
+        <IonInput
+          type="tel"
+          placeholder="Phone Number"
+          v-model="contactPhone"
+          class="ion-no-padding"
+        />
+        <IonText color="danger" class="form-error" v-if="errors.contactPhone">
+          {{ errors.contactPhone }}
+        </IonText>
+      </div>
+    </IonItem>
+
+    <IonItem class="form-item ion-no-padding">
+      <div class="w-full">
+        <IonLabel>Contact Email</IonLabel>
+        <IonNote class="helper-text"
+          >Email address for property inquiries</IonNote
+        >
+        <IonInput
+          type="email"
+          placeholder="Email Address"
+          v-model="contactEmail"
+          class="ion-no-padding"
+        />
+        <IonText color="danger" class="form-error" v-if="errors.contactEmail">
+          {{ errors.contactEmail }}
+        </IonText>
+      </div>
+    </IonItem>
   </div>
+
+  <IonModal
+    :is-open="isModalOpen"
+    @didDismiss="closeAddressModal"
+    class="location-modal"
+    backdrop-dismiss="false"
+  >
+    <IonHeader class="ion-no-border ion-no-padding">
+      <IonToolbar>
+        <div class="flex w-full justify-between">
+          <IonButton size="small" fill="clear" @click="closeAddressModal"
+            >Cancel</IonButton
+          >
+          <IonButton size="small" fill="clear" @click="confirmLocationSelection"
+            >Save</IonButton
+          >
+        </div>
+      </IonToolbar>
+    </IonHeader>
+
+    <LocationMapComponent
+      :initial-latitude="latitude"
+      :initial-longitude="longitude"
+      :initial-address="address"
+      @location-selected="handleLocationSelected"
+    />
+  </IonModal>
 </template>
 
 <style scoped lang="scss">
 @use '@/theme/addPropertyForm.scss';
+
+.location-modal {
+  --height: 100%;
+  --width: 100%;
+}
+
+ion-header {
+  ion-toolbar {
+    padding-top: 5px;
+    --background: var(--ion-color-light);
+
+    ion-button {
+      font-size: 17px;
+      color: var(--ion-color-primary);
+    }
+
+    ion-title {
+      margin-top: 2px;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--ion-color-dark);
+    }
+  }
+}
 </style>

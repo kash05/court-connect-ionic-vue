@@ -419,17 +419,29 @@ const toggleProfileMenu = () => {
 
   .logo-container,
   .profile-container {
+    width: 30px;
+    height: 30px;
+  }
+
+  .header-title {
+    font-size: 1.1rem;
+  }
+
+  .notifications-menu {
+    width: calc(100vw - 32px);
+    right: -12px;
+  }
+}
+
+@media (max-width: 400px) {
+  .logo-container,
+  .profile-container {
     width: 28px;
     height: 28px;
   }
 
   .header-title {
     font-size: 0.9rem;
-  }
-
-  .notifications-menu {
-    width: calc(100vw - 32px);
-    right: -12px;
   }
 }
 </style>
