@@ -1,45 +1,57 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import { Preferences } from '@capacitor/preferences';
+import { PropertyForm } from '@/types/addPropertyInterface';
 
 const STORAGE_KEY = 'propertyFormData';
 
 export const useFormStore = defineStore('form', () => {
-  const formData = ref({
+  const formData = ref<PropertyForm>({
     basicInfo: {
-      propertyName: '',
+      name: '',
       description: '',
-    },
-    contactDetails: {
-      phoneNumber: '',
-      email: '',
-    },
-    location: {
       address: '',
+      latitude: undefined,
+      longitude: undefined,
+      contactPhone: '',
+      contactEmail: '',
     },
-    sportsDetails: {
-      sportsAvailable: [] as string[],
-      pricing: {} as Record<string, string>,
+    propertyDetail: {
+      sports: [],
+      subUnits: {},
+      surfaceType: '',
+      facilities: [],
+      equipmentRental: false,
+      accessibility: [],
+      additionalAmenities: [],
     },
     timingAndAvailability: {
-      openingTime: '',
-      closingTime: '',
-      sportSlots: {} as Record<
-        string,
-        { start: string; end: string; available: boolean }[]
-      >,
-      isAvailable: true,
+      openingHours: {},
+      bookingMode: 'slots',
+      slotDuration: 60,
+      weeklySlots: {},
+      exceptions: [],
+      maxAdvanceDays: 30,
+      minNoticeHours: 2,
     },
-    bookingSettings: {
-      preBookingAllowed: false,
-      fullDayBookingAllowed: false,
-    },
-    amenitiesAndPolicies: {
-      amenities: [] as string[],
-      cancellationPolicy: '',
+    bookingAndPricing: {
+      pricingModel: 'hourly',
+      baseRate: 0,
+      peakRates: [],
+      securityDeposit: 0,
+      preBooking: false,
+      fullDayBooking: false,
+      cancellationPolicy: {
+        freeWindowHours: 24,
+        feePercent: 0,
+        noShowCharge: 0,
+      },
     },
     media: {
-      images: [] as string[],
+      images: [],
+      videoUrl: undefined,
+      floorPlan: undefined,
+      isActive: true,
     },
   });
 
@@ -49,8 +61,8 @@ export const useFormStore = defineStore('form', () => {
         key: STORAGE_KEY,
         value: JSON.stringify(formData.value),
       });
-    } catch (error) {
-      console.error('Error saving form data to Preferences:', error);
+    } catch (err) {
+      console.error('Error saving form data:', err);
     }
   }
 
@@ -60,118 +72,73 @@ export const useFormStore = defineStore('form', () => {
       if (value) {
         formData.value = JSON.parse(value);
       }
-    } catch (error) {
-      console.error('Error loading form data from Preferences:', error);
+    } catch (err) {
+      console.error('Error loading form data:', err);
     }
+  }
+
+  function updateForm(data: Partial<PropertyForm>) {
+    formData.value = { ...formData.value, ...data };
+    saveFormData();
   }
 
   async function resetForm() {
     formData.value = {
       basicInfo: {
-        propertyName: '',
+        name: '',
         description: '',
-      },
-      contactDetails: {
-        phoneNumber: '',
-        email: '',
-      },
-      location: {
         address: '',
+        latitude: undefined,
+        longitude: undefined,
+        contactPhone: '',
+        contactEmail: '',
       },
-      sportsDetails: {
-        sportsAvailable: [],
-        pricing: {},
+      propertyDetail: {
+        sports: [],
+        subUnits: {},
+        surfaceType: '',
+        facilities: [],
+        equipmentRental: false,
+        accessibility: [],
+        additionalAmenities: [],
       },
       timingAndAvailability: {
-        openingTime: '',
-        closingTime: '',
-        sportSlots: {},
-        isAvailable: true,
+        openingHours: {},
+        bookingMode: 'slots',
+        slotDuration: 60,
+        weeklySlots: {},
+        exceptions: [],
+        maxAdvanceDays: 30,
+        minNoticeHours: 2,
       },
-      bookingSettings: {
-        preBookingAllowed: false,
-        fullDayBookingAllowed: false,
-      },
-      amenitiesAndPolicies: {
-        amenities: [],
-        cancellationPolicy: '',
+      bookingAndPricing: {
+        pricingModel: 'hourly',
+        baseRate: 0,
+        peakRates: [],
+        securityDeposit: 0,
+        preBooking: false,
+        fullDayBooking: false,
+        cancellationPolicy: {
+          freeWindowHours: 24,
+          feePercent: 0,
+          noShowCharge: 0,
+        },
       },
       media: {
         images: [],
+        videoUrl: undefined,
+        floorPlan: undefined,
+        isActive: true,
       },
     };
-
     await Preferences.remove({ key: STORAGE_KEY });
   }
-
-  function updateBasicInfo(data: Partial<typeof formData.value.basicInfo>) {
-    Object.assign(formData.value.basicInfo, data);
-    saveFormData();
-  }
-
-  function updateContactDetails(
-    data: Partial<typeof formData.value.contactDetails>,
-  ) {
-    Object.assign(formData.value.contactDetails, data);
-    saveFormData();
-  }
-
-  function updateLocation(data: Partial<typeof formData.value.location>) {
-    Object.assign(formData.value.location, data);
-    saveFormData();
-  }
-
-  function updateSportsDetails(
-    data: Partial<typeof formData.value.sportsDetails>,
-  ) {
-    Object.assign(formData.value.sportsDetails, data);
-    saveFormData();
-  }
-
-  function updateTimingAndAvailability(
-    data: Partial<typeof formData.value.timingAndAvailability>,
-  ) {
-    Object.assign(formData.value.timingAndAvailability, data);
-    saveFormData();
-  }
-
-  function updateBookingSettings(
-    data: Partial<typeof formData.value.bookingSettings>,
-  ) {
-    Object.assign(formData.value.bookingSettings, data);
-    saveFormData();
-  }
-
-  function updateAmenitiesAndPolicies(
-    data: Partial<typeof formData.value.amenitiesAndPolicies>,
-  ) {
-    Object.assign(formData.value.amenitiesAndPolicies, data);
-    saveFormData();
-  }
-
-  function updateMedia(data: Partial<typeof formData.value.media>) {
-    Object.assign(formData.value.media, data);
-    saveFormData();
-  }
-
-  const isBasicStepComplete = computed(() => {
-    const { propertyName, description } = formData.value.basicInfo;
-    return !!propertyName && !!description;
-  });
 
   return {
     formData,
     initializeForm,
     saveFormData,
     resetForm,
-    updateBasicInfo,
-    updateContactDetails,
-    updateLocation,
-    updateSportsDetails,
-    updateTimingAndAvailability,
-    updateBookingSettings,
-    updateAmenitiesAndPolicies,
-    updateMedia,
-    isBasicStepComplete,
+    updateForm,
   };
 });

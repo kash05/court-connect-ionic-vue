@@ -13,7 +13,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 const props = defineProps<{
-  formData: { phoneNumber: string; email: string };
+  formData: FormValues;
 }>();
 
 const emit = defineEmits<{
