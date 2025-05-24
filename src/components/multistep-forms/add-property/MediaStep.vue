@@ -67,7 +67,7 @@ const { errors, values, meta } = useForm<MediaForm>({
 
 const { value: images } = useField<string[]>('images');
 const { value: videoUrl } = useField<string>('videoUrl');
-const { value: floorPlan } = useField<string>('floorPlan');
+const { value: floorPlan } = useField<string | undefined>('floorPlan');
 
 watch(
   values,
