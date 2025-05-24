@@ -13,9 +13,9 @@ import { useWindowSize } from '@vueuse/core';
 import {
   homeOutline,
   businessOutline,
-  barChartOutline,
+  trendingUpOutline,
   add,
-  repeatOutline,
+  calendarNumberOutline,
 } from 'ionicons/icons';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
@@ -31,17 +31,19 @@ const activeTab = computed(() => {
   if (path.includes('/owner')) return 'home';
   if (path.includes('/properties')) return 'properties';
   if (path.includes('/stats')) return 'stats';
+  if (path.includes('/bookings')) return 'bookings';
   return '';
 });
 
 const animatingTab = ref('');
 
-type TabKey = 'home' | 'properties' | 'stats';
+type TabKey = 'home' | 'properties' | 'stats' | 'bookings';
 
 const tabRoutes: Record<TabKey, string> = {
   home: '/owner',
   properties: '/properties',
   stats: '/stats',
+  bookings: '/bookings',
 };
 
 const handleTabClick = (tab: TabKey) => {
@@ -78,17 +80,16 @@ const addProperty = () => {
       </IonTabButton>
 
       <IonTabButton
-        href="/properties"
+        href="/bookings"
         :class="{
-          'tab-selected': activeTab === 'properties',
-          'tab-animating': animatingTab === 'properties',
+          'tab-selected': activeTab === 'bookings',
+          'tab-animating': animatingTab === 'bookings',
         }"
-        @click="handleTabClick('properties')"
       >
         <div class="tab-icon-container">
-          <IonIcon :icon="businessOutline" />
+          <IonIcon :icon="calendarNumberOutline" />
         </div>
-        <IonLabel>Properties</IonLabel>
+        <IonLabel>Bookings</IonLabel>
         <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
 
@@ -108,17 +109,24 @@ const addProperty = () => {
         @click="handleTabClick('stats')"
       >
         <div class="tab-icon-container">
-          <IonIcon :icon="barChartOutline" />
+          <IonIcon :icon="trendingUpOutline" />
         </div>
         <IonLabel>Stats</IonLabel>
         <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
 
-      <IonTabButton id="open-action-sheet-owner">
+      <IonTabButton
+        href="/properties"
+        :class="{
+          'tab-selected': activeTab === 'properties',
+          'tab-animating': animatingTab === 'properties',
+        }"
+        @click="handleTabClick('properties')"
+      >
         <div class="tab-icon-container">
-          <IonIcon :icon="repeatOutline" color="primary" size="large" />
+          <IonIcon :icon="businessOutline" />
         </div>
-        <IonLabel>Switch</IonLabel>
+        <IonLabel>Properties</IonLabel>
         <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
     </IonTabBar>

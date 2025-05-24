@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useForm, useField } from 'vee-validate';
-import { z } from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
 import {
   IonItem,
@@ -14,28 +13,10 @@ import {
 import { watch, onMounted, ref } from 'vue';
 import { BasicInfoForm } from '@/types/addPropertyInterface';
 import LocationMapComponent from './LocationMapComponent.vue';
-
-const schema = z.object({
-  name: z
-    .string()
-    .min(2, 'Facility name must be at least 2 characters')
-    .nonempty('Facility name is required'),
-  description: z
-    .string()
-    .min(5, 'Description must be at least 5 characters')
-    .nonempty('Description is required'),
-  address: z.string().nonempty('Address is required'),
-  latitude: z.number().optional(),
-  longitude: z.number().optional(),
-  contactPhone: z
-    .string()
-    .min(10, 'Phone number should be at least 10 digits')
-    .nonempty('Contact phone is required'),
-  contactEmail: z
-    .string()
-    .email('Invalid email format')
-    .nonempty('Contact email is required'),
-});
+import {
+  BasicInfoFormData,
+  basicInfoSchema,
+} from '@/lib/validation/addPropertyFormValidation';
 
 const props = defineProps<{
   formData: BasicInfoForm;
@@ -52,8 +33,8 @@ onMounted(async () => {
   emit('validation-change', meta.value.valid);
 });
 
-const { errors, values, meta } = useForm({
-  validationSchema: toTypedSchema(schema),
+const { errors, values, meta } = useForm<BasicInfoFormData>({
+  validationSchema: toTypedSchema(basicInfoSchema),
   initialValues: props.formData,
 });
 
@@ -216,6 +197,7 @@ const handleLocationSelected = (location: {
 .personal-details-form {
   max-height: calc(100vh - 240px);
   overflow: auto;
+  padding: 16px;
 }
 
 .location-modal {

@@ -8,14 +8,16 @@ import {
   IonTabs,
   IonTab,
   useIonRouter,
+  IonActionSheet,
 } from '@ionic/vue';
 import { useWindowSize } from '@vueuse/core';
 import {
   homeOutline,
   peopleOutline,
   calendarOutline,
-  repeatOutline,
   searchSharp,
+  chatbubbleOutline,
+  searchOutline,
 } from 'ionicons/icons';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
@@ -29,19 +31,21 @@ const route = useRoute();
 const activeTab = computed(() => {
   const path = route.path;
   if (path.includes('/player')) return 'home';
-  if (path.includes('/teams')) return 'teams';
-  if (path.includes('/events')) return 'events';
+  if (path.includes('/messages')) return 'messages';
+  if (path.includes('/bookings')) return 'bookings';
+  if (path.includes('/connections')) return 'connections';
   return '';
 });
 
 const animatingTab = ref('');
 
-type TabKey = 'home' | 'teams' | 'events';
+type TabKey = 'home' | 'messages' | 'bookings' | 'connections';
 
 const tabRoutes: Record<TabKey, string> = {
   home: '/player',
-  teams: '/teams',
-  events: '/events',
+  messages: '/messages',
+  bookings: '/bookings',
+  connections: '/connections',
 };
 
 const handleTabClick = (tab: TabKey) => {
@@ -52,8 +56,29 @@ const handleTabClick = (tab: TabKey) => {
   ionRouter.push(tabRoutes[tab]);
 };
 
+const actionSheetButtons = [
+  {
+    text: 'Find Players Near You',
+    ionIcon: searchOutline,
+    handler: () => findPlayers(),
+  },
+  {
+    text: 'Find Courts & Properties',
+    ionIcon: searchOutline,
+    handler: () => findCourts(),
+  },
+  {
+    text: 'Cancel',
+    role: 'cancel',
+  },
+];
+
 const findPlayers = () => {
-  console.log('find players clicked');
+  console.log('Find players clicked');
+};
+
+const findCourts = () => {
+  console.log('Find courts clicked');
 };
 </script>
 
@@ -77,21 +102,21 @@ const findPlayers = () => {
       </IonTabButton>
 
       <IonTabButton
-        href="/teams"
+        href="/messages"
         :class="{
-          'tab-selected': activeTab === 'teams',
-          'tab-animating': animatingTab === 'teams',
+          'tab-selected': activeTab === 'messages',
+          'tab-animating': animatingTab === 'messages',
         }"
-        @click="handleTabClick('teams')"
+        @click="handleTabClick('messages')"
       >
         <div class="tab-icon-container">
-          <IonIcon :icon="peopleOutline" />
+          <IonIcon :icon="chatbubbleOutline" />
         </div>
-        <IonLabel>Teams</IonLabel>
+        <IonLabel>Messages</IonLabel>
         <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
 
-      <IonTabButton @click="findPlayers" href="/find/players">
+      <IonTabButton id="open-find-action-sheet">
         <div class="find-tab-icon">
           <ion-icon :icon="searchSharp"></ion-icon>
         </div>
@@ -99,28 +124,42 @@ const findPlayers = () => {
       </IonTabButton>
 
       <IonTabButton
-        href="/events"
+        href="/bookings"
         :class="{
-          'tab-selected': activeTab === 'events',
-          'tab-animating': animatingTab === 'events',
+          'tab-selected': activeTab === 'bookings',
+          'tab-animating': animatingTab === 'bookings',
         }"
-        @click="handleTabClick('events')"
+        @click="handleTabClick('bookings')"
       >
         <div class="tab-icon-container">
           <IonIcon :icon="calendarOutline" />
         </div>
-        <IonLabel>Events</IonLabel>
+        <IonLabel>Bookings</IonLabel>
         <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
 
-      <IonTabButton id="open-action-sheet-player">
+      <IonTabButton
+        href="/connections"
+        :class="{
+          'tab-selected': activeTab === 'connections',
+          'tab-animating': animatingTab === 'connections',
+        }"
+      >
         <div class="tab-icon-container">
-          <IonIcon :icon="repeatOutline" color="secondary" size="large" />
+          <IonIcon :icon="peopleOutline" />
         </div>
-        <IonLabel>Switch</IonLabel>
+        <IonLabel>Connections</IonLabel>
         <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
     </IonTabBar>
+
+    //-------------Action Sheet---------------------//
+    <IonActionSheet
+      trigger="open-find-action-sheet"
+      class="find"
+      backdrop-dismiss="false"
+      :buttons="actionSheetButtons"
+    ></IonActionSheet>
   </ion-tabs>
 </template>
 
@@ -214,6 +253,13 @@ ion-tab-button {
   ion-icon {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
+}
+
+ion-action-sheet.find {
+  --background: var(--ion-color-light-shade);
+  --backdrop-opacity: 0.6;
+  --button-background-selected: var(--ion-color-danger);
+  --button-color: var(--ion-color-dark);
 }
 
 @keyframes pulse {

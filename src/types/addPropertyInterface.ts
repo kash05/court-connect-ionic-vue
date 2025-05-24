@@ -27,11 +27,12 @@ export interface PropertyDetail {
 }
 
 export interface TimingAndAvailabilityForm {
-  openingHours: Record<string, { open: string; close: string }>;
+  openingHours: {
+    open: string;
+    close: string;
+  };
   bookingMode: 'slots' | 'full-day';
   slotDuration: number;
-  weeklySlots: Record<string, { start: string; end: string }[]>;
-  exceptions: { date: string; reason?: string }[];
   maxAdvanceDays: number;
   minNoticeHours: number;
 }

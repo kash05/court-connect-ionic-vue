@@ -1,91 +1,551 @@
 <script setup lang="ts">
-import { Field, useForm } from 'vee-validate';
-import { z } from 'zod';
+import { useForm, useField } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import { IonList, IonItem, IonLabel, IonInput, IonNote } from '@ionic/vue';
-import { watch, computed } from 'vue';
-
-const schema = z.object({
-  openingTime: z.string().nonempty('Opening time is required'),
-  closingTime: z.string().nonempty('Closing time is required'),
-  isAvailable: z.boolean(),
-  sportSlots: z.record(z.any()).optional(),
-});
-
-type FormValues = z.infer<typeof schema>;
+import {
+  IonItem,
+  IonText,
+  IonNote,
+  IonLabel,
+  IonCheckbox,
+  IonChip,
+  IonDatetime,
+  IonIcon,
+} from '@ionic/vue';
+import { watch, onMounted, computed } from 'vue';
+import { timeOutline, calendarOutline, settingsOutline } from 'ionicons/icons';
+import { TimingAndAvailabilityForm } from '@/types/addPropertyInterface';
+import {
+  TimingAndAvailabilityFormData,
+  timingAndAvailabilitySchema,
+} from '@/lib/validation/addPropertyFormValidation';
 
 const props = defineProps<{
-  formData: FormValues;
+  formData: TimingAndAvailabilityForm;
 }>();
 
 const emit = defineEmits<{
-  'update-form': [payload: FormValues];
+  'update-form': [payload: TimingAndAvailabilityForm];
   'validation-change': [isValid: boolean];
 }>();
 
-const { values, meta } = useForm({
-  validationSchema: toTypedSchema(schema),
+const BOOKING_MODES = [
+  {
+    value: 'slots' as const,
+    label: 'Time Slots',
+    description: 'Customers book specific time slots',
+  },
+  {
+    value: 'full-day' as const,
+    label: 'Full Day',
+    description: 'Customers book entire day access',
+  },
+];
+
+const SLOT_DURATION_OPTIONS = [
+  { value: 30, label: '30 minutes' },
+  { value: 60, label: '1 hour' },
+  { value: 90, label: '1.5 hours' },
+  { value: 120, label: '2 hours' },
+  { value: 180, label: '3 hours' },
+  { value: 240, label: '4 hours' },
+];
+
+const MAX_ADVANCE_OPTIONS = [
+  { value: 1, label: '1 day' },
+  { value: 3, label: '3 days' },
+  { value: 7, label: '1 week' },
+  { value: 14, label: '2 weeks' },
+  { value: 30, label: '1 month' },
+  { value: 60, label: '2 months' },
+  { value: 90, label: '3 months' },
+];
+
+const MIN_NOTICE_OPTIONS = [
+  { value: 1, label: '1 hour' },
+  { value: 2, label: '2 hours' },
+  { value: 4, label: '4 hours' },
+  { value: 8, label: '8 hours' },
+  { value: 12, label: '12 hours' },
+  { value: 24, label: '24 hours' },
+  { value: 48, label: '48 hours' },
+];
+
+onMounted(async () => {
+  emit('validation-change', meta.value.valid);
+});
+
+const { errors, values, meta } = useForm<TimingAndAvailabilityFormData>({
+  validationSchema: toTypedSchema(timingAndAvailabilitySchema),
   initialValues: props.formData,
 });
 
-watch(values, (val) => emit('update-form', val as FormValues), { deep: true });
-
-const isFormValid = computed(() => {
-  return meta.value.valid;
-});
+const { value: openingHours } = useField<{ open: string; close: string }>(
+  'openingHours',
+);
+const { value: bookingModes } =
+  useField<('slots' | 'full-day')[]>('bookingModes');
+const { value: slotDurations } = useField<number[]>('slotDurations');
+const { value: maxAdvanceDays } = useField<number>('maxAdvanceDays');
+const { value: minNoticeHours } = useField<number>('minNoticeHours');
 
 watch(
-  isFormValid,
+  values,
+  (val) => {
+    emit('update-form', val as TimingAndAvailabilityForm);
+  },
+  { deep: true },
+);
+
+watch(
+  () => meta.value.valid,
   (valid) => {
     emit('validation-change', valid);
   },
-  { immediate: true },
 );
 
-function inputClass(error: string | undefined, value: string) {
-  return { 'ion-invalid': !!error, 'ion-valid': !error && value };
-}
+const toggleBookingMode = (mode: 'slots' | 'full-day') => {
+  const currentModes = bookingModes.value || [];
+  if (currentModes.includes(mode)) {
+    bookingModes.value = currentModes.filter((m) => m !== mode);
+    if (mode === 'slots' && !bookingModes.value.includes('slots')) {
+      slotDurations.value = [];
+    }
+  } else {
+    bookingModes.value = [...currentModes, mode];
+  }
+};
+
+const toggleSlotDuration = (duration: number) => {
+  const currentDurations = slotDurations.value || [];
+  if (currentDurations.includes(duration)) {
+    slotDurations.value = currentDurations.filter((d) => d !== duration);
+  } else {
+    slotDurations.value = [...currentDurations, duration].sort((a, b) => a - b);
+  }
+};
+
+const selectedBookingModes = computed(() => bookingModes.value || []);
+const selectedSlotDurations = computed(() => slotDurations.value || []);
+const showSlotDurations = computed(() =>
+  selectedBookingModes.value.includes('slots'),
+);
+
+const updateOpeningHour = (type: 'open' | 'close', value: string) => {
+  openingHours.value = {
+    ...openingHours.value,
+    [type]: value,
+  };
+};
+
+const formatTimeForInput = (time: string) => {
+  if (!time) return '';
+  return time.includes('T') ? time : `2024-01-01T${time}:00`;
+};
+
+const formatTimeFromInput = (isoString: string) => {
+  if (!isoString) return '';
+  return isoString.split('T')[1]?.substring(0, 5) || '';
+};
 </script>
 
 <template>
-  <div class="form-step">
+  <div class="timing-availability-form">
     <h2>Timing & Availability</h2>
-    <ion-list>
-      <ion-item>
-        <ion-label position="floating">Opening Time*</ion-label>
-        <Field name="openingTime" v-slot="{ field, errorMessage }">
-          <ion-input
-            type="time"
-            v-bind="field"
-            :class="inputClass(errorMessage, field.value)"
-            @ionInput="field.onInput"
-          />
-          <ion-note slot="error" v-if="errorMessage">{{
-            errorMessage
-          }}</ion-note>
-        </Field>
-      </ion-item>
+    <p class="subtitle">
+      Set your property's operating hours and booking preferences
+    </p>
 
-      <ion-item>
-        <ion-label position="floating">Closing Time*</ion-label>
-        <Field name="closingTime" v-slot="{ field, errorMessage }">
-          <ion-input
-            type="time"
-            v-bind="field"
-            :class="inputClass(errorMessage, field.value)"
-            @ionInput="field.onInput"
-          />
-          <ion-note slot="error" v-if="errorMessage">{{
-            errorMessage
-          }}</ion-note>
-        </Field>
-      </ion-item>
-    </ion-list>
+    <!-- Opening Hours -->
+    <div class="form-section">
+      <IonLabel class="section-label">
+        <IonIcon :icon="timeOutline" class="label-icon" />
+        Operating Hours *
+      </IonLabel>
+      <IonNote class="helper-text">
+        Set your property's daily opening and closing times
+      </IonNote>
+
+      <div class="time-inputs">
+        <IonItem class="time-item">
+          <div class="time-input-container">
+            <IonLabel>Opening Time *</IonLabel>
+            <IonDatetime
+              presentation="time"
+              :value="formatTimeForInput(openingHours?.open || '09:00')"
+              @ionChange="
+                updateOpeningHour(
+                  'open',
+                  formatTimeFromInput($event.detail.value),
+                )
+              "
+              class="time-picker"
+              :show-default-buttons="true"
+              :show-clear-button="false"
+            >
+              <div slot="title">Select Opening Time</div>
+            </IonDatetime>
+          </div>
+        </IonItem>
+
+        <IonItem class="time-item">
+          <div class="time-input-container">
+            <IonLabel>Closing Time *</IonLabel>
+            <IonDatetime
+              presentation="time"
+              :value="formatTimeForInput(openingHours?.close || '21:00')"
+              @ionChange="
+                updateOpeningHour(
+                  'close',
+                  formatTimeFromInput($event.detail.value),
+                )
+              "
+              class="time-picker"
+              :show-default-buttons="true"
+              :show-clear-button="false"
+            >
+              <div slot="title">Select Closing Time</div>
+            </IonDatetime>
+          </div>
+        </IonItem>
+      </div>
+
+      <IonText color="danger" class="form-error" v-if="errors.openingHours">
+        {{ errors.openingHours }}
+      </IonText>
+    </div>
+
+    <!-- Booking Modes -->
+    <div class="form-section">
+      <IonLabel class="section-label">
+        <IonIcon :icon="calendarOutline" class="label-icon" />
+        Booking Methods *
+      </IonLabel>
+      <IonNote class="helper-text">
+        Choose how customers can book your property (multiple selections
+        allowed)
+      </IonNote>
+
+      <div class="booking-modes">
+        <div
+          v-for="mode in BOOKING_MODES"
+          :key="mode.value"
+          class="booking-mode-card"
+          :class="{ selected: selectedBookingModes.includes(mode.value) }"
+          @click="toggleBookingMode(mode.value)"
+        >
+          <div class="mode-header">
+            <IonCheckbox
+              :checked="selectedBookingModes.includes(mode.value)"
+              @ion-change="toggleBookingMode(mode.value)"
+            />
+            <h4 class="mode-title">{{ mode.label }}</h4>
+          </div>
+          <p class="mode-description">{{ mode.description }}</p>
+        </div>
+      </div>
+
+      <IonText color="danger" class="form-error" v-if="errors.bookingMode">
+        {{ errors.bookingMode }}
+      </IonText>
+    </div>
+
+    <!-- Slot Durations (only show if slots mode is selected) -->
+    <div v-if="showSlotDurations" class="form-section">
+      <IonLabel class="section-label">
+        <IonIcon :icon="timeOutline" class="label-icon" />
+        Available Slot Durations *
+      </IonLabel>
+      <IonNote class="helper-text">
+        Select the time slot durations customers can book (multiple selections
+        allowed)
+      </IonNote>
+
+      <div class="chip-container">
+        <IonChip
+          v-for="option in SLOT_DURATION_OPTIONS"
+          :key="option.value"
+          :color="
+            selectedSlotDurations.includes(option.value) ? 'primary' : 'medium'
+          "
+          :outline="!selectedSlotDurations.includes(option.value)"
+          @click="toggleSlotDuration(option.value)"
+          class="duration-chip"
+        >
+          {{ option.label }}
+        </IonChip>
+      </div>
+
+      <IonText color="danger" class="form-error" v-if="errors.slotDurations">
+        {{ errors.slotDurations }}
+      </IonText>
+    </div>
+
+    <!-- Max Advance Days -->
+    <div class="form-section">
+      <IonLabel class="section-label">
+        <IonIcon :icon="calendarOutline" class="label-icon" />
+        Maximum Advance Booking *
+      </IonLabel>
+      <IonNote class="helper-text">
+        How far in advance can customers make bookings?
+      </IonNote>
+
+      <div class="chip-container">
+        <IonChip
+          v-for="option in MAX_ADVANCE_OPTIONS"
+          :key="option.value"
+          :color="maxAdvanceDays === option.value ? 'primary' : 'medium'"
+          :outline="maxAdvanceDays !== option.value"
+          @click="maxAdvanceDays = option.value"
+          class="advance-chip"
+        >
+          {{ option.label }}
+        </IonChip>
+      </div>
+
+      <IonText color="danger" class="form-error" v-if="errors.maxAdvanceDays">
+        {{ errors.maxAdvanceDays }}
+      </IonText>
+    </div>
+
+    <!-- Min Notice Hours -->
+    <div class="form-section">
+      <IonLabel class="section-label">
+        <IonIcon :icon="settingsOutline" class="label-icon" />
+        Minimum Notice Required *
+      </IonLabel>
+      <IonNote class="helper-text">
+        How much advance notice do you need for bookings?
+      </IonNote>
+
+      <div class="chip-container">
+        <IonChip
+          v-for="option in MIN_NOTICE_OPTIONS"
+          :key="option.value"
+          :color="minNoticeHours === option.value ? 'primary' : 'medium'"
+          :outline="minNoticeHours !== option.value"
+          @click="minNoticeHours = option.value"
+          class="notice-chip"
+        >
+          {{ option.label }}
+        </IonChip>
+      </div>
+
+      <IonText color="danger" class="form-error" v-if="errors.minNoticeHours">
+        {{ errors.minNoticeHours }}
+      </IonText>
+    </div>
   </div>
 </template>
 
-<style scoped>
-.form-step {
-  margin-bottom: 20px;
+<style scoped lang="scss">
+@use '@/theme/addPropertyForm.scss';
+
+.timing-availability-form {
+  max-height: calc(100vh - 240px);
+  overflow: auto;
+  padding: 16px;
+}
+
+.subtitle {
+  color: var(--ion-color-medium);
+  font-size: 14px;
+  margin-bottom: 24px;
+  line-height: 1.4;
+}
+
+.info-banner {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: var(--ion-color-primary-shade);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--ion-color-primary-rgb), 0.1),
+    rgba(var(--ion-color-primary-rgb), 0.05)
+  );
+  border-radius: 12px;
+  border-left: 4px solid var(--ion-color-primary);
+  margin-bottom: 32px;
+
+  .info-icon {
+    color: var(--ion-color-primary);
+    font-size: 20px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .info-content {
+    flex: 1;
+  }
+
+  .info-text {
+    margin: 0;
+    font-size: 14px;
+    color: var(--ion-color-dark);
+    line-height: 1.4;
+
+    strong {
+      color: var(--ion-color-primary);
+    }
+  }
+}
+
+.form-section {
+  margin-bottom: 32px;
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ion-color-dark);
+  margin-bottom: 8px;
+
+  .label-icon {
+    font-size: 18px;
+    color: var(--ion-color-primary);
+  }
+}
+
+.helper-text {
+  display: block;
+  margin-bottom: 16px;
+  color: var(--ion-color-medium);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.time-inputs {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 8px;
+
+  .time-item {
+    flex: 1;
+    --border-color: var(--ion-color-light);
+    --border-radius: 8px;
+    --padding-start: 0;
+    --padding-end: 0;
+    --inner-padding-end: 0;
+    --inner-padding-start: 0;
+    border: 1px solid var(--ion-color-light);
+    border-radius: 8px;
+    overflow: hidden;
+
+    .time-input-container {
+      width: 100%;
+      padding: 16px;
+
+      ion-label {
+        display: block;
+        margin-bottom: 12px;
+        font-weight: 500;
+        color: var(--ion-color-dark);
+      }
+
+      .time-picker {
+        width: 100%;
+        --background: transparent;
+        --padding-start: 0;
+        --padding-end: 0;
+      }
+    }
+  }
+}
+
+.booking-modes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.booking-mode-card {
+  border: 2px solid var(--ion-color-light);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--ion-color-primary-tint);
+    background: rgba(var(--ion-color-primary-rgb), 0.02);
+  }
+
+  &.selected {
+    border-color: var(--ion-color-primary);
+    background: rgba(var(--ion-color-primary-rgb), 0.05);
+  }
+
+  .mode-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .mode-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+  }
+
+  .mode-description {
+    margin: 0;
+    font-size: 14px;
+    color: var(--ion-color-medium);
+    line-height: 1.4;
+  }
+}
+
+.chip-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.duration-chip,
+.advance-chip,
+.notice-chip {
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.form-error {
+  display: block;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .time-inputs {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .chip-container {
+    gap: 6px;
+  }
+
+  .duration-chip,
+  .advance-chip,
+  .notice-chip {
+    font-size: 12px;
+    --padding-start: 8px;
+    --padding-end: 8px;
+  }
+
+  .booking-mode-card {
+    padding: 12px;
+  }
 }
 </style>
