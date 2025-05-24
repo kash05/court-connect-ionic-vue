@@ -171,11 +171,12 @@ const formatTimeFromInput = (isoString: string) => {
             <IonLabel>Opening Time *</IonLabel>
             <IonDatetime
               presentation="time"
+              :prefer-wheel="true"
               :value="formatTimeForInput(openingHours?.open || '09:00')"
               @ionChange="
                 updateOpeningHour(
                   'open',
-                  formatTimeFromInput($event.detail.value),
+                  formatTimeFromInput($event.detail.value as string),
                 )
               "
               class="time-picker"
@@ -192,11 +193,12 @@ const formatTimeFromInput = (isoString: string) => {
             <IonLabel>Closing Time *</IonLabel>
             <IonDatetime
               presentation="time"
+              :prefer-wheel="true"
               :value="formatTimeForInput(openingHours?.close || '21:00')"
               @ionChange="
                 updateOpeningHour(
                   'close',
-                  formatTimeFromInput($event.detail.value),
+                  formatTimeFromInput($event.detail.value as string),
                 )
               "
               class="time-picker"
@@ -275,8 +277,8 @@ const formatTimeFromInput = (isoString: string) => {
         </IonChip>
       </div>
 
-      <IonText color="danger" class="form-error" v-if="errors.slotDurations">
-        {{ errors.slotDurations }}
+      <IonText color="danger" class="form-error" v-if="errors.slotDuration">
+        {{ errors.slotDuration }}
       </IonText>
     </div>
 
@@ -354,43 +356,6 @@ const formatTimeFromInput = (isoString: string) => {
   line-height: 1.4;
 }
 
-.info-banner {
-  display: flex;
-  gap: 12px;
-  padding: 16px;
-  background: var(--ion-color-primary-shade);
-  background: linear-gradient(
-    135deg,
-    rgba(var(--ion-color-primary-rgb), 0.1),
-    rgba(var(--ion-color-primary-rgb), 0.05)
-  );
-  border-radius: 12px;
-  border-left: 4px solid var(--ion-color-primary);
-  margin-bottom: 32px;
-
-  .info-icon {
-    color: var(--ion-color-primary);
-    font-size: 20px;
-    margin-top: 2px;
-    flex-shrink: 0;
-  }
-
-  .info-content {
-    flex: 1;
-  }
-
-  .info-text {
-    margin: 0;
-    font-size: 14px;
-    color: var(--ion-color-dark);
-    line-height: 1.4;
-
-    strong {
-      color: var(--ion-color-primary);
-    }
-  }
-}
-
 .form-section {
   margin-bottom: 32px;
 }
@@ -425,35 +390,26 @@ const formatTimeFromInput = (isoString: string) => {
 
   .time-item {
     flex: 1;
-    --border-color: var(--ion-color-light);
-    --border-radius: 8px;
-    --padding-start: 0;
-    --padding-end: 0;
-    --inner-padding-end: 0;
-    --inner-padding-start: 0;
-    border: 1px solid var(--ion-color-light);
-    border-radius: 8px;
     overflow: hidden;
 
     .time-input-container {
       width: 100%;
       padding: 16px;
-
-      ion-label {
-        display: block;
-        margin-bottom: 12px;
-        font-weight: 500;
-        color: var(--ion-color-dark);
-      }
-
-      .time-picker {
-        width: 100%;
-        --background: transparent;
-        --padding-start: 0;
-        --padding-end: 0;
-      }
     }
   }
+}
+
+ion-datetime {
+  --background: var(--ion-color-light);
+  --wheel-highlight-background: var(--ion-color-light);
+}
+
+ion-datetime::part(wheel-item) {
+  color: var(--ion-color-tertialry);
+}
+
+ion-datetime::part(wheel-item active) {
+  color: var(--ion-color-primary);
 }
 
 .booking-modes {
