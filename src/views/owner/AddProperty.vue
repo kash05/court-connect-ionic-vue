@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, reactive } from 'vue';
+import {
+  ref,
+  computed,
+  onMounted,
+  reactive,
+  ComponentPublicInstance,
+} from 'vue';
 import { IonPage, IonContent, useIonRouter, IonSpinner } from '@ionic/vue';
 import { useFormStore } from '@/stores/useFormStore';
 import BasicInfoStep from '@/components/multistep-forms/add-property/BasicInfoStep.vue';
@@ -18,6 +24,7 @@ const ionRouter = useIonRouter();
 const currentStep = ref(1);
 const totalSteps = 5;
 const isInitialized = ref(false);
+const content = ref<ComponentPublicInstance<typeof IonContent> | null>(null);
 
 const validationStatus = reactive<Record<number, boolean>>({
   1: false,
@@ -72,12 +79,16 @@ const submitForm = async () => {
 function cancelForm() {
   ionRouter.push('/owner');
 }
+
+function scrollToTop() {
+  content.value?.$el?.scrollToTop?.(500);
+}
 </script>
 
 <template>
   <ion-page>
     <HeaderComponent @cancel="cancelForm" />
-    <ion-content class="ion-padding">
+    <ion-content class="ion-padding" ref="content">
       <StepIndicator
         :current-step="currentStep - 1"
         :step-titles="stepTitles"
@@ -150,8 +161,18 @@ function cancelForm() {
           :current-step="currentStep"
           :total-steps="totalSteps"
           :can-proceed="canProceed"
-          @prev="currentStep--"
-          @next="currentStep++"
+          @prev="
+            {
+              scrollToTop();
+              currentStep--;
+            }
+          "
+          @next="
+            {
+              scrollToTop();
+              currentStep++;
+            }
+          "
           @submit="submitForm"
         />
       </div>

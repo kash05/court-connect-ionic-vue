@@ -65,16 +65,20 @@ const { value: securityDeposit } = useField<number>('securityDeposit');
 const { value: preBooking } = useField<boolean>('preBooking');
 const { value: fullDayBooking } = useField<boolean>('fullDayBooking');
 
-const { value: lightingFee } = useField<number>('additionalFees.lightingFee');
-const { value: equipmentFee } = useField<number>('additionalFees.equipmentFee');
-const { value: maintenanceSurcharge } = useField<number>(
+const { value: lightingFee } = useField<number | undefined>(
+  'additionalFees.lightingFee',
+);
+const { value: equipmentFee } = useField<number | undefined>(
+  'additionalFees.equipmentFee',
+);
+const { value: maintenanceSurcharge } = useField<number | undefined>(
   'additionalFees.maintenanceSurcharge',
 );
 
-const { value: earlyBirdPercent } = useField<number>(
+const { value: earlyBirdPercent } = useField<number | undefined>(
   'discounts.earlyBirdPercent',
 );
-const { value: multiDayDiscountPercent } = useField<number>(
+const { value: multiDayDiscountPercent } = useField<number | undefined>(
   'discounts.multiDayDiscountPercent',
 );
 

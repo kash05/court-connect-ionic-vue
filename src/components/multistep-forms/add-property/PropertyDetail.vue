@@ -2,18 +2,18 @@
 import { useForm, useField } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import {
-	IonItem,
-	IonInput,
-	IonText,
-	IonNote,
-	IonLabel,
-	IonToggle,
-	IonChip,
+  IonItem,
+  IonInput,
+  IonText,
+  IonNote,
+  IonLabel,
+  IonToggle,
+  IonChip,
 } from '@ionic/vue';
 import { watch, onMounted, computed } from 'vue';
 import {
-	PropertyDetailFormData,
-	propertyDetailSchema,
+  PropertyDetailFormData,
+  propertyDetailSchema,
 } from '@/lib/validation/addPropertyFormValidation';
 
 const props = defineProps<{
@@ -205,7 +205,7 @@ const selectedAmenities = computed(() => additionalAmenities.value || []);
           type="number"
           placeholder="0"
           :value="subUnits?.[sport]?.toString() || ''"
-          @ion-input="updateSubUnit(sport, $event.target.value)"
+          @ion-input="updateSubUnit(sport, $event.target.value as string)"
           class="sub-unit-input"
           slot="end"
         />
