@@ -13,6 +13,7 @@ import { computed, ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ProfilePopoverComponent from '@/components/ProfilePopoverComponent.vue';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { UserRole } from '@/types/enums/UserEnum';
 
 const { user } = useAuthStore();
 
@@ -153,7 +154,7 @@ const toggleProfileMenu = () => {
             :color="authStore.isCurrentRolePlayer ? 'primary' : 'secondary'"
             class="ion-no-padding role-text"
           >
-            {{ authStore.activeRole }}
+            {{ authStore.activeRole === UserRole.PLAYER ? 'Player' : 'Owner' }}
           </ion-badge>
         </div>
 

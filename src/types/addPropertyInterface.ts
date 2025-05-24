@@ -38,12 +38,20 @@ export interface TimingAndAvailabilityForm {
 }
 
 export interface BookingAndPricingForm {
-  pricingModel: 'hourly' | 'daily';
+  pricingModel: 'hourly' | 'daily' | 'mixed';
   baseRate: number;
-  peakRates: number[];
+  additionalFees?: {
+    lightingFee?: number;
+    equipmentFee?: number;
+    maintenanceSurcharge?: number;
+  };
   securityDeposit: number;
   preBooking: boolean;
   fullDayBooking: boolean;
+  discounts?: {
+    earlyBirdPercent?: number;
+    multiDayDiscountPercent?: number;
+  };
   cancellationPolicy: {
     freeWindowHours: number;
     feePercent: number;
@@ -55,5 +63,4 @@ export interface MediaForm {
   images: string[];
   videoUrl?: string;
   floorPlan?: string;
-  isActive: boolean;
 }

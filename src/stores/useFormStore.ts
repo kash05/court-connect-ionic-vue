@@ -38,8 +38,12 @@ export const useFormStore = defineStore('formStore', () => {
     bookingAndPricing: {
       pricingModel: 'hourly',
       baseRate: 0,
-      peakRates: [],
       securityDeposit: 0,
+      additionalFees: {
+        lightingFee: undefined,
+        equipmentFee: undefined,
+        maintenanceSurcharge: undefined,
+      },
       preBooking: false,
       fullDayBooking: false,
       cancellationPolicy: {
@@ -47,12 +51,15 @@ export const useFormStore = defineStore('formStore', () => {
         feePercent: 0,
         noShowCharge: 0,
       },
+      discounts: {
+        earlyBirdPercent: undefined,
+        multiDayDiscountPercent: undefined,
+      },
     },
     media: {
       images: [],
       videoUrl: undefined,
       floorPlan: undefined,
-      isActive: true,
     },
   });
 
@@ -89,10 +96,17 @@ export const useFormStore = defineStore('formStore', () => {
   }
 
   async function saveFormData() {
+    const { media, ...rest } = propertyForm.value;
+    const formToSave = {
+      ...rest,
+      media: {
+        videoUrl: media?.videoUrl,
+      },
+    };
     try {
       await Preferences.set({
         key: FORM_KEY,
-        value: JSON.stringify(propertyForm.value),
+        value: JSON.stringify(formToSave),
       });
     } catch (error) {
       console.error('Error saving property form:', error);
@@ -143,8 +157,12 @@ export const useFormStore = defineStore('formStore', () => {
       bookingAndPricing: {
         pricingModel: 'hourly',
         baseRate: 0,
-        peakRates: [],
         securityDeposit: 0,
+        additionalFees: {
+          lightingFee: undefined,
+          equipmentFee: undefined,
+          maintenanceSurcharge: undefined,
+        },
         preBooking: false,
         fullDayBooking: false,
         cancellationPolicy: {
@@ -152,12 +170,15 @@ export const useFormStore = defineStore('formStore', () => {
           feePercent: 0,
           noShowCharge: 0,
         },
+        discounts: {
+          earlyBirdPercent: undefined,
+          multiDayDiscountPercent: undefined,
+        },
       },
       media: {
         images: [],
         videoUrl: undefined,
         floorPlan: undefined,
-        isActive: true,
       },
     };
     await Preferences.remove({ key: FORM_KEY });

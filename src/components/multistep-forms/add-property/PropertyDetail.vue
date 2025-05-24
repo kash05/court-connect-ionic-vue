@@ -2,18 +2,18 @@
 import { useForm, useField } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import {
-  IonItem,
-  IonInput,
-  IonText,
-  IonNote,
-  IonLabel,
-  IonToggle,
-  IonChip,
+	IonItem,
+	IonInput,
+	IonText,
+	IonNote,
+	IonLabel,
+	IonToggle,
+	IonChip,
 } from '@ionic/vue';
 import { watch, onMounted, computed } from 'vue';
 import {
-  PropertyDetailFormData,
-  propertyDetailSchema,
+	PropertyDetailFormData,
+	propertyDetailSchema,
 } from '@/lib/validation/addPropertyFormValidation';
 
 const props = defineProps<{
@@ -296,9 +296,10 @@ const selectedAmenities = computed(() => additionalAmenities.value || []);
 @use '@/theme/addPropertyForm.scss';
 
 .property-detail-form {
-  max-height: calc(100vh - 240px);
+  height: max-content;
   overflow: auto;
   padding: 16px;
+  margin-bottom: 50px;
 }
 
 .subtitle {
