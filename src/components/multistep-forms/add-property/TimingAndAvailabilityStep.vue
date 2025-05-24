@@ -344,9 +344,10 @@ const formatTimeFromInput = (isoString: string) => {
 @use '@/theme/addPropertyForm.scss';
 
 .timing-availability-form {
-  max-height: calc(100vh - 240px);
+  height: max-content;
   overflow: auto;
   padding: 16px;
+  margin-bottom: 50px;
 }
 
 .subtitle {

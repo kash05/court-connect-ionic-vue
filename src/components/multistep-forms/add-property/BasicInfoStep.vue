@@ -195,9 +195,10 @@ const handleLocationSelected = (location: {
 @use '@/theme/addPropertyForm.scss';
 
 .personal-details-form {
-  max-height: calc(100vh - 240px);
+  height: max-content;
   overflow: auto;
   padding: 16px;
+  margin-bottom: 50px;
 }
 
 .location-modal {

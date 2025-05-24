@@ -9,6 +9,8 @@ import FooterComponent from '@/components/multistep-forms/add-property/FooterCom
 import PropertyDetail from '@/components/multistep-forms/add-property/PropertyDetail.vue';
 import TimingAndAvailabilityStep from '@/components/multistep-forms/add-property/TimingAndAvailabilityStep.vue';
 import GlobalMessage from '@/components/GlobalMessage.vue';
+import BookinAndPricingForm from '@/components/multistep-forms/add-property/BookinAndPricingForm.vue';
+import MediaStep from '@/components/multistep-forms/add-property/MediaStep.vue';
 
 const formStore = useFormStore();
 const ionRouter = useIonRouter();
@@ -59,7 +61,7 @@ const updateValidationStatus = (step: number, isValid: boolean) => {
 const submitForm = async () => {
   try {
     alert('Form submitted successfully!');
-    formStore.resetForm();
+    // formStore.resetForm();
     currentStep.value = 1;
   } catch (error) {
     console.error('Error submitting form:', error);
@@ -121,6 +123,26 @@ function cancelForm() {
           "
           @validation-change="
             (isValid: boolean) => updateValidationStatus(3, isValid)
+          "
+        />
+
+        <BookinAndPricingForm
+          v-if="currentStep === 4"
+          :form-data="formStore.propertyForm.bookingAndPricing"
+          @update-form="
+            (val) => formStore.updatePropertyForm({ bookingAndPricing: val })
+          "
+          @validation-change="
+            (isValid: boolean) => updateValidationStatus(4, isValid)
+          "
+        />
+
+        <MediaStep
+          v-if="currentStep === 5"
+          :form-data="formStore.propertyForm.media"
+          @update-form="(val) => formStore.updatePropertyForm({ media: val })"
+          @validation-change="
+            (isValid: boolean) => updateValidationStatus(5, isValid)
           "
         />
 

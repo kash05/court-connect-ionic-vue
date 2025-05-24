@@ -52,28 +52,31 @@ export const timingAndAvailabilitySchema = z.object({
 });
 
 export const bookingAndPricingSchema = z.object({
-  pricingModel: z.enum(['hourly', 'daily', 'monthly']),
-  baseRate: z.number().min(0, 'Base rate cannot be negative'),
-  peakRates: z.array(
-    z.object({
-      startTime: z.string(),
-      endTime: z.string(),
-      rate: z.number().min(0),
-      days: z.array(z.string()),
-    }),
-  ),
-  securityDeposit: z.number().min(0, 'Security deposit cannot be negative'),
+  pricingModel: z.enum(['hourly', 'daily', 'mixed']),
+  baseRate: z.number().min(0, 'Base rate must be a positive number'),
+  additionalFees: z
+    .object({
+      lightingFee: z.number().min(0).optional(),
+      equipmentFee: z.number().min(0).optional(),
+      maintenanceSurcharge: z.number().min(0).optional(),
+    })
+    .optional(),
+  securityDeposit: z.number().min(0, 'Security deposit must be zero or more'),
+
   preBooking: z.boolean(),
   fullDayBooking: z.boolean(),
+  discounts: z
+    .object({
+      earlyBirdPercent: z.number().min(0).max(100).optional(),
+      multiDayDiscountPercent: z.number().min(0).max(100).optional(),
+    })
+    .optional(),
   cancellationPolicy: z.object({
     freeWindowHours: z
       .number()
-      .min(0, 'Free cancellation window cannot be negative'),
-    feePercent: z
-      .number()
-      .min(0, 'Fee percentage cannot be negative')
-      .max(100, 'Fee percentage cannot exceed 100%'),
-    noShowCharge: z.number().min(0, 'No show charge cannot be negative'),
+      .min(0, 'Free cancellation window must be zero or more'),
+    feePercent: z.number().min(0).max(100, 'Fee cannot exceed 100%'),
+    noShowCharge: z.number().min(0, 'No-show charge must be zero or more'),
   }),
 });
 
@@ -81,7 +84,6 @@ export const mediaSchema = z.object({
   images: z.array(z.string()).min(1, 'At least one image is required'),
   videoUrl: z.string().url('Invalid video URL').optional().or(z.literal('')),
   floorPlan: z.string().optional(),
-  isActive: z.boolean(),
 });
 
 export const propertyFormSchema = z.object({
