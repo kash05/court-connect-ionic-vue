@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { Preferences } from '@capacitor/preferences';
 import { PropertyForm } from '@/types/addPropertyInterface';
+import { Preferences } from '@capacitor/preferences';
 
-const STORAGE_KEY = 'propertyFormData';
+const FORM_KEY = 'propertyFormData';
 
-export const useFormStore = defineStore('form', () => {
-  const formData = ref<PropertyForm>({
+export const useFormStore = defineStore('formStore', () => {
+  const propertyForm = ref<PropertyForm>({
     basicInfo: {
       name: '',
       description: '',
@@ -26,11 +26,12 @@ export const useFormStore = defineStore('form', () => {
       additionalAmenities: [],
     },
     timingAndAvailability: {
-      openingHours: {},
+      openingHours: {
+        open: '00:00',
+        close: '23:59',
+      },
       bookingMode: 'slots',
       slotDuration: 60,
-      weeklySlots: {},
-      exceptions: [],
       maxAdvanceDays: 30,
       minNoticeHours: 2,
     },
@@ -55,35 +56,62 @@ export const useFormStore = defineStore('form', () => {
     },
   });
 
-  async function saveFormData() {
-    try {
-      await Preferences.set({
-        key: STORAGE_KEY,
-        value: JSON.stringify(formData.value),
-      });
-    } catch (err) {
-      console.error('Error saving form data:', err);
-    }
-  }
+  const userProperties = ref<PropertyForm[]>([]);
+  const filters = ref<{
+    sport?: string;
+    location?: string;
+    priceRange?: [number, number];
+    radius?: number;
+  }>({});
 
-  async function initializeForm() {
-    try {
-      const { value } = await Preferences.get({ key: STORAGE_KEY });
-      if (value) {
-        formData.value = JSON.parse(value);
-      }
-    } catch (err) {
-      console.error('Error loading form data:', err);
-    }
-  }
+  const isLoading = ref(false);
 
-  function updateForm(data: Partial<PropertyForm>) {
-    formData.value = { ...formData.value, ...data };
+  function setPropertyForm(data: PropertyForm) {
+    propertyForm.value = data;
     saveFormData();
   }
 
+  function updatePropertyForm(data: Partial<PropertyForm>) {
+    propertyForm.value = { ...propertyForm.value, ...data };
+    saveFormData();
+  }
+
+  function setUserProperties(properties: PropertyForm[]) {
+    userProperties.value = properties;
+  }
+
+  function addProperty(property: PropertyForm) {
+    userProperties.value.push(property);
+  }
+
+  function setFilters(newFilters: Partial<typeof filters.value>) {
+    filters.value = { ...filters.value, ...newFilters };
+  }
+
+  async function saveFormData() {
+    try {
+      await Preferences.set({
+        key: FORM_KEY,
+        value: JSON.stringify(propertyForm.value),
+      });
+    } catch (error) {
+      console.error('Error saving property form:', error);
+    }
+  }
+
+  async function loadFormData() {
+    try {
+      const { value } = await Preferences.get({ key: FORM_KEY });
+      if (value) {
+        propertyForm.value = JSON.parse(value);
+      }
+    } catch (error) {
+      console.error('Error loading form data:', error);
+    }
+  }
+
   async function resetForm() {
-    formData.value = {
+    propertyForm.value = {
       basicInfo: {
         name: '',
         description: '',
@@ -103,11 +131,12 @@ export const useFormStore = defineStore('form', () => {
         additionalAmenities: [],
       },
       timingAndAvailability: {
-        openingHours: {},
+        openingHours: {
+          open: '00:00',
+          close: '23:59',
+        },
         bookingMode: 'slots',
         slotDuration: 60,
-        weeklySlots: {},
-        exceptions: [],
         maxAdvanceDays: 30,
         minNoticeHours: 2,
       },
@@ -131,14 +160,23 @@ export const useFormStore = defineStore('form', () => {
         isActive: true,
       },
     };
-    await Preferences.remove({ key: STORAGE_KEY });
+    await Preferences.remove({ key: FORM_KEY });
   }
 
   return {
-    formData,
-    initializeForm,
+    propertyForm,
+    userProperties,
+    filters,
+    isLoading,
+
+    setPropertyForm,
+    updatePropertyForm,
+    setUserProperties,
+    addProperty,
+    setFilters,
+
     saveFormData,
+    loadFormData,
     resetForm,
-    updateForm,
   };
 });
