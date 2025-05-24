@@ -23,6 +23,7 @@ import {
 import { logoGoogle } from 'ionicons/icons';
 import { onMounted, ref } from 'vue';
 import { toastService } from '@/services/toastService';
+import { UserRole } from '@/types/enums/UserEnum';
 
 const router = useIonRouter();
 const formError = ref<string | null>();
@@ -49,7 +50,7 @@ const registerSchema = toTypedSchema(
 );
 
 onMounted(() => {
-  forRole.value = route.params.roleType;
+  forRole.value = route.params.roleId;
 });
 
 const { handleSubmit, errors } = useForm({
@@ -80,7 +81,7 @@ const onSubmit = handleSubmit((values) => {
     full_name: values.fullName,
     gender: values.gender,
     agree_terms: values.agreeTerms,
-    role: forRole.value,
+    role_id: Number(forRole.value),
   };
 
   loadingService.withLoading(
@@ -103,6 +104,10 @@ const onSubmit = handleSubmit((values) => {
     'Registering your account...',
   );
 });
+
+function getRoleName() {
+  return Number(forRole.value) === UserRole.PLAYER ? 'Player' : 'Owner';
+}
 
 const goToLogin = () => {
   router.push('/login');
@@ -133,7 +138,7 @@ const handleGoogleRegistration = () => {
           >
             CourtConnect
             <span class="text-primary-600 text-md block capitalize"
-              >{{ forRole }} Registration</span
+              >{{ getRoleName() }} Registration</span
             >
           </h1>
 

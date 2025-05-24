@@ -19,5 +19,5 @@ export interface RegisterInterface {
   full_name: string;
   gender: string;
   agree_terms: boolean;
-  role: string;
+  role_id: number;
 }
