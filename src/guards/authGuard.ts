@@ -1,23 +1,32 @@
 import { useAuthStore } from '@/stores/useAuthStore';
+import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router';
 import { UserRole } from '@/types/enums/UserEnum';
-import { NavigationGuardNext, RouteLocationNormalized } from 'vue-router';
 
 /**
- * Authentication guard for protected routes
- * Redirects to login if user is not authenticated
+ * Ensures the auth store is initialized before proceeding.
+ */
+export async function ensureAuthInitialized(): Promise<
+  ReturnType<typeof useAuthStore>
+> {
+  const auth = useAuthStore();
+  if (!auth.initialized) {
+    await auth.initializeAuth();
+  }
+  return auth;
+}
+
+/**
+ * Guard for authenticated routes.
+ * Redirects unauthenticated users to login.
  */
 export const authGuard = async (
   to: RouteLocationNormalized,
   from: RouteLocationNormalized,
   next: NavigationGuardNext,
 ) => {
-  const authStore = useAuthStore();
+  const auth = await ensureAuthInitialized();
 
-  if (!authStore.initialized) {
-    await authStore.initializeAuth();
-  }
-
-  if (authStore.isAuthenticated()) {
+  if (auth.isAuthenticated) {
     next();
   } else {
     next({
@@ -28,27 +37,18 @@ export const authGuard = async (
 };
 
 /**
- * Guest guard for login/register routes
- * Redirects to dashboard if user is already authenticated
+ * Guard for guest-only routes (login, register).
+ * Redirects authenticated users to their respective dashboard.
  */
 export const guestGuard = async (
   to: RouteLocationNormalized,
   from: RouteLocationNormalized,
   next: NavigationGuardNext,
 ) => {
-  const authStore = useAuthStore();
+  const auth = await ensureAuthInitialized();
 
-  if (!authStore.initialized) {
-    await authStore.initializeAuth();
-  }
-
-  if (authStore.isAuthenticated()) {
-    const isOwner = authStore.activeRole === UserRole.OWNER;
-    if (isOwner) {
-      next('/owner');
-    } else {
-      next('/player');
-    }
+  if (auth.isAuthenticated) {
+    next(auth.activeRole === UserRole.OWNER ? '/owner' : '/player');
   } else {
     next();
   }

@@ -13,7 +13,7 @@ export const basicInfoSchema = z.object({
   contactPhone: z
     .string()
     .min(10, 'Valid phone number required')
-    .regex(/^\+?[\d\s\-(\)]+$/, 'Invalid phone format'),
+    .regex(/^\+?[\d\s\-()]+$/, 'Invalid phone format'),
   contactEmail: z.string().email('Valid email required'),
 });
 

@@ -1,21 +1,25 @@
-import { useAuthStore } from '@/stores/useAuthStore';
 import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router';
-import { UserRole } from '@/types/enums/UserEnum';
+import { ensureAuthInitialized } from './authGuard';
+import { UserRole } from '../types/enums/UserEnum';
 
-export const roleGuard: (
-  to: RouteLocationNormalized,
-  from: RouteLocationNormalized,
-  next: NavigationGuardNext,
-) => Promise<void> = async (to, from, next) => {
-  const auth = useAuthStore();
+/**
+ * Role-based access guard (parameterized).
+ * Only allows access if user's activeRole is in the allowedRoles list.
+ */
+export const roleGuard =
+  (allowedRoles: UserRole[]) =>
+  async (
+    to: RouteLocationNormalized,
+    from: RouteLocationNormalized,
+    next: NavigationGuardNext,
+  ) => {
+    const auth = await ensureAuthInitialized();
 
-  const requiredRole = (to.meta.requiredRole as UserRole) || null;
-  const current = auth.activeRole;
+    if (!allowedRoles.includes(auth.activeRole)) {
+      const fallback =
+        auth.activeRole === UserRole.OWNER ? '/owner' : '/player';
+      return next(fallback);
+    }
 
-  if (requiredRole && requiredRole !== current) {
-    const redirectPath = current === UserRole.OWNER ? '/owner' : '/player';
-    return next(redirectPath);
-  }
-
-  return next();
-};
+    return next();
+  };
