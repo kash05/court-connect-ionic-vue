@@ -15,15 +15,11 @@ import {
   PropertyDetailFormData,
   propertyDetailSchema,
 } from '@/lib/validation/addPropertyFormValidation';
+import { useFormStore } from '@/stores/useFormStore';
 
-const props = defineProps<{
-  formData: PropertyDetailFormData;
-}>();
+const formStore = useFormStore();
 
-const emit = defineEmits<{
-  'update-form': [payload: PropertyDetailFormData];
-  'validation-change': [isValid: boolean];
-}>();
+const formData = computed(() => formStore.propertyForm.propertyDetail);
 
 const SPORTS_OPTIONS = [
   'Football',
@@ -84,13 +80,15 @@ const AMENITIES_OPTIONS = [
   'Coaching Available',
 ];
 
-onMounted(async () => {
-  emit('validation-change', meta.value.valid);
+onMounted(() => {
+  if (formData.value) {
+    setValues(formData.value);
+  }
 });
 
-const { errors, values, meta } = useForm<PropertyDetailFormData>({
+const { errors, values, setValues } = useForm<PropertyDetailFormData>({
   validationSchema: toTypedSchema(propertyDetailSchema),
-  initialValues: props.formData,
+  initialValues: formData.value,
 });
 
 const { value: sports } = useField<string[]>('sports');
@@ -104,18 +102,25 @@ const { value: additionalAmenities } = useField<string[]>(
 );
 
 watch(
-  values,
-  (val) => {
-    emit('update-form', val as PropertyDetailFormData);
+  formData,
+  (newData) => {
+    if (newData) {
+      setValues(newData);
+    }
   },
-  { deep: true },
+  { deep: true, immediate: true },
 );
 
 watch(
-  () => meta.value.valid,
-  (valid) => {
-    emit('validation-change', valid);
+  values,
+  (newValues) => {
+    if (newValues && Object.keys(newValues).length > 0) {
+      formStore.updatePropertyForm({
+        basicInfo: newValues as any,
+      });
+    }
   },
+  { deep: true },
 );
 
 const toggleSport = (sport: string) => {
@@ -163,6 +168,14 @@ const selectedSports = computed(() => sports.value || []);
 const selectedFacilities = computed(() => facilities.value || []);
 const selectedAccessibility = computed(() => accessibility.value || []);
 const selectedAmenities = computed(() => additionalAmenities.value || []);
+
+const getFieldError = (fieldName: keyof PropertyDetailFormData) => {
+  return errors.value[fieldName];
+};
+
+const hasFieldError = (fieldName: keyof PropertyDetailFormData) => {
+  return !!errors.value[fieldName];
+};
 </script>
 
 <template>
@@ -184,8 +197,8 @@ const selectedAmenities = computed(() => additionalAmenities.value || []);
           {{ sport }}
         </IonChip>
       </div>
-      <IonText color="danger" class="form-error" v-if="errors.sports">
-        {{ errors.sports }}
+      <IonText color="danger" class="form-error" v-if="hasFieldError('sports')">
+        {{ getFieldError('sports') }}
       </IonText>
     </div>
 
@@ -226,8 +239,12 @@ const selectedAmenities = computed(() => additionalAmenities.value || []);
           {{ surface }}
         </IonChip>
       </div>
-      <IonText color="danger" class="form-error" v-if="errors.surfaceType">
-        {{ errors.surfaceType }}
+      <IonText
+        color="danger"
+        class="form-error"
+        v-if="hasFieldError('surfaceType')"
+      >
+        {{ getFieldError('surfaceType') }}
       </IonText>
     </div>
 
