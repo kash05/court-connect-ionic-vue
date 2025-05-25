@@ -35,16 +35,16 @@ import {
 } from 'ionicons/icons';
 import { watch, onMounted, ref } from 'vue';
 import { MediaForm } from '@/types/addPropertyInterface';
-import { mediaSchema } from '@/lib/validation/addPropertyFormValidation';
+import {
+  MediaFormData,
+  mediaSchema,
+} from '@/lib/validation/addPropertyFormValidation';
+import { useFormStore } from '@/stores/useFormStore';
+import { computed } from 'vue';
 
-const props = defineProps<{
-  formData: MediaForm;
-}>();
+const formStore = useFormStore();
 
-const emit = defineEmits<{
-  'update-form': [payload: MediaForm];
-  'validation-change': [isValid: boolean];
-}>();
+const formData = computed(() => formStore.propertyForm.media);
 
 const imageInput = ref<HTMLInputElement>();
 const floorPlanInput = ref<HTMLInputElement>();
@@ -56,13 +56,15 @@ const mainSwiper = ref(null);
 
 const swiperModules = [Navigation, Pagination, Thumbs, FreeMode];
 
-onMounted(async () => {
-  emit('validation-change', meta.value.valid);
+onMounted(() => {
+  if (formData.value) {
+    setValues(formData.value);
+  }
 });
 
-const { errors, values, meta } = useForm<MediaForm>({
+const { errors, values, setValues } = useForm<MediaForm>({
   validationSchema: toTypedSchema(mediaSchema),
-  initialValues: props.formData,
+  initialValues: formData.value,
 });
 
 const { value: images } = useField<string[]>('images');
@@ -70,18 +72,25 @@ const { value: videoUrl } = useField<string>('videoUrl');
 const { value: floorPlan } = useField<string | undefined>('floorPlan');
 
 watch(
-  values,
-  (val) => {
-    emit('update-form', val as MediaForm);
+  formData,
+  (newData) => {
+    if (newData) {
+      setValues(newData);
+    }
   },
-  { deep: true },
+  { deep: true, immediate: true },
 );
 
 watch(
-  () => meta.value.valid,
-  (valid) => {
-    emit('validation-change', valid);
+  values,
+  (newValues) => {
+    if (newValues && Object.keys(newValues).length > 0) {
+      formStore.updatePropertyForm({
+        basicInfo: newValues as any,
+      });
+    }
   },
+  { deep: true },
 );
 
 const openImagePicker = () => {
@@ -176,6 +185,14 @@ const actionSheetButtons = [
     icon: closeOutline,
   },
 ];
+
+const getFieldError = (fieldName: keyof MediaFormData) => {
+  return errors.value[fieldName];
+};
+
+const hasFieldError = (fieldName: keyof MediaFormData) => {
+  return !!errors.value[fieldName];
+};
 </script>
 
 <template>
@@ -259,8 +276,12 @@ const actionSheetButtons = [
           Add More Images
         </IonButton>
 
-        <IonText color="danger" class="form-error" v-if="errors.images">
-          {{ errors.images }}
+        <IonText
+          color="danger"
+          class="form-error"
+          v-if="hasFieldError('images')"
+        >
+          {{ getFieldError('images') }}
         </IonText>
       </IonCardContent>
     </IonCard>

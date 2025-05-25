@@ -2,59 +2,44 @@
 import { useForm, useField } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import {
-  IonItem,
-  IonInput,
-  IonText,
-  IonNote,
-  IonLabel,
-  IonSelect,
-  IonSelectOption,
-  IonCheckbox,
-  IonToggle,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
+	IonItem,
+	IonInput,
+	IonText,
+	IonNote,
+	IonLabel,
+	IonSelect,
+	IonSelectOption,
+	IonCheckbox,
+	IonToggle,
+	IonCard,
+	IonCardHeader,
+	IonCardTitle,
+	IonCardContent,
 } from '@ionic/vue';
-import { watch, onMounted, ref } from 'vue';
-import { bookingAndPricingSchema } from '@/lib/validation/addPropertyFormValidation';
+import { watch, onMounted, ref, computed } from 'vue';
+import {
+	BookingAndPricingFormData,
+	bookingAndPricingSchema,
+} from '@/lib/validation/addPropertyFormValidation';
 import { BookingAndPricingForm } from '@/types/addPropertyInterface';
+import { useFormStore } from '@/stores/useFormStore';
 
-const props = defineProps<{
-  formData: BookingAndPricingForm;
-}>();
+const formStore = useFormStore();
 
-const emit = defineEmits<{
-  'update-form': [payload: BookingAndPricingForm];
-  'validation-change': [isValid: boolean];
-}>();
+const formData = computed(() => formStore.propertyForm.bookingAndPricing);
 
 const showAdditionalFees = ref(false);
 const showDiscounts = ref(false);
 
 onMounted(async () => {
-  emit('validation-change', meta.value.valid);
-
-  if (props.formData.additionalFees) {
-    const { lightingFee, equipmentFee, maintenanceSurcharge } =
-      props.formData.additionalFees;
-    if (lightingFee || equipmentFee || maintenanceSurcharge) {
-      showAdditionalFees.value = true;
-    }
-  }
-
-  if (props.formData.discounts) {
-    const { earlyBirdPercent, multiDayDiscountPercent } =
-      props.formData.discounts;
-    if (earlyBirdPercent || multiDayDiscountPercent) {
-      showDiscounts.value = true;
-    }
+  if (formData.value) {
+    setValues(formData.value);
   }
 });
 
-const { errors, values, meta } = useForm<BookingAndPricingForm>({
+const { errors, values, setValues } = useForm<BookingAndPricingForm>({
   validationSchema: toTypedSchema(bookingAndPricingSchema),
-  initialValues: props.formData,
+  initialValues: formData.value,
 });
 
 const { value: pricingModel } = useField<'hourly' | 'daily' | 'mixed'>(
@@ -65,44 +50,55 @@ const { value: securityDeposit } = useField<number>('securityDeposit');
 const { value: preBooking } = useField<boolean>('preBooking');
 const { value: fullDayBooking } = useField<boolean>('fullDayBooking');
 
-const { value: lightingFee } = useField<number | undefined>(
-  'additionalFees.lightingFee',
-);
-const { value: equipmentFee } = useField<number | undefined>(
-  'additionalFees.equipmentFee',
-);
-const { value: maintenanceSurcharge } = useField<number | undefined>(
-  'additionalFees.maintenanceSurcharge',
+const { value: lightingFee, errorMessage: lightingFeeError } = useField<
+  number | undefined
+>('additionalFees.lightingFee');
+
+const { value: equipmentFee, errorMessage: equipmentFeeError } = useField<
+  number | undefined
+>('additionalFees.equipmentFee');
+
+const { value: maintenanceSurcharge, errorMessage: maintenanceSurchargeError } =
+  useField<number | undefined>('additionalFees.maintenanceSurcharge');
+
+const { value: earlyBirdPercent, errorMessage: earlyBirdPercentError } =
+  useField<number | undefined>('discounts.earlyBirdPercent');
+
+const {
+  value: multiDayDiscountPercent,
+  errorMessage: multiDayDiscountPercentError,
+} = useField<number | undefined>('discounts.multiDayDiscountPercent');
+
+const { value: freeWindowHours, errorMessage: freeWindowHoursError } =
+  useField<number>('cancellationPolicy.freeWindowHours');
+
+const { value: feePercent, errorMessage: feePercentError } = useField<number>(
+  'cancellationPolicy.feePercent',
 );
 
-const { value: earlyBirdPercent } = useField<number | undefined>(
-  'discounts.earlyBirdPercent',
-);
-const { value: multiDayDiscountPercent } = useField<number | undefined>(
-  'discounts.multiDayDiscountPercent',
-);
+const { value: noShowCharge, errorMessage: noShowChargeError } =
+  useField<number>('cancellationPolicy.noShowCharge');
 
-const { value: freeWindowHours } = useField<number>(
-  'cancellationPolicy.freeWindowHours',
-);
-const { value: feePercent } = useField<number>('cancellationPolicy.feePercent');
-const { value: noShowCharge } = useField<number>(
-  'cancellationPolicy.noShowCharge',
+watch(
+  formData,
+  (newData) => {
+    if (newData) {
+      setValues(newData);
+    }
+  },
+  { deep: true, immediate: true },
 );
 
 watch(
   values,
-  (val) => {
-    emit('update-form', val as BookingAndPricingForm);
+  (newValues) => {
+    if (newValues && Object.keys(newValues).length > 0) {
+      formStore.updatePropertyForm({
+        basicInfo: newValues as any,
+      });
+    }
   },
   { deep: true },
-);
-
-watch(
-  () => meta.value.valid,
-  (valid) => {
-    emit('validation-change', valid);
-  },
 );
 
 const toggleAdditionalFees = () => {
@@ -120,6 +116,14 @@ const toggleDiscounts = () => {
     earlyBirdPercent.value = undefined;
     multiDayDiscountPercent.value = undefined;
   }
+};
+
+const getFieldError = (fieldName: keyof BookingAndPricingFormData) => {
+  return errors.value[fieldName];
+};
+
+const hasFieldError = (fieldName: keyof BookingAndPricingFormData) => {
+  return !!errors.value[fieldName];
 };
 </script>
 
@@ -145,8 +149,12 @@ const toggleDiscounts = () => {
             >Mixed (Hourly & Daily)</IonSelectOption
           >
         </IonSelect>
-        <IonText color="danger" class="form-error" v-if="errors.pricingModel">
-          {{ errors.pricingModel }}
+        <IonText
+          color="danger"
+          class="form-error"
+          v-if="hasFieldError('pricingModel')"
+        >
+          {{ getFieldError('pricingModel') }}
         </IonText>
       </div>
     </IonItem>
@@ -172,8 +180,12 @@ const toggleDiscounts = () => {
           min="0"
           step="0.01"
         />
-        <IonText color="danger" class="form-error" v-if="errors.baseRate">
-          {{ errors.baseRate }}
+        <IonText
+          color="danger"
+          class="form-error"
+          v-if="hasFieldError('baseRate')"
+        >
+          {{ getFieldError('baseRate') }}
         </IonText>
       </div>
     </IonItem>
@@ -194,9 +206,9 @@ const toggleDiscounts = () => {
         <IonText
           color="danger"
           class="form-error"
-          v-if="errors.securityDeposit"
+          v-if="hasFieldError('securityDeposit')"
         >
-          {{ errors.securityDeposit }}
+          {{ getFieldError('securityDeposit') }}
         </IonText>
       </div>
     </IonItem>
@@ -254,12 +266,8 @@ const toggleDiscounts = () => {
               min="0"
               step="0.01"
             />
-            <IonText
-              color="danger"
-              class="form-error"
-              v-if="errors['additionalFees.lightingFee']"
-            >
-              {{ errors['additionalFees.lightingFee'] }}
+            <IonText color="danger" class="form-error" v-if="lightingFeeError">
+              {{ lightingFeeError }}
             </IonText>
           </div>
         </IonItem>
@@ -278,12 +286,8 @@ const toggleDiscounts = () => {
               min="0"
               step="0.01"
             />
-            <IonText
-              color="danger"
-              class="form-error"
-              v-if="errors['additionalFees.equipmentFee']"
-            >
-              {{ errors['additionalFees.equipmentFee'] }}
+            <IonText color="danger" class="form-error" v-if="equipmentFeeError">
+              {{ equipmentFeeError }}
             </IonText>
           </div>
         </IonItem>
@@ -305,9 +309,9 @@ const toggleDiscounts = () => {
             <IonText
               color="danger"
               class="form-error"
-              v-if="errors['additionalFees.maintenanceSurcharge']"
+              v-if="maintenanceSurchargeError"
             >
-              {{ errors['additionalFees.maintenanceSurcharge'] }}
+              {{ maintenanceSurchargeError }}
             </IonText>
           </div>
         </IonItem>
@@ -347,9 +351,9 @@ const toggleDiscounts = () => {
             <IonText
               color="danger"
               class="form-error"
-              v-if="errors['discounts.earlyBirdPercent']"
+              v-if="earlyBirdPercentError"
             >
-              {{ errors['discounts.earlyBirdPercent'] }}
+              {{ earlyBirdPercentError }}
             </IonText>
           </div>
         </IonItem>
@@ -372,9 +376,9 @@ const toggleDiscounts = () => {
             <IonText
               color="danger"
               class="form-error"
-              v-if="errors['discounts.multiDayDiscountPercent']"
+              v-if="multiDayDiscountPercentError"
             >
-              {{ errors['discounts.multiDayDiscountPercent'] }}
+              {{ multiDayDiscountPercentError }}
             </IonText>
           </div>
         </IonItem>
@@ -404,9 +408,9 @@ const toggleDiscounts = () => {
             <IonText
               color="danger"
               class="form-error"
-              v-if="errors['cancellationPolicy.freeWindowHours']"
+              v-if="freeWindowHoursError"
             >
-              {{ errors['cancellationPolicy.freeWindowHours'] }}
+              {{ freeWindowHoursError }}
             </IonText>
           </div>
         </IonItem>
@@ -426,12 +430,8 @@ const toggleDiscounts = () => {
               max="100"
               step="1"
             />
-            <IonText
-              color="danger"
-              class="form-error"
-              v-if="errors['cancellationPolicy.feePercent']"
-            >
-              {{ errors['cancellationPolicy.feePercent'] }}
+            <IonText color="danger" class="form-error" v-if="feePercentError">
+              {{ feePercentError }}
             </IonText>
           </div>
         </IonItem>
@@ -450,12 +450,8 @@ const toggleDiscounts = () => {
               min="0"
               step="0.01"
             />
-            <IonText
-              color="danger"
-              class="form-error"
-              v-if="errors['cancellationPolicy.noShowCharge']"
-            >
-              {{ errors['cancellationPolicy.noShowCharge'] }}
+            <IonText color="danger" class="form-error" v-if="noShowChargeError">
+              {{ noShowChargeError }}
             </IonText>
           </div>
         </IonItem>

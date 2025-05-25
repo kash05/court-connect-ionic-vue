@@ -13,20 +13,15 @@ import {
 } from '@ionic/vue';
 import { watch, onMounted, computed } from 'vue';
 import { timeOutline, calendarOutline, settingsOutline } from 'ionicons/icons';
-import { TimingAndAvailabilityForm } from '@/types/addPropertyInterface';
 import {
   TimingAndAvailabilityFormData,
   timingAndAvailabilitySchema,
 } from '@/lib/validation/addPropertyFormValidation';
+import { useFormStore } from '@/stores/useFormStore';
 
-const props = defineProps<{
-  formData: TimingAndAvailabilityForm;
-}>();
+const formStore = useFormStore();
 
-const emit = defineEmits<{
-  'update-form': [payload: TimingAndAvailabilityForm];
-  'validation-change': [isValid: boolean];
-}>();
+const formData = computed(() => formStore.propertyForm.timingAndAvailability);
 
 const BOOKING_MODES = [
   {
@@ -70,13 +65,14 @@ const MIN_NOTICE_OPTIONS = [
   { value: 48, label: '48 hours' },
 ];
 
-onMounted(async () => {
-  emit('validation-change', meta.value.valid);
+onMounted(() => {
+  if (formData.value) {
+    setValues(formData.value);
+  }
 });
-
-const { errors, values, meta } = useForm<TimingAndAvailabilityFormData>({
+const { errors, values, setValues } = useForm<TimingAndAvailabilityFormData>({
   validationSchema: toTypedSchema(timingAndAvailabilitySchema),
-  initialValues: props.formData,
+  initialValues: formData.value,
 });
 
 const { value: openingHours } = useField<{ open: string; close: string }>(
@@ -89,18 +85,25 @@ const { value: maxAdvanceDays } = useField<number>('maxAdvanceDays');
 const { value: minNoticeHours } = useField<number>('minNoticeHours');
 
 watch(
-  values,
-  (val) => {
-    emit('update-form', val as TimingAndAvailabilityForm);
+  formData,
+  (newData) => {
+    if (newData) {
+      setValues(newData);
+    }
   },
-  { deep: true },
+  { deep: true, immediate: true },
 );
 
 watch(
-  () => meta.value.valid,
-  (valid) => {
-    emit('validation-change', valid);
+  values,
+  (newValues) => {
+    if (newValues && Object.keys(newValues).length > 0) {
+      formStore.updatePropertyForm({
+        basicInfo: newValues as any,
+      });
+    }
   },
+  { deep: true },
 );
 
 const toggleBookingMode = (mode: 'slots' | 'full-day') => {
@@ -145,6 +148,14 @@ const formatTimeForInput = (time: string) => {
 const formatTimeFromInput = (isoString: string) => {
   if (!isoString) return '';
   return isoString.split('T')[1]?.substring(0, 5) || '';
+};
+
+const getFieldError = (fieldName: keyof TimingAndAvailabilityFormData) => {
+  return errors.value[fieldName];
+};
+
+const hasFieldError = (fieldName: keyof TimingAndAvailabilityFormData) => {
+  return !!errors.value[fieldName];
 };
 </script>
 
@@ -211,8 +222,12 @@ const formatTimeFromInput = (isoString: string) => {
         </IonItem>
       </div>
 
-      <IonText color="danger" class="form-error" v-if="errors.openingHours">
-        {{ errors.openingHours }}
+      <IonText
+        color="danger"
+        class="form-error"
+        v-if="hasFieldError('openingHours')"
+      >
+        {{ getFieldError('openingHours') }}
       </IonText>
     </div>
 
@@ -246,8 +261,12 @@ const formatTimeFromInput = (isoString: string) => {
         </div>
       </div>
 
-      <IonText color="danger" class="form-error" v-if="errors.bookingMode">
-        {{ errors.bookingMode }}
+      <IonText
+        color="danger"
+        class="form-error"
+        v-if="hasFieldError('bookingMode')"
+      >
+        {{ getFieldError('bookingMode') }}
       </IonText>
     </div>
 
@@ -277,8 +296,12 @@ const formatTimeFromInput = (isoString: string) => {
         </IonChip>
       </div>
 
-      <IonText color="danger" class="form-error" v-if="errors.slotDuration">
-        {{ errors.slotDuration }}
+      <IonText
+        color="danger"
+        class="form-error"
+        v-if="hasFieldError('slotDuration')"
+      >
+        {{ getFieldError('slotDuration') }}
       </IonText>
     </div>
 
@@ -305,8 +328,12 @@ const formatTimeFromInput = (isoString: string) => {
         </IonChip>
       </div>
 
-      <IonText color="danger" class="form-error" v-if="errors.maxAdvanceDays">
-        {{ errors.maxAdvanceDays }}
+      <IonText
+        color="danger"
+        class="form-error"
+        v-if="hasFieldError('maxAdvanceDays')"
+      >
+        {{ getFieldError('maxAdvanceDays') }}
       </IonText>
     </div>
 
@@ -333,8 +360,12 @@ const formatTimeFromInput = (isoString: string) => {
         </IonChip>
       </div>
 
-      <IonText color="danger" class="form-error" v-if="errors.minNoticeHours">
-        {{ errors.minNoticeHours }}
+      <IonText
+        color="danger"
+        class="form-error"
+        v-if="hasFieldError('minNoticeHours')"
+      >
+        {{ getFieldError('minNoticeHours') }}
       </IonText>
     </div>
   </div>
