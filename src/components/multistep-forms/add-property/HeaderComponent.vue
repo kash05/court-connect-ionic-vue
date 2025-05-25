@@ -49,7 +49,6 @@ const actionSheetButtons = [
     <IonActionSheet
       :is-open="isActionSheetOpen"
       header="Are you sure you want to leave?"
-      sub-header="Your data will be saved."
       :buttons="actionSheetButtons"
       @didDismiss="isActionSheetOpen = false"
     />
