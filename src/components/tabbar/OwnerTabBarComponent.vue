@@ -137,10 +137,11 @@ const addProperty = () => {
 @use '@/theme/variables.scss' as *;
 
 ion-tabs {
-  padding-top: var(--padding-top, 0);
+  padding-top: var(--padding-top, 10px);
+  padding-bottom: var(--padding-bottom, 5px); 
   display: block;
   position: static;
-  height: 60px;
+  height: 70px;
 
   ion-tab-bar {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
