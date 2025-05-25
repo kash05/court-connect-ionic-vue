@@ -39,6 +39,8 @@ const activeTab = computed(() => {
 
 const animatingTab = ref('');
 
+const isActionSheetOpen = ref(false);
+
 type TabKey = 'home' | 'messages' | 'bookings' | 'connections';
 
 const tabRoutes: Record<TabKey, string> = {
@@ -59,17 +61,21 @@ const handleTabClick = (tab: TabKey) => {
 const actionSheetButtons = [
   {
     text: 'Find Players Near You',
-    ionIcon: searchOutline,
+    icon: searchSharp,
     handler: () => findPlayers(),
   },
   {
-    text: 'Find Courts & Properties',
-    ionIcon: searchOutline,
+    text: 'Find Nearby Courts & Properties',
+    icon: searchOutline,
     handler: () => findCourts(),
   },
   {
     text: 'Cancel',
     role: 'cancel',
+    icon: close,
+    handler: () => {
+      isActionSheetOpen.value = false;
+    },
   },
 ];
 
@@ -116,7 +122,7 @@ const findCourts = () => {
         <IonRippleEffect type="unbounded"></IonRippleEffect>
       </IonTabButton>
 
-      <IonTabButton id="open-find-action-sheet">
+      <IonTabButton @click="isActionSheetOpen = true">
         <div class="find-tab-icon">
           <ion-icon :icon="searchSharp"></ion-icon>
         </div>
@@ -153,13 +159,13 @@ const findCourts = () => {
       </IonTabButton>
     </IonTabBar>
 
-    //-------------Action Sheet---------------------//
     <IonActionSheet
-      trigger="open-find-action-sheet"
-      class="find"
-      backdrop-dismiss="false"
+      :is-open="isActionSheetOpen"
+      header="Search for players and courts near you"
       :buttons="actionSheetButtons"
-    ></IonActionSheet>
+      class="custom-action-sheet"
+      :backdrop-dismiss="false"
+    />
   </ion-tabs>
 </template>
 
