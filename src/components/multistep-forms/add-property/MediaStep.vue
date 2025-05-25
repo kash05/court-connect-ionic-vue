@@ -33,14 +33,13 @@ import {
   closeOutline,
   imageOutline,
 } from 'ionicons/icons';
-import { watch, onMounted, ref } from 'vue';
+import { watch, onMounted, ref, computed } from 'vue';
 import { MediaForm } from '@/types/addPropertyInterface';
 import {
   MediaFormData,
   mediaSchema,
 } from '@/lib/validation/addPropertyFormValidation';
 import { useFormStore } from '@/stores/useFormStore';
-import { computed } from 'vue';
 
 const formStore = useFormStore();
 
@@ -86,7 +85,7 @@ watch(
   (newValues) => {
     if (newValues && Object.keys(newValues).length > 0) {
       formStore.updatePropertyForm({
-        basicInfo: newValues as any,
+        media: newValues,
       });
     }
   },

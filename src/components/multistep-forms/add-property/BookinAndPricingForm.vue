@@ -2,24 +2,24 @@
 import { useForm, useField } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import {
-	IonItem,
-	IonInput,
-	IonText,
-	IonNote,
-	IonLabel,
-	IonSelect,
-	IonSelectOption,
-	IonCheckbox,
-	IonToggle,
-	IonCard,
-	IonCardHeader,
-	IonCardTitle,
-	IonCardContent,
+  IonItem,
+  IonInput,
+  IonText,
+  IonNote,
+  IonLabel,
+  IonSelect,
+  IonSelectOption,
+  IonCheckbox,
+  IonToggle,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
 } from '@ionic/vue';
 import { watch, onMounted, ref, computed } from 'vue';
 import {
-	BookingAndPricingFormData,
-	bookingAndPricingSchema,
+  BookingAndPricingFormData,
+  bookingAndPricingSchema,
 } from '@/lib/validation/addPropertyFormValidation';
 import { BookingAndPricingForm } from '@/types/addPropertyInterface';
 import { useFormStore } from '@/stores/useFormStore';
@@ -94,7 +94,7 @@ watch(
   (newValues) => {
     if (newValues && Object.keys(newValues).length > 0) {
       formStore.updatePropertyForm({
-        basicInfo: newValues as any,
+        bookingAndPricing: newValues,
       });
     }
   },

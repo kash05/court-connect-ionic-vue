@@ -58,7 +58,7 @@ watch(
   (newValues) => {
     if (newValues && Object.keys(newValues).length > 0) {
       formStore.updatePropertyForm({
-        basicInfo: newValues as any,
+        basicInfo: newValues,
       });
     }
   },
