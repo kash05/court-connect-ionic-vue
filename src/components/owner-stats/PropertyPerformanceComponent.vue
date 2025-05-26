@@ -1,3 +1,125 @@
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import {
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardSubtitle,
+  IonChip,
+  IonIcon,
+  IonSkeletonText,
+} from '@ionic/vue';
+import { starOutline } from 'ionicons/icons';
+
+const isLoading = ref(true);
+
+interface PropertyPerformance {
+  id: string;
+  name: string;
+  location: string;
+  type: string;
+  image: string;
+  bookings: number;
+  revenue: number;
+  occupancy: number;
+  rating: number;
+  isActive: boolean;
+}
+
+const propertyData = ref<PropertyPerformance[]>([]);
+
+const fetchPropertyData = async (): Promise<PropertyPerformance[]> => {
+  await new Promise((resolve) => setTimeout(resolve, 4000));
+  isLoading.value = false;
+
+  return [
+    {
+      id: '1',
+      name: 'Downtown Tennis Court',
+      location: 'City Center',
+      type: 'Tennis',
+      image: 'https://via.placeholder.com/50x50/4CAF50/ffffff?text=T',
+      bookings: 45,
+      revenue: 8920,
+      occupancy: 85,
+      rating: 4.8,
+      isActive: true,
+    },
+    {
+      id: '2',
+      name: 'Sunset Basketball Court',
+      location: 'West District',
+      type: 'Basketball',
+      image: 'https://via.placeholder.com/50x50/FF9800/ffffff?text=B',
+      bookings: 38,
+      revenue: 6450,
+      occupancy: 72,
+      rating: 4.5,
+      isActive: true,
+    },
+    {
+      id: '3',
+      name: 'Olympic Swimming Pool',
+      location: 'Sports Complex',
+      type: 'Swimming',
+      image: 'https://via.placeholder.com/50x50/2196F3/ffffff?text=S',
+      bookings: 67,
+      revenue: 12340,
+      occupancy: 91,
+      rating: 4.9,
+      isActive: true,
+    },
+    {
+      id: '4',
+      name: 'Community Football Field',
+      location: 'North Park',
+      type: 'Football',
+      image: 'https://via.placeholder.com/50x50/9C27B0/ffffff?text=F',
+      bookings: 29,
+      revenue: 4830,
+      occupancy: 65,
+      rating: 4.2,
+      isActive: true,
+    },
+    {
+      id: '5',
+      name: 'Indoor Badminton Court',
+      location: 'Sports Center',
+      type: 'Badminton',
+      image: 'https://via.placeholder.com/50x50/607D8B/ffffff?text=BD',
+      bookings: 52,
+      revenue: 7280,
+      occupancy: 88,
+      rating: 4.7,
+      isActive: false,
+    },
+  ];
+};
+
+const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+};
+
+const getTypeColor = (type: string): string => {
+  const colors: { [key: string]: string } = {
+    Tennis: 'success',
+    Basketball: 'warning',
+    Swimming: 'primary',
+    Football: 'secondary',
+    Badminton: 'tertiary',
+  };
+  return colors[type] || 'medium';
+};
+
+onMounted(async () => {
+  propertyData.value = await fetchPropertyData();
+});
+</script>
+
 <template>
   <ion-card>
     <ion-card-header>
@@ -100,129 +222,6 @@
     </div>
   </ion-card>
 </template>
-
-<script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import {
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardSubtitle,
-  IonChip,
-  IonIcon,
-  IonSkeletonText,
-} from '@ionic/vue';
-import { starOutline } from 'ionicons/icons';
-
-const isLoading = ref(true);
-
-interface PropertyPerformance {
-  id: string;
-  name: string;
-  location: string;
-  type: string;
-  image: string;
-  bookings: number;
-  revenue: number;
-  occupancy: number;
-  rating: number;
-  isActive: boolean;
-}
-
-const propertyData = ref<PropertyPerformance[]>([]);
-
-const fetchPropertyData = async (): Promise<PropertyPerformance[]> => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 4000));
-  isLoading.value = false;
-
-  return [
-    {
-      id: '1',
-      name: 'Downtown Tennis Court',
-      location: 'City Center',
-      type: 'Tennis',
-      image: 'https://via.placeholder.com/50x50/4CAF50/ffffff?text=T',
-      bookings: 45,
-      revenue: 8920,
-      occupancy: 85,
-      rating: 4.8,
-      isActive: true,
-    },
-    {
-      id: '2',
-      name: 'Sunset Basketball Court',
-      location: 'West District',
-      type: 'Basketball',
-      image: 'https://via.placeholder.com/50x50/FF9800/ffffff?text=B',
-      bookings: 38,
-      revenue: 6450,
-      occupancy: 72,
-      rating: 4.5,
-      isActive: true,
-    },
-    {
-      id: '3',
-      name: 'Olympic Swimming Pool',
-      location: 'Sports Complex',
-      type: 'Swimming',
-      image: 'https://via.placeholder.com/50x50/2196F3/ffffff?text=S',
-      bookings: 67,
-      revenue: 12340,
-      occupancy: 91,
-      rating: 4.9,
-      isActive: true,
-    },
-    {
-      id: '4',
-      name: 'Community Football Field',
-      location: 'North Park',
-      type: 'Football',
-      image: 'https://via.placeholder.com/50x50/9C27B0/ffffff?text=F',
-      bookings: 29,
-      revenue: 4830,
-      occupancy: 65,
-      rating: 4.2,
-      isActive: true,
-    },
-    {
-      id: '5',
-      name: 'Indoor Badminton Court',
-      location: 'Sports Center',
-      type: 'Badminton',
-      image: 'https://via.placeholder.com/50x50/607D8B/ffffff?text=BD',
-      bookings: 52,
-      revenue: 7280,
-      occupancy: 88,
-      rating: 4.7,
-      isActive: false,
-    },
-  ];
-};
-
-const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-};
-
-const getTypeColor = (type: string): string => {
-  const colors: { [key: string]: string } = {
-    Tennis: 'success',
-    Basketball: 'warning',
-    Swimming: 'primary',
-    Football: 'secondary',
-    Badminton: 'tertiary',
-  };
-  return colors[type] || 'medium';
-};
-
-onMounted(async () => {
-  propertyData.value = await fetchPropertyData();
-});
-</script>
 
 <style scoped>
 .table-container {

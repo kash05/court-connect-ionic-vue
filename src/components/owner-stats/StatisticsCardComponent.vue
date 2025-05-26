@@ -1,3 +1,143 @@
+<script setup lang="ts">
+import { ref, onMounted, watch } from 'vue';
+import { IonCard, IonCardContent, IonIcon, IonSkeletonText } from '@ionic/vue';
+import {
+  cashOutline,
+  calendarOutline,
+  businessOutline,
+  starOutline,
+  trendingUpOutline,
+  trendingDownOutline,
+} from 'ionicons/icons';
+
+interface FilterData {
+  period: string;
+  customDateRange?: {
+    from: string;
+    to: string;
+  };
+}
+
+interface Trend {
+  type: 'positive' | 'negative';
+  percentage: number;
+  icon: string;
+}
+
+interface StatsData {
+  totalRevenue: number;
+  totalBookings: number;
+  activeProperties: number;
+  averageOccupancy: number;
+  averageRating: number;
+  totalReviews: number;
+  revenueTrend: Trend;
+  bookingsTrend: Trend;
+}
+
+const props = defineProps<{
+  filterData: FilterData;
+}>();
+
+const isLoading = ref(true);
+
+const statsData = ref<StatsData>({
+  totalRevenue: 0,
+  totalBookings: 0,
+  activeProperties: 0,
+  averageOccupancy: 0,
+  averageRating: 0,
+  totalReviews: 0,
+  revenueTrend: {
+    type: 'positive',
+    percentage: 0,
+    icon: trendingUpOutline,
+  },
+  bookingsTrend: {
+    type: 'positive',
+    percentage: 0,
+    icon: trendingUpOutline,
+  },
+});
+
+onMounted(() => {
+  loadData();
+});
+
+const loadData = async () => {
+  statsData.value = await fetchStatsData(props.filterData);
+};
+
+watch(() => props.filterData, loadData, { deep: true });
+
+const fetchStatsData = async (filterData: FilterData): Promise<StatsData> => {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  isLoading.value = false;
+
+  const baseData = {
+    thisMonth: {
+      totalRevenue: 45620,
+      totalBookings: 312,
+      revenueTrend: { type: 'positive' as const, percentage: 12.5 },
+      bookingsTrend: { type: 'positive' as const, percentage: 8.3 },
+    },
+    lastMonth: {
+      totalRevenue: 38450,
+      totalBookings: 285,
+      revenueTrend: { type: 'negative' as const, percentage: 5.2 },
+      bookingsTrend: { type: 'positive' as const, percentage: 3.1 },
+    },
+    thisYear: {
+      totalRevenue: 487200,
+      totalBookings: 3456,
+      revenueTrend: { type: 'positive' as const, percentage: 18.7 },
+      bookingsTrend: { type: 'positive' as const, percentage: 15.2 },
+    },
+    lastYear: {
+      totalRevenue: 398600,
+      totalBookings: 2891,
+      revenueTrend: { type: 'positive' as const, percentage: 22.1 },
+      bookingsTrend: { type: 'positive' as const, percentage: 19.6 },
+    },
+  };
+
+  const periodData =
+    baseData[filterData.period as keyof typeof baseData] || baseData.thisMonth;
+
+  return {
+    totalRevenue: periodData.totalRevenue,
+    totalBookings: periodData.totalBookings,
+    activeProperties: 8,
+    averageOccupancy: 78,
+    averageRating: 4.6,
+    totalReviews: 245,
+    revenueTrend: {
+      type: periodData.revenueTrend.type,
+      percentage: periodData.revenueTrend.percentage,
+      icon:
+        periodData.revenueTrend.type === 'positive'
+          ? trendingUpOutline
+          : trendingDownOutline,
+    },
+    bookingsTrend: {
+      type: periodData.bookingsTrend.type,
+      percentage: periodData.bookingsTrend.percentage,
+      icon:
+        periodData.bookingsTrend.type === 'positive'
+          ? trendingUpOutline
+          : trendingDownOutline,
+    },
+  };
+};
+
+const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+};
+</script>
+
 <template>
   <div class="stats-cards" v-if="!isLoading">
     <ion-card class="stat-card revenue">
@@ -88,149 +228,6 @@
     </ion-card>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
-import { IonCard, IonCardContent, IonIcon, IonSkeletonText } from '@ionic/vue';
-import {
-  cashOutline,
-  calendarOutline,
-  businessOutline,
-  starOutline,
-  trendingUpOutline,
-  trendingDownOutline,
-} from 'ionicons/icons';
-
-interface FilterData {
-  period: string;
-  customDateRange?: {
-    from: string;
-    to: string;
-  };
-}
-
-interface Trend {
-  type: 'positive' | 'negative';
-  percentage: number;
-  icon: string;
-}
-
-interface StatsData {
-  totalRevenue: number;
-  totalBookings: number;
-  activeProperties: number;
-  averageOccupancy: number;
-  averageRating: number;
-  totalReviews: number;
-  revenueTrend: Trend;
-  bookingsTrend: Trend;
-}
-
-const props = defineProps<{
-  filterData: FilterData;
-}>();
-
-const isLoading = ref(true);
-
-const statsData = ref<StatsData>({
-  totalRevenue: 0,
-  totalBookings: 0,
-  activeProperties: 0,
-  averageOccupancy: 0,
-  averageRating: 0,
-  totalReviews: 0,
-  revenueTrend: {
-    type: 'positive',
-    percentage: 0,
-    icon: trendingUpOutline,
-  },
-  bookingsTrend: {
-    type: 'positive',
-    percentage: 0,
-    icon: trendingUpOutline,
-  },
-});
-
-const fetchStatsData = async (filterData: FilterData): Promise<StatsData> => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  isLoading.value = false;
-
-  // Mock data that varies based on filter
-  const baseData = {
-    thisMonth: {
-      totalRevenue: 45620,
-      totalBookings: 312,
-      revenueTrend: { type: 'positive' as const, percentage: 12.5 },
-      bookingsTrend: { type: 'positive' as const, percentage: 8.3 },
-    },
-    lastMonth: {
-      totalRevenue: 38450,
-      totalBookings: 285,
-      revenueTrend: { type: 'negative' as const, percentage: 5.2 },
-      bookingsTrend: { type: 'positive' as const, percentage: 3.1 },
-    },
-    thisYear: {
-      totalRevenue: 487200,
-      totalBookings: 3456,
-      revenueTrend: { type: 'positive' as const, percentage: 18.7 },
-      bookingsTrend: { type: 'positive' as const, percentage: 15.2 },
-    },
-    lastYear: {
-      totalRevenue: 398600,
-      totalBookings: 2891,
-      revenueTrend: { type: 'positive' as const, percentage: 22.1 },
-      bookingsTrend: { type: 'positive' as const, percentage: 19.6 },
-    },
-  };
-
-  const periodData =
-    baseData[filterData.period as keyof typeof baseData] || baseData.thisMonth;
-
-  return {
-    totalRevenue: periodData.totalRevenue,
-    totalBookings: periodData.totalBookings,
-    activeProperties: 8,
-    averageOccupancy: 78,
-    averageRating: 4.6,
-    totalReviews: 245,
-    revenueTrend: {
-      type: periodData.revenueTrend.type,
-      percentage: periodData.revenueTrend.percentage,
-      icon:
-        periodData.revenueTrend.type === 'positive'
-          ? trendingUpOutline
-          : trendingDownOutline,
-    },
-    bookingsTrend: {
-      type: periodData.bookingsTrend.type,
-      percentage: periodData.bookingsTrend.percentage,
-      icon:
-        periodData.bookingsTrend.type === 'positive'
-          ? trendingUpOutline
-          : trendingDownOutline,
-    },
-  };
-};
-
-const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-};
-
-const loadData = async () => {
-  statsData.value = await fetchStatsData(props.filterData);
-};
-
-// Watch for filter changes
-watch(() => props.filterData, loadData, { deep: true });
-
-onMounted(() => {
-  loadData();
-});
-</script>
 
 <style scoped>
 .stats-cards {

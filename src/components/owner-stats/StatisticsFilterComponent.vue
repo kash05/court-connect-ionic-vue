@@ -1,3 +1,72 @@
+<script setup lang="ts">
+import { ref, reactive } from 'vue';
+import {
+  IonItem,
+  IonLabel,
+  IonSelect,
+  IonSelectOption,
+  IonButton,
+  IonIcon,
+  IonDatetime,
+} from '@ionic/vue';
+import { refreshOutline } from 'ionicons/icons';
+
+interface FilterData {
+  period: string;
+  customDateRange?: {
+    from: string;
+    to: string;
+  };
+}
+
+const emit = defineEmits<{
+  filterChange: [filterData: FilterData];
+  refresh: [];
+}>();
+
+defineProps<{
+  loading?: boolean;
+}>();
+
+const selectedPeriod = ref('thisMonth');
+const customDateRange = reactive({
+  from: new Date().toISOString(),
+  to: new Date().toISOString(),
+});
+
+const onPeriodChange = (event: CustomEvent) => {
+  selectedPeriod.value = event.detail.value;
+  emitFilterChange();
+};
+
+const onDateRangeChange = () => {
+  if (selectedPeriod.value === 'custom') {
+    emitFilterChange();
+  }
+};
+
+const emitFilterChange = () => {
+  const filterData: FilterData = {
+    period: selectedPeriod.value,
+  };
+
+  if (selectedPeriod.value === 'custom') {
+    filterData.customDateRange = {
+      from: customDateRange.from,
+      to: customDateRange.to,
+    };
+  }
+
+  emit('filterChange', filterData);
+};
+
+const handleRefresh = () => {
+  emit('refresh');
+};
+
+emitFilterChange();
+</script>
+
 <template>
   <div class="filter-section">
     <ion-item>
@@ -48,77 +117,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref, reactive } from 'vue';
-import {
-  IonItem,
-  IonLabel,
-  IonSelect,
-  IonSelectOption,
-  IonButton,
-  IonIcon,
-  IonDatetime,
-} from '@ionic/vue';
-import { refreshOutline } from 'ionicons/icons';
-
-interface FilterData {
-  period: string;
-  customDateRange?: {
-    from: string;
-    to: string;
-  };
-}
-
-// Define emits
-const emit = defineEmits<{
-  filterChange: [filterData: FilterData];
-  refresh: [];
-}>();
-
-defineProps<{
-  loading?: boolean;
-}>();
-
-const selectedPeriod = ref('thisMonth');
-const customDateRange = reactive({
-  from: new Date().toISOString(),
-  to: new Date().toISOString(),
-});
-
-const onPeriodChange = (event: CustomEvent) => {
-  selectedPeriod.value = event.detail.value;
-  emitFilterChange();
-};
-
-const onDateRangeChange = () => {
-  if (selectedPeriod.value === 'custom') {
-    emitFilterChange();
-  }
-};
-
-const emitFilterChange = () => {
-  const filterData: FilterData = {
-    period: selectedPeriod.value,
-  };
-
-  if (selectedPeriod.value === 'custom') {
-    filterData.customDateRange = {
-      from: customDateRange.from,
-      to: customDateRange.to,
-    };
-  }
-
-  emit('filterChange', filterData);
-};
-
-const handleRefresh = () => {
-  emit('refresh');
-};
-
-// Initialize with default filter
-emitFilterChange();
-</script>
 
 <style scoped>
 .filter-section {
