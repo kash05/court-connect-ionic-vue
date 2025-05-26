@@ -16,23 +16,14 @@ import {
   propertyDetailSchema,
 } from '@/lib/validation/addPropertyFormValidation';
 import { useFormStore } from '@/stores/useFormStore';
+import { SportsData } from '@/types/properyInterface';
+import { SystemData } from '@/services/systemDataService';
 
 const formStore = useFormStore();
 
 const formData = computed(() => formStore.propertyForm.propertyDetail);
 
-const SPORTS_OPTIONS = [
-  'Football',
-  'Basketball',
-  'Tennis',
-  'Cricket',
-  'Badminton',
-  'Volleyball',
-  'Swimming',
-  'Table Tennis',
-  'Squash',
-  'Hockey',
-];
+const SPORTS_OPTIONS: SportsData[] = SystemData.sports;
 
 const SURFACE_TYPES = [
   'Grass',
@@ -188,13 +179,15 @@ const hasFieldError = (fieldName: keyof PropertyDetailFormData) => {
       <div class="chip-container">
         <IonChip
           v-for="sport in SPORTS_OPTIONS"
-          :key="sport"
-          :color="selectedSports.includes(sport) ? 'primary' : 'medium'"
-          :outline="!selectedSports.includes(sport)"
-          @click="toggleSport(sport)"
+          :key="sport.id"
+          :color="
+            selectedSports.includes(sport.display_name) ? 'primary' : 'medium'
+          "
+          :outline="!selectedSports.includes(sport.display_name)"
+          @click="toggleSport(sport.display_name)"
           class="sport-chip"
         >
-          {{ sport }}
+          {{ sport.display_name }}
         </IonChip>
       </div>
       <IonText color="danger" class="form-error" v-if="hasFieldError('sports')">

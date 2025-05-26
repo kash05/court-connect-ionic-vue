@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/stores/useAuthStore';
-import { getRoles } from './systemDataService';
+import { getRoles, getSports } from './systemDataService';
 import { toastService } from './toastService';
 
 /**
@@ -14,7 +14,8 @@ export const initializeApp = async () => {
       'Failed to initialize the app. Please try again.',
     );
   });
-  await getRoles().catch(() => {
+
+  Promise.allSettled([getRoles(), getSports()]).catch(() => {
     toastService.dangerMessage('App Initialization failed');
   });
 };
