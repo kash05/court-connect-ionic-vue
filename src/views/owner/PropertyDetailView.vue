@@ -33,10 +33,13 @@ import TimingAndAvailabilityStep from '@/components/multistep-forms/add-property
 import BookinAndPricingForm from '@/components/multistep-forms/add-property/BookinAndPricingForm.vue';
 import MediaStep from '@/components/multistep-forms/add-property/MediaStep.vue';
 import { useRouter } from 'vue-router';
+import { useStepValidation } from '@/composables/useStepValidation';
 
 const router = useRouter();
 
 const formStore = useFormStore();
+
+const { validateEntireForm } = useStepValidation();
 
 const propertyStats = ref({
   totalRevenue: 45000,
@@ -280,6 +283,7 @@ const goBack = () => {
           @click="saveProperty"
           color="success"
           size="large"
+          :disabled="!validateEntireForm()"
         >
           <IonIcon :icon="saveOutline" slot="start" />
           Save Changes

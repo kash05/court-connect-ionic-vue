@@ -9,8 +9,9 @@ import {
   IonLabel,
   IonToggle,
   IonChip,
+  IonButton,
 } from '@ionic/vue';
-import { watch, onMounted, computed } from 'vue';
+import { watch, onMounted, computed, ref } from 'vue';
 import {
   PropertyDetailFormData,
   propertyDetailSchema,
@@ -22,6 +23,8 @@ import { SystemData } from '@/services/systemDataService';
 const formStore = useFormStore();
 
 const formData = computed(() => formStore.propertyForm.propertyDetail);
+
+const otherSports = ref('');
 
 const SPORTS_OPTIONS: SportsData[] = SystemData.sports;
 
@@ -114,6 +117,14 @@ watch(
   { deep: true },
 );
 
+const addOtherSport = () => {
+  if (otherSports.value) {
+    const newSports = [...sports.value, otherSports.value];
+    sports.value = newSports;
+    otherSports.value = '';
+  }
+};
+
 const toggleSport = (sport: string) => {
   const currentSports = sports.value || [];
   if (currentSports.includes(sport)) {
@@ -193,6 +204,25 @@ const hasFieldError = (fieldName: keyof PropertyDetailFormData) => {
       <IonText color="danger" class="form-error" v-if="hasFieldError('sports')">
         {{ getFieldError('sports') }}
       </IonText>
+    </div>
+
+    <div class="form-section">
+      <IonLabel class="section-label"
+        >If you have other sports available</IonLabel
+      >
+      <IonText color="medium" class="helper-text">
+        Please specify the sports you have available
+      </IonText>
+      <div class="flex gap-3">
+        <IonInput v-model="otherSports" placeholder="Other sports" />
+        <IonButton
+          fill="outline"
+          color="medium"
+          size="small"
+          @click="addOtherSport"
+          >Add</IonButton
+        >
+      </div>
     </div>
 
     <div v-if="selectedSports.length > 0" class="form-section">
@@ -303,13 +333,18 @@ const hasFieldError = (fieldName: keyof PropertyDetailFormData) => {
 </template>
 
 <style scoped lang="scss">
-@use '@/theme/addPropertyForm.scss';
-
 .property-detail-form {
   height: max-content;
   overflow: auto;
   padding: 16px;
   margin-bottom: 50px;
+}
+
+ion-input {
+  --padding-start: 12px !important;
+  --padding-end: 12px !important;
+  --border-radius: 8px;
+  --background: var(--ion-color-light-shade) !important;
 }
 
 .subtitle {
