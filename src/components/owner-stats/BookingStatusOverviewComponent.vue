@@ -127,7 +127,7 @@ const hasData = computed(() => {
 
 const fetchBookingStats = async (): Promise<BookingStats> => {
   try {
-    await new Promise((resolve) => setTimeout(resolve, 1600));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     return {
       pending: 23,

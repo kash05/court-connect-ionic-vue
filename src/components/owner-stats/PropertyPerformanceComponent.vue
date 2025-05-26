@@ -4,107 +4,100 @@
       <ion-card-title>Property Performance</ion-card-title>
       <ion-card-subtitle>Revenue breakdown by property</ion-card-subtitle>
     </ion-card-header>
-    <ion-card-content>
-      <Suspense>
-        <template #default>
-          <div class="table-container">
-            <table class="property-table">
-              <thead>
-                <tr>
-                  <th>Property</th>
-                  <th>Type</th>
-                  <th>Bookings</th>
-                  <th>Revenue</th>
-                  <th>Occupancy</th>
-                  <th>Avg. Rating</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="property in propertyData" :key="property.id">
-                  <td>
-                    <div class="property-info">
-                      <img
-                        :src="property.image"
-                        :alt="property.name"
-                        class="property-image"
-                      />
-                      <div>
-                        <strong>{{ property.name }}</strong>
-                        <small>{{ property.location }}</small>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <ion-chip :color="getTypeColor(property.type)">
-                      {{ property.type }}
-                    </ion-chip>
-                  </td>
-                  <td>{{ property.bookings }}</td>
-                  <td class="revenue">
-                    ${{ formatCurrency(property.revenue) }}
-                  </td>
-                  <td>
-                    <div class="occupancy-bar">
-                      <div
-                        class="occupancy-fill"
-                        :style="{ width: property.occupancy + '%' }"
-                      ></div>
-                      <span>{{ property.occupancy }}%</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="rating">
-                      <ion-icon :icon="starOutline"></ion-icon>
-                      {{ property.rating.toFixed(1) }}
-                    </div>
-                  </td>
-                  <td>
-                    <ion-chip :color="property.isActive ? 'success' : 'medium'">
-                      {{ property.isActive ? 'Active' : 'Inactive' }}
-                    </ion-chip>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </template>
-        <template #fallback>
-          <div class="loading-skeleton">
-            <div v-for="i in 5" :key="i" class="skeleton-row">
-              <ion-skeleton-text
-                animated
-                style="width: 200px; height: 20px"
-              ></ion-skeleton-text>
-              <ion-skeleton-text
-                animated
-                style="width: 80px; height: 20px"
-              ></ion-skeleton-text>
-              <ion-skeleton-text
-                animated
-                style="width: 60px; height: 20px"
-              ></ion-skeleton-text>
-              <ion-skeleton-text
-                animated
-                style="width: 100px; height: 20px"
-              ></ion-skeleton-text>
-              <ion-skeleton-text
-                animated
-                style="width: 80px; height: 20px"
-              ></ion-skeleton-text>
-              <ion-skeleton-text
-                animated
-                style="width: 60px; height: 20px"
-              ></ion-skeleton-text>
-              <ion-skeleton-text
-                animated
-                style="width: 80px; height: 20px"
-              ></ion-skeleton-text>
-            </div>
-          </div>
-        </template>
-      </Suspense>
+    <ion-card-content v-if="!isLoading">
+      <div class="table-container">
+        <table class="property-table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Type</th>
+              <th>Bookings</th>
+              <th>Revenue</th>
+              <th>Occupancy</th>
+              <th>Avg. Rating</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="property in propertyData" :key="property.id">
+              <td>
+                <div class="property-info">
+                  <img
+                    :src="property.image"
+                    :alt="property.name"
+                    class="property-image"
+                  />
+                  <div>
+                    <strong>{{ property.name }}</strong>
+                    <small>{{ property.location }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <ion-chip :color="getTypeColor(property.type)">
+                  {{ property.type }}
+                </ion-chip>
+              </td>
+              <td>{{ property.bookings }}</td>
+              <td class="revenue">${{ formatCurrency(property.revenue) }}</td>
+              <td>
+                <div class="occupancy-bar">
+                  <div
+                    class="occupancy-fill"
+                    :style="{ width: property.occupancy + '%' }"
+                  ></div>
+                  <span>{{ property.occupancy }}%</span>
+                </div>
+              </td>
+              <td>
+                <div class="rating">
+                  <ion-icon :icon="starOutline"></ion-icon>
+                  {{ property.rating.toFixed(1) }}
+                </div>
+              </td>
+              <td>
+                <ion-chip :color="property.isActive ? 'success' : 'medium'">
+                  {{ property.isActive ? 'Active' : 'Inactive' }}
+                </ion-chip>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </ion-card-content>
+
+    <div class="loading-skeleton" v-else>
+      <div v-for="i in 5" :key="i" class="skeleton-row">
+        <ion-skeleton-text
+          animated
+          style="width: 200px; height: 20px"
+        ></ion-skeleton-text>
+        <ion-skeleton-text
+          animated
+          style="width: 80px; height: 20px"
+        ></ion-skeleton-text>
+        <ion-skeleton-text
+          animated
+          style="width: 60px; height: 20px"
+        ></ion-skeleton-text>
+        <ion-skeleton-text
+          animated
+          style="width: 100px; height: 20px"
+        ></ion-skeleton-text>
+        <ion-skeleton-text
+          animated
+          style="width: 80px; height: 20px"
+        ></ion-skeleton-text>
+        <ion-skeleton-text
+          animated
+          style="width: 60px; height: 20px"
+        ></ion-skeleton-text>
+        <ion-skeleton-text
+          animated
+          style="width: 80px; height: 20px"
+        ></ion-skeleton-text>
+      </div>
+    </div>
   </ion-card>
 </template>
 
@@ -121,6 +114,8 @@ import {
   IonSkeletonText,
 } from '@ionic/vue';
 import { starOutline } from 'ionicons/icons';
+
+const isLoading = ref(true);
 
 interface PropertyPerformance {
   id: string;
@@ -139,7 +134,8 @@ const propertyData = ref<PropertyPerformance[]>([]);
 
 const fetchPropertyData = async (): Promise<PropertyPerformance[]> => {
   // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1500));
+  await new Promise((resolve) => setTimeout(resolve, 4000));
+  isLoading.value = false;
 
   return [
     {

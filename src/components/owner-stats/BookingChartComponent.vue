@@ -4,21 +4,15 @@
       <ion-card-title>Booking Trends</ion-card-title>
       <ion-card-subtitle>Monthly booking patterns</ion-card-subtitle>
     </ion-card-header>
-    <ion-card-content>
-      <Suspense>
-        <template #default>
-          <canvas ref="chartCanvas" class="chart-canvas"></canvas>
-        </template>
-        <template #fallback>
-          <div class="chart-skeleton">
-            <ion-skeleton-text
-              animated
-              style="width: 100%; height: 300px"
-            ></ion-skeleton-text>
-          </div>
-        </template>
-      </Suspense>
+    <ion-card-content v-if="!isLoading">
+      <canvas ref="chartCanvas" class="chart-canvas"></canvas>
     </ion-card-content>
+    <div class="chart-skeleton" v-else>
+      <ion-skeleton-text
+        animated
+        style="width: 100%; height: 300px"
+      ></ion-skeleton-text>
+    </div>
   </ion-card>
 </template>
 
@@ -33,6 +27,8 @@ import {
   IonSkeletonText,
 } from '@ionic/vue';
 import Chart from 'chart.js/auto';
+
+const isLoading = ref(true);
 
 const chartCanvas = ref<HTMLCanvasElement>();
 let chartInstance: Chart | null = null;
@@ -76,7 +72,8 @@ const mockBookingData = {
 
 const initializeChart = async () => {
   // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1600));
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+  isLoading.value = false;
 
   await nextTick();
 
