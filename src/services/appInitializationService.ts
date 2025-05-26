@@ -2,25 +2,30 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { getRoles, getSports } from './systemDataService';
 import { toastService } from './toastService';
 
-const authStore = useAuthStore();
-
 /**
  * Service responsible for initializing the application.
  */
 export const initializeApp = async () => {
-  await authStore.initializeAuth().catch(() => {
+  const authStore = useAuthStore();
+  try {
+    await authStore.initializeAuth();
+  } catch {
     authStore.resetStore();
-    toastService.dangerMessage(
-      'Failed to initialize the app. Please try again.',
-    );
-  });
+    toastService.dangerMessage('Authentication failed. Please login again.');
+    return;
+  }
 
-  Promise.allSettled([getRoles(), OwnerConfig()]).catch(() => {
-    toastService.dangerMessage('App Initialization failed');
+  const results = await Promise.allSettled([getRoles(), OwnerConfig()]);
+
+  results.forEach((result) => {
+    if (result.status === 'rejected') {
+      toastService.dangerMessage('Missing some data');
+    }
   });
 };
 
 async function OwnerConfig() {
+  const authStore = useAuthStore();
   if (!authStore.isCurrentRoleOwner) return;
   return await Promise.allSettled([getSports()]);
 }
