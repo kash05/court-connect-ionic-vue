@@ -1,3 +1,167 @@
+<script setup lang="ts">
+import { ref, onMounted, nextTick, computed } from 'vue';
+import {
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonIcon,
+  IonSkeletonText,
+  IonCardContent,
+} from '@ionic/vue';
+import {
+  timeOutline,
+  checkmarkCircleOutline,
+  checkmarkDoneOutline,
+  closeCircleOutline,
+} from 'ionicons/icons';
+import Chart from 'chart.js/auto';
+
+interface BookingStats {
+  pending: number;
+  confirmed: number;
+  completed: number;
+  cancelled: number;
+}
+
+const isLoading = ref(true);
+const chartCanvas = ref<HTMLCanvasElement | null>(null);
+let chartInstance: Chart | null = null;
+
+const bookingStats = ref<BookingStats>({
+  pending: 0,
+  confirmed: 0,
+  completed: 0,
+  cancelled: 0,
+});
+
+const hasData = computed(() => {
+  const stats = bookingStats.value;
+  return (
+    stats.pending > 0 ||
+    stats.confirmed > 0 ||
+    stats.completed > 0 ||
+    stats.cancelled > 0
+  );
+});
+
+onMounted(() => {
+  initializeData();
+});
+
+const fetchBookingStats = async (): Promise<BookingStats> => {
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    return {
+      pending: 23,
+      confirmed: 156,
+      completed: 298,
+      cancelled: 35,
+    };
+  } catch (err) {
+    console.error('Failed to fetch booking stats:', err);
+    return {
+      pending: 0,
+      confirmed: 0,
+      completed: 0,
+      cancelled: 0,
+    };
+  }
+};
+
+const destroyChart = () => {
+  if (chartInstance) {
+    chartInstance.destroy();
+    chartInstance = null;
+  }
+};
+
+const initializeChart = async () => {
+  await nextTick();
+
+  destroyChart();
+
+  if (!chartCanvas.value || !hasData.value) {
+    return;
+  }
+
+  const ctx = chartCanvas.value.getContext('2d');
+  if (!ctx) {
+    console.error('Could not get canvas context');
+    return;
+  }
+
+  try {
+    const data = {
+      labels: ['Pending', 'Confirmed', 'Completed', 'Cancelled'],
+      datasets: [
+        {
+          data: [
+            bookingStats.value.pending,
+            bookingStats.value.confirmed,
+            bookingStats.value.completed,
+            bookingStats.value.cancelled,
+          ],
+          backgroundColor: [
+            'rgba(255, 193, 7, 0.8)',
+            'rgba(13, 110, 253, 0.8)',
+            'rgba(25, 135, 84, 0.8)',
+            'rgba(220, 53, 69, 0.8)',
+          ],
+          borderColor: [
+            'rgba(255, 193, 7, 1)',
+            'rgba(13, 110, 253, 1)',
+            'rgba(25, 135, 84, 1)',
+            'rgba(220, 53, 69, 1)',
+          ],
+          borderWidth: 2,
+        },
+      ],
+    };
+
+    chartInstance = new Chart(ctx, {
+      type: 'doughnut',
+      data: data,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Booking Status Distribution',
+            font: {
+              size: 16,
+            },
+          },
+          legend: {
+            display: true,
+            position: 'bottom',
+          },
+        },
+        animation: {
+          duration: 1000,
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Failed to create chart:', error);
+  }
+};
+
+const initializeData = async () => {
+  try {
+    isLoading.value = true;
+    const stats = await fetchBookingStats();
+    bookingStats.value = stats;
+    await initializeChart();
+  } catch (error) {
+    console.error('Failed to initialize data:', error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+</script>
+
 <template>
   <ion-card>
     <ion-card-header>
@@ -76,187 +240,6 @@
     </div>
   </ion-card>
 </template>
-
-<script setup lang="ts">
-import { ref, onMounted, nextTick, onUnmounted, computed } from 'vue';
-import {
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonIcon,
-  IonSkeletonText,
-  IonCardContent,
-} from '@ionic/vue';
-import {
-  timeOutline,
-  checkmarkCircleOutline,
-  checkmarkDoneOutline,
-  closeCircleOutline,
-} from 'ionicons/icons';
-import Chart from 'chart.js/auto';
-
-interface BookingStats {
-  pending: number;
-  confirmed: number;
-  completed: number;
-  cancelled: number;
-}
-
-const isLoading = ref(true);
-const chartCanvas = ref<HTMLCanvasElement | null>(null);
-let chartInstance: Chart | null = null;
-let fetchController: AbortController | null = null;
-
-const bookingStats = ref<BookingStats>({
-  pending: 0,
-  confirmed: 0,
-  completed: 0,
-  cancelled: 0,
-});
-
-// Computed property to check if we have data
-const hasData = computed(() => {
-  const stats = bookingStats.value;
-  return (
-    stats.pending > 0 ||
-    stats.confirmed > 0 ||
-    stats.completed > 0 ||
-    stats.cancelled > 0
-  );
-});
-
-const fetchBookingStats = async (): Promise<BookingStats> => {
-  try {
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    return {
-      pending: 23,
-      confirmed: 156,
-      completed: 298,
-      cancelled: 35,
-    };
-  } catch (err) {
-    console.error('Failed to fetch booking stats:', err);
-    return {
-      pending: 0,
-      confirmed: 0,
-      completed: 0,
-      cancelled: 0,
-    };
-  }
-};
-
-const destroyChart = () => {
-  if (chartInstance) {
-    chartInstance.destroy();
-    chartInstance = null;
-  }
-};
-
-const initializeChart = async () => {
-  // Wait for DOM to be ready
-  await nextTick();
-
-  // Destroy existing chart if it exists
-  destroyChart();
-
-  if (!chartCanvas.value || !hasData.value) {
-    return;
-  }
-
-  const ctx = chartCanvas.value.getContext('2d');
-  if (!ctx) {
-    console.error('Could not get canvas context');
-    return;
-  }
-
-  try {
-    const data = {
-      labels: ['Pending', 'Confirmed', 'Completed', 'Cancelled'],
-      datasets: [
-        {
-          data: [
-            bookingStats.value.pending,
-            bookingStats.value.confirmed,
-            bookingStats.value.completed,
-            bookingStats.value.cancelled,
-          ],
-          backgroundColor: [
-            'rgba(255, 193, 7, 0.8)', // Warning (Pending)
-            'rgba(13, 110, 253, 0.8)', // Primary (Confirmed)
-            'rgba(25, 135, 84, 0.8)', // Success (Completed)
-            'rgba(220, 53, 69, 0.8)', // Danger (Cancelled)
-          ],
-          borderColor: [
-            'rgba(255, 193, 7, 1)',
-            'rgba(13, 110, 253, 1)',
-            'rgba(25, 135, 84, 1)',
-            'rgba(220, 53, 69, 1)',
-          ],
-          borderWidth: 2,
-        },
-      ],
-    };
-
-    chartInstance = new Chart(ctx, {
-      type: 'doughnut',
-      data: data,
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          title: {
-            display: true,
-            text: 'Booking Status Distribution',
-            font: {
-              size: 16,
-            },
-          },
-          legend: {
-            display: true,
-            position: 'bottom',
-          },
-        },
-        animation: {
-          duration: 1000,
-        },
-      },
-    });
-  } catch (error) {
-    console.error('Failed to create chart:', error);
-  }
-};
-
-const initializeData = async () => {
-  try {
-    isLoading.value = true;
-    const stats = await fetchBookingStats();
-    bookingStats.value = stats;
-    await initializeChart();
-  } catch (error) {
-    if (error instanceof Error && error.message === 'Request aborted') {
-      return; // Component was unmounted
-    }
-    console.error('Failed to initialize data:', error);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-onMounted(() => {
-  initializeData();
-});
-
-onUnmounted(() => {
-  // Clean up chart instance
-  destroyChart();
-
-  // Abort any pending requests
-  if (fetchController) {
-    fetchController.abort();
-  }
-});
-</script>
 
 <style scoped>
 .booking-status-content {

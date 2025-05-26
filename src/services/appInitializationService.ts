@@ -2,12 +2,12 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { getRoles, getSports } from './systemDataService';
 import { toastService } from './toastService';
 
+const authStore = useAuthStore();
+
 /**
  * Service responsible for initializing the application.
  */
 export const initializeApp = async () => {
-  const authStore = useAuthStore();
-
   await authStore.initializeAuth().catch(() => {
     authStore.resetStore();
     toastService.dangerMessage(
@@ -21,5 +21,6 @@ export const initializeApp = async () => {
 };
 
 async function OwnerConfig() {
+  if (!authStore.isCurrentRoleOwner) return;
   return await Promise.allSettled([getSports()]);
 }
