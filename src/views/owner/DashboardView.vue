@@ -117,7 +117,9 @@ const navigateToAllProperties = () => {
             >
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-blue-100 text-sm">Total Revenue</p>
+                  <p class="text-blue-100 text-sm">
+                    <span class="block">Total</span> Revenue
+                  </p>
                   <p class="text-2xl font-bold">
                     ₹{{ revenueStats.totalRevenue.toLocaleString() }}
                   </p>
@@ -132,7 +134,12 @@ const navigateToAllProperties = () => {
             >
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-green-100 text-sm">Today's Revenue</p>
+                  <p class="text-green-100 text-sm">
+                    <span>
+                      <span class="block">Today's</span>
+                    </span>
+                    Revenue
+                  </p>
                   <p class="text-2xl font-bold">
                     ₹{{ revenueStats.todayRevenue.toLocaleString() }}
                   </p>
@@ -150,7 +157,9 @@ const navigateToAllProperties = () => {
             >
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-purple-100 text-sm">Today's Bookings</p>
+                  <p class="text-purple-100 text-sm">
+                    <span class="block">Today's</span> Bookings
+                  </p>
                   <p class="text-2xl font-bold">
                     {{ revenueStats.todayBookings }}
                   </p>
@@ -168,7 +177,9 @@ const navigateToAllProperties = () => {
             >
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-orange-100 text-sm">Pending Bookings</p>
+                  <p class="text-orange-100 text-sm">
+                    <span class="block">Pending</span> Bookings
+                  </p>
                   <p class="text-2xl font-bold">
                     {{ revenueStats.pendingBookings }}
                   </p>
