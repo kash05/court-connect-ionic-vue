@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { IonPage, IonContent, IonSpinner } from '@ionic/vue';
+import {
+  IonPage,
+  IonContent,
+  IonSpinner,
+  IonSegment,
+  IonSegmentButton,
+  IonLabel,
+} from '@ionic/vue';
 import OwnerTabBarComponent from '@/components/tabbar/OwnerTabBarComponent.vue';
 import PageHeaderComponent from '@/components/PageHeaderComponent.vue';
-import StatisticsFilterComponent from '@/components/owner-stats/StatisticsFilterComponent.vue';
 import RevenueChartComponent from '@/components/owner-stats/RevenueChartComponent.vue';
 import BookingChartComponent from '@/components/owner-stats/BookingChartComponent.vue';
 import BookingStatusOverviewComponent from '@/components/owner-stats/BookingStatusOverviewComponent.vue';
@@ -20,45 +26,49 @@ interface FilterData {
 }
 
 const loading = ref(false);
+const activeTab = ref('stats');
 const filterData = ref<FilterData>({
   period: 'thisMonth',
 });
 
-const handleFilterChange = (newFilterData: FilterData) => {
-  filterData.value = newFilterData;
-  // You can emit this data to child components or handle it here
-  console.log('Filter changed:', newFilterData);
-};
-
-const handleRefresh = async () => {
-  loading.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  loading.value = false;
+const handleTabChange = (event: CustomEvent) => {
+  activeTab.value = event.detail.value;
 };
 </script>
 
 <template>
   <ion-page>
     <PageHeaderComponent />
+    <ion-content :scroll-y="false">
+      <div class="tab-container">
+        <ion-segment
+          :value="activeTab"
+          @ionChange="handleTabChange"
+          mode="md"
+          class="custom-segment"
+        >
+          <ion-segment-button value="stats">
+            <ion-label>Stats</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="analytics">
+            <ion-label>Analytics</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </div>
 
-    <ion-content>
-      <StatisticsFilterComponent
-        @filter-change="handleFilterChange"
-        @refresh="handleRefresh"
-      />
+      <div class="scrollable-content">
+        <div v-show="activeTab === 'stats'" class="tab-panel">
+          <StatisticsCardComponent :filter-data="filterData" />
+          <BookingStatusOverviewComponent />
+          <PropertyPerformanceComponent />
+        </div>
 
-      <StatisticsCardComponent :filter-data="filterData" />
-
-      <RevenueChartComponent />
-
-      <BookingChartComponent />
-
-      <BookingStatusOverviewComponent />
-
-      <PropertyPerformanceComponent />
-
-      <PeakHoursChartComponent />
+        <div v-show="activeTab === 'analytics'" class="tab-panel">
+          <RevenueChartComponent />
+          <BookingChartComponent />
+          <PeakHoursChartComponent />
+        </div>
+      </div>
 
       <div v-if="loading" class="loading-overlay">
         <div class="loading-container">
@@ -67,12 +77,51 @@ const handleRefresh = async () => {
         </div>
       </div>
     </ion-content>
-
     <OwnerTabBarComponent />
   </ion-page>
 </template>
 
 <style scoped>
+.tab-container {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 16px;
+  background: var(--ion-color-light);
+  border-bottom: 1px solid var(--ion-color-light-shade);
+}
+
+.custom-segment {
+  --background: var(--ion-color-light);
+  --indicator-color: var(--ion-color-primary);
+  --color-checked: var(--ion-color-primary);
+  --color: var(--ion-color-dark);
+  border-radius: 8px;
+  background: var(--ion-color-step-50);
+}
+
+.scrollable-content {
+  height: calc(100vh - 160px);
+  overflow-y: auto;
+  padding-bottom: 40px;
+}
+
+.tab-panel {
+  padding: 16px 0;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .loading-overlay {
   position: fixed;
   top: 0;
