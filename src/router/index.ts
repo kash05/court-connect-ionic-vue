@@ -81,6 +81,12 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/owner/PropertyDetailView.vue'),
     beforeEnter: [authGuard, roleGuard([UserRole.OWNER])],
   },
+  {
+    path: '/statistics',
+    name: 'Statistics',
+    component: () => import('../views/owner/StatisticsView.vue'),
+    beforeEnter: [authGuard, roleGuard([UserRole.OWNER])],
+  },
 
   {
     path: '/:pathMatch(.*)*',

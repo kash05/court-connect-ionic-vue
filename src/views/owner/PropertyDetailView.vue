@@ -2,9 +2,6 @@
 import {
   IonPage,
   IonContent,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonButton,
   IonIcon,
   IonSegment,
@@ -22,7 +19,6 @@ import {
   settingsOutline,
   imagesOutline,
   cardOutline,
-  arrowBackOutline,
 } from 'ionicons/icons';
 import { onMounted, ref } from 'vue';
 
@@ -32,10 +28,9 @@ import PropertyDetail from '@/components/multistep-forms/add-property/PropertyDe
 import TimingAndAvailabilityStep from '@/components/multistep-forms/add-property/TimingAndAvailabilityStep.vue';
 import BookinAndPricingForm from '@/components/multistep-forms/add-property/BookinAndPricingForm.vue';
 import MediaStep from '@/components/multistep-forms/add-property/MediaStep.vue';
-import { useRouter } from 'vue-router';
 import { useStepValidation } from '@/composables/useStepValidation';
-
-const router = useRouter();
+import PageHeaderComponent from '@/components/PageHeaderComponent.vue';
+import OwnerTabBarComponent from '@/components/tabbar/OwnerTabBarComponent.vue';
 
 const formStore = useFormStore();
 
@@ -145,24 +140,11 @@ const saveProperty = () => {
   // Example: API call to update property
   // updateProperty(propertyId, formStore.propertyForm);
 };
-
-const goBack = () => {
-  router.push('/owner');
-};
 </script>
 
 <template>
   <IonPage>
-    <IonHeader>
-      <IonToolbar color="primary">
-        <IonButton slot="start" @click="goBack" size="small">
-          <IonIcon :icon="arrowBackOutline" slot="start" />
-        </IonButton>
-        <IonTitle>{{
-          formStore.propertyForm.basicInfo?.name || 'Property Details'
-        }}</IonTitle>
-      </IonToolbar>
-    </IonHeader>
+    <PageHeaderComponent />
 
     <IonContent>
       <!-- Property Stats Section -->
@@ -282,7 +264,6 @@ const goBack = () => {
           expand="block"
           @click="saveProperty"
           color="success"
-          size="large"
           :disabled="!validateEntireForm()"
         >
           <IonIcon :icon="saveOutline" slot="start" />
@@ -290,6 +271,7 @@ const goBack = () => {
         </IonButton>
       </div>
     </IonContent>
+    <OwnerTabBarComponent />
   </IonPage>
 </template>
 
@@ -395,7 +377,6 @@ const goBack = () => {
 
 .tab-content {
   padding: 16px;
-  padding-bottom: 100px;
 }
 
 .tab-panel {
@@ -413,10 +394,6 @@ const goBack = () => {
   }
 }
 .save-section {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
   padding: 6px;
   background: var(--ion-color-light);
   border-top: 1px solid var(--ion-color-light-shade);

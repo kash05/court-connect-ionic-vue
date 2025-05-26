@@ -30,19 +30,19 @@ const activeTab = computed(() => {
   const path = route.path;
   if (path.includes('/owner')) return 'home';
   if (path.includes('/properties')) return 'properties';
-  if (path.includes('/stats')) return 'stats';
+  if (path.includes('/statistics')) return 'statistics';
   if (path.includes('/bookings')) return 'bookings';
   return '';
 });
 
 const animatingTab = ref('');
 
-type TabKey = 'home' | 'properties' | 'stats' | 'bookings';
+type TabKey = 'home' | 'properties' | 'statistics' | 'bookings';
 
 const tabRoutes: Record<TabKey, string> = {
   home: '/owner',
   properties: '/properties',
-  stats: '/stats',
+  statistics: '/statistics',
   bookings: '/bookings',
 };
 
@@ -103,10 +103,10 @@ const addProperty = () => {
       <IonTabButton
         href="/stats"
         :class="{
-          'tab-selected': activeTab === 'stats',
-          'tab-animating': animatingTab === 'stats',
+          'tab-selected': activeTab === 'statistics',
+          'tab-animating': animatingTab === 'statistics',
         }"
-        @click="handleTabClick('stats')"
+        @click="handleTabClick('statistics')"
       >
         <div class="tab-icon-container">
           <IonIcon :icon="trendingUpOutline" />
@@ -138,7 +138,7 @@ const addProperty = () => {
 
 ion-tabs {
   padding-top: var(--padding-top, 10px);
-  padding-bottom: var(--padding-bottom, 5px); 
+  padding-bottom: var(--padding-bottom, 5px);
   display: block;
   position: static;
   height: 70px;
