@@ -18,6 +18,7 @@ import { z } from 'zod';
 import { logoGoogle } from 'ionicons/icons';
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { initializeApp } from '@/services/appInitializationService';
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -46,6 +47,14 @@ const onSubmit = handleSubmit((values) => {
     () =>
       authStore
         .login(values)
+        .then(async () => {
+          await initializeApp().catch((err) => {
+            console.error('App failed to initialize', err);
+            toastService.dangerMessage(
+              'Failed to initialize the app. Please try again.',
+            );
+          });
+        })
         .then(() => {
           const redirectPath = route.query.redirect
             ? String(route.query.redirect)

@@ -15,7 +15,11 @@ export const initializeApp = async () => {
     );
   });
 
-  Promise.allSettled([getRoles(), getSports()]).catch(() => {
+  Promise.allSettled([getRoles(), OwnerConfig()]).catch(() => {
     toastService.dangerMessage('App Initialization failed');
   });
 };
+
+async function OwnerConfig() {
+  return await Promise.allSettled([getSports()]);
+}
