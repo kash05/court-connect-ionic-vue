@@ -194,7 +194,7 @@ const getFilterOptions = () => {
       @didDismiss="cancelCustomDateRange"
     >
       <ion-header>
-        <ion-toolbar>
+        <ion-toolbar color="light">
           <ion-title>Select Date Range</ion-title>
           <ion-buttons slot="end">
             <ion-button fill="clear" @click="cancelCustomDateRange">
