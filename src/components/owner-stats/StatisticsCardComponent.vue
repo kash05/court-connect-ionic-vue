@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import { IonCard, IonCardContent, IonIcon, IonSkeletonText } from '@ionic/vue';
 import {
   cashOutline,
@@ -9,14 +9,10 @@ import {
   trendingUpOutline,
   trendingDownOutline,
 } from 'ionicons/icons';
-
-interface FilterData {
-  period: string;
-  customDateRange?: {
-    from: string;
-    to: string;
-  };
-}
+import GlobalFilter, {
+  type FilterData,
+  type FilterOption,
+} from '../../components/DateRangeFilterComponent.vue';
 
 interface Trend {
   type: 'positive' | 'negative';
@@ -35,11 +31,16 @@ interface StatsData {
   bookingsTrend: Trend;
 }
 
-const props = defineProps<{
-  filterData: FilterData;
-}>();
-
 const isLoading = ref(true);
+
+const availableFilters: FilterOption[] = [
+  { value: 'thisMonth', label: 'This Month' },
+  { value: 'lastMonth', label: 'Last Month' },
+  { value: 'thisQuarter', label: 'This Quarter' },
+  { value: 'lastQuarter', label: 'Last Quarter' },
+  { value: 'thisYear', label: 'This Year' },
+  { value: 'lastYear', label: 'Last Year' },
+];
 
 const statsData = ref<StatsData>({
   totalRevenue: 0,
@@ -60,15 +61,12 @@ const statsData = ref<StatsData>({
   },
 });
 
-onMounted(() => {
-  loadData();
-});
+onMounted(() => {});
 
-const loadData = async () => {
-  statsData.value = await fetchStatsData(props.filterData);
+const handleFilterChange = async (filterData: FilterData) => {
+  isLoading.value = true;
+  statsData.value = await fetchStatsData(filterData);
 };
-
-watch(() => props.filterData, loadData, { deep: true });
 
 const fetchStatsData = async (filterData: FilterData): Promise<StatsData> => {
   await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -87,6 +85,18 @@ const fetchStatsData = async (filterData: FilterData): Promise<StatsData> => {
       revenueTrend: { type: 'negative' as const, percentage: 5.2 },
       bookingsTrend: { type: 'positive' as const, percentage: 3.1 },
     },
+    thisQuarter: {
+      totalRevenue: 128400,
+      totalBookings: 892,
+      revenueTrend: { type: 'positive' as const, percentage: 16.8 },
+      bookingsTrend: { type: 'positive' as const, percentage: 12.4 },
+    },
+    lastQuarter: {
+      totalRevenue: 115200,
+      totalBookings: 798,
+      revenueTrend: { type: 'positive' as const, percentage: 8.9 },
+      bookingsTrend: { type: 'positive' as const, percentage: 6.7 },
+    },
     thisYear: {
       totalRevenue: 487200,
       totalBookings: 3456,
@@ -98,6 +108,12 @@ const fetchStatsData = async (filterData: FilterData): Promise<StatsData> => {
       totalBookings: 2891,
       revenueTrend: { type: 'positive' as const, percentage: 22.1 },
       bookingsTrend: { type: 'positive' as const, percentage: 19.6 },
+    },
+    custom: {
+      totalRevenue: 52300,
+      totalBookings: 387,
+      revenueTrend: { type: 'positive' as const, percentage: 15.8 },
+      bookingsTrend: { type: 'positive' as const, percentage: 11.2 },
     },
   };
 
@@ -139,102 +155,118 @@ const formatCurrency = (amount: number): string => {
 </script>
 
 <template>
-  <div class="stats-cards" v-if="!isLoading">
-    <ion-card class="stat-card revenue">
-      <ion-card-content>
-        <div class="stat-icon">
-          <ion-icon :icon="cashOutline"></ion-icon>
-        </div>
-        <div class="stat-info">
-          <h2>${{ formatCurrency(statsData.totalRevenue) }}</h2>
-          <p>Total Revenue</p>
-          <span class="trend" :class="statsData.revenueTrend.type">
-            <ion-icon :icon="statsData.revenueTrend.icon"></ion-icon>
-            {{ statsData.revenueTrend.percentage }}% vs previous period
-          </span>
-        </div>
-      </ion-card-content>
-    </ion-card>
+  <div class="stats-container">
+    <GlobalFilter
+      :available-filters="availableFilters"
+      default-filter="thisMonth"
+      :custom-range-enabled="true"
+      @filter-change="handleFilterChange"
+    />
 
-    <ion-card class="stat-card bookings">
-      <ion-card-content>
-        <div class="stat-icon">
-          <ion-icon :icon="calendarOutline"></ion-icon>
-        </div>
-        <div class="stat-info">
-          <h2>{{ statsData.totalBookings }}</h2>
-          <p>Total Bookings</p>
-          <span class="trend" :class="statsData.bookingsTrend.type">
-            <ion-icon :icon="statsData.bookingsTrend.icon"></ion-icon>
-            {{ statsData.bookingsTrend.percentage }}% vs previous period
-          </span>
-        </div>
-      </ion-card-content>
-    </ion-card>
-
-    <ion-card class="stat-card properties">
-      <ion-card-content>
-        <div class="stat-icon">
-          <ion-icon :icon="businessOutline"></ion-icon>
-        </div>
-        <div class="stat-info">
-          <h2>{{ statsData.activeProperties }}</h2>
-          <p>Active Properties</p>
-          <span class="occupancy-rate"
-            >{{ statsData.averageOccupancy }}% avg occupancy</span
-          >
-        </div>
-      </ion-card-content>
-    </ion-card>
-
-    <ion-card class="stat-card rating">
-      <ion-card-content>
-        <div class="stat-icon">
-          <ion-icon :icon="starOutline"></ion-icon>
-        </div>
-        <div class="stat-info">
-          <h2>{{ statsData.averageRating.toFixed(1) }}</h2>
-          <p>Average Rating</p>
-          <span class="rating-count">{{ statsData.totalReviews }} reviews</span>
-        </div>
-      </ion-card-content>
-    </ion-card>
-  </div>
-
-  <div class="skeleton-cards" v-else>
-    <ion-card v-for="i in 4" :key="i" class="stat-card skeleton">
-      <ion-card-content>
-        <div class="skeleton-content">
-          <ion-skeleton-text
-            animated
-            style="width: 60px; height: 60px; border-radius: 12px"
-          ></ion-skeleton-text>
-          <div class="skeleton-info">
-            <ion-skeleton-text
-              animated
-              style="width: 80px; height: 32px"
-            ></ion-skeleton-text>
-            <ion-skeleton-text
-              animated
-              style="width: 100px; height: 16px"
-            ></ion-skeleton-text>
-            <ion-skeleton-text
-              animated
-              style="width: 120px; height: 14px"
-            ></ion-skeleton-text>
+    <div class="stats-cards" v-if="!isLoading">
+      <ion-card class="stat-card revenue">
+        <ion-card-content>
+          <div class="stat-icon">
+            <ion-icon :icon="cashOutline"></ion-icon>
           </div>
-        </div>
-      </ion-card-content>
-    </ion-card>
+          <div class="stat-info">
+            <h2>${{ formatCurrency(statsData.totalRevenue) }}</h2>
+            <p>Total Revenue</p>
+            <span class="trend" :class="statsData.revenueTrend.type">
+              <ion-icon :icon="statsData.revenueTrend.icon"></ion-icon>
+              {{ statsData.revenueTrend.percentage }}% vs previous period
+            </span>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="stat-card bookings">
+        <ion-card-content>
+          <div class="stat-icon">
+            <ion-icon :icon="calendarOutline"></ion-icon>
+          </div>
+          <div class="stat-info">
+            <h2>{{ statsData.totalBookings }}</h2>
+            <p>Total Bookings</p>
+            <span class="trend" :class="statsData.bookingsTrend.type">
+              <ion-icon :icon="statsData.bookingsTrend.icon"></ion-icon>
+              {{ statsData.bookingsTrend.percentage }}% vs previous period
+            </span>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="stat-card properties">
+        <ion-card-content>
+          <div class="stat-icon">
+            <ion-icon :icon="businessOutline"></ion-icon>
+          </div>
+          <div class="stat-info">
+            <h2>{{ statsData.activeProperties }}</h2>
+            <p>Active Properties</p>
+            <span class="occupancy-rate"
+              >{{ statsData.averageOccupancy }}% avg occupancy</span
+            >
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="stat-card rating">
+        <ion-card-content>
+          <div class="stat-icon">
+            <ion-icon :icon="starOutline"></ion-icon>
+          </div>
+          <div class="stat-info">
+            <h2>{{ statsData.averageRating.toFixed(1) }}</h2>
+            <p>Average Rating</p>
+            <span class="rating-count"
+              >{{ statsData.totalReviews }} reviews</span
+            >
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Skeleton Loading -->
+    <div class="skeleton-cards" v-else>
+      <ion-card v-for="i in 4" :key="i" class="stat-card skeleton">
+        <ion-card-content>
+          <div class="skeleton-content">
+            <ion-skeleton-text
+              animated
+              style="width: 60px; height: 60px; border-radius: 12px"
+            ></ion-skeleton-text>
+            <div class="skeleton-info">
+              <ion-skeleton-text
+                animated
+                style="width: 80px; height: 32px"
+              ></ion-skeleton-text>
+              <ion-skeleton-text
+                animated
+                style="width: 100px; height: 16px"
+              ></ion-skeleton-text>
+              <ion-skeleton-text
+                animated
+                style="width: 120px; height: 14px"
+              ></ion-skeleton-text>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.stats-container {
+  width: 100%;
+}
+
 .stats-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 16px;
-  padding: 16px;
+  padding: 0 16px 16px;
 }
 
 .stat-card {
@@ -334,6 +366,10 @@ const formatCurrency = (amount: number): string => {
   .stats-cards,
   .skeleton-cards {
     grid-template-columns: 1fr;
+  }
+
+  .filter-section {
+    padding: 12px;
   }
 }
 </style>
