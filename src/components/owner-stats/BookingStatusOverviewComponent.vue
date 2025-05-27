@@ -15,6 +15,10 @@ import {
   closeCircleOutline,
 } from 'ionicons/icons';
 import Chart from 'chart.js/auto';
+import GlobalFilter, {
+  type FilterData,
+  type FilterOption,
+} from '../../components/DateRangeFilterComponent.vue';
 
 interface BookingStats {
   pending: number;
@@ -34,6 +38,16 @@ const bookingStats = ref<BookingStats>({
   cancelled: 0,
 });
 
+const filterOptions: FilterOption[] = [
+  { value: 'today', label: 'Today' },
+  { value: 'yesterday', label: 'Yesterday' },
+  { value: 'last7days', label: 'Last 7 Days' },
+  { value: 'last30days', label: 'Last 30 Days' },
+  { value: 'thisMonth', label: 'This Month' },
+  { value: 'lastMonth', label: 'Last Month' },
+  { value: 'thisYear', label: 'This Year' },
+];
+
 const hasData = computed(() => {
   const stats = bookingStats.value;
   return (
@@ -44,20 +58,52 @@ const hasData = computed(() => {
   );
 });
 
-onMounted(() => {
-  initializeData();
-});
+const handleFilterChange = async (filterData: FilterData) => {
+  console.log('Filter changed:', filterData);
+  isLoading.value = true;
 
-const fetchBookingStats = async (): Promise<BookingStats> => {
   try {
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    const stats = await fetchBookingStats(filterData);
+    bookingStats.value = stats;
+    await initializeChart();
+  } catch (error) {
+    console.error('Failed to apply filter:', error);
+  } finally {
+    isLoading.value = false;
+  }
+};
 
-    return {
-      pending: 23,
-      confirmed: 156,
-      completed: 298,
-      cancelled: 35,
+onMounted(() => {});
+
+const fetchBookingStats = async (
+  filterData?: FilterData,
+): Promise<BookingStats> => {
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    const mockDataByPeriod: Record<string, BookingStats> = {
+      today: { pending: 5, confirmed: 12, completed: 8, cancelled: 2 },
+      yesterday: { pending: 3, confirmed: 15, completed: 22, cancelled: 1 },
+      last7days: { pending: 23, confirmed: 89, completed: 156, cancelled: 12 },
+      last30days: {
+        pending: 45,
+        confirmed: 234,
+        completed: 567,
+        cancelled: 28,
+      },
+      thisMonth: { pending: 67, confirmed: 345, completed: 678, cancelled: 34 },
+      lastMonth: { pending: 89, confirmed: 456, completed: 789, cancelled: 45 },
+      thisYear: {
+        pending: 234,
+        confirmed: 1234,
+        completed: 2345,
+        cancelled: 123,
+      },
+      custom: { pending: 15, confirmed: 78, completed: 134, cancelled: 19 },
     };
+
+    const period = filterData?.period || 'last30days';
+    return mockDataByPeriod[period] || mockDataByPeriod.last30days;
   } catch (err) {
     console.error('Failed to fetch booking stats:', err);
     return {
@@ -147,26 +193,23 @@ const initializeChart = async () => {
     console.error('Failed to create chart:', error);
   }
 };
-
-const initializeData = async () => {
-  try {
-    isLoading.value = true;
-    const stats = await fetchBookingStats();
-    bookingStats.value = stats;
-    await initializeChart();
-  } catch (error) {
-    console.error('Failed to initialize data:', error);
-  } finally {
-    isLoading.value = false;
-  }
-};
 </script>
 
 <template>
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Booking Status Overview</ion-card-title>
+      <div class="card-header-content">
+        <ion-card-title>Booking Status Overview</ion-card-title>
+        <GlobalFilter
+          :available-filters="filterOptions"
+          default-filter="last30days"
+          placeholder="Select Period"
+          :custom-range-enabled="true"
+          @filter-change="handleFilterChange"
+        />
+      </div>
     </ion-card-header>
+
     <ion-card-content class="ion-padding" v-if="!isLoading">
       <div class="booking-status-content">
         <!-- Status Grid -->
@@ -242,6 +285,14 @@ const initializeData = async () => {
 </template>
 
 <style scoped>
+.card-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
 .booking-status-content {
   display: flex;
   flex-direction: column;
@@ -336,6 +387,11 @@ const initializeData = async () => {
 }
 
 @media (max-width: 768px) {
+  .card-header-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .booking-status-grid {
     grid-template-columns: repeat(2, 1fr);
   }
