@@ -17,19 +17,8 @@ import PropertyPerformanceComponent from '@/components/owner-stats/PropertyPerfo
 import PeakHoursChartComponent from '@/components/owner-stats/PeakHoursChartComponent.vue';
 import StatisticsCardComponent from '@/components/owner-stats/StatisticsCardComponent.vue';
 
-interface FilterData {
-  period: string;
-  customDateRange?: {
-    from: string;
-    to: string;
-  };
-}
-
 const loading = ref(false);
 const activeTab = ref('stats');
-const filterData = ref<FilterData>({
-  period: 'thisMonth',
-});
 
 const handleTabChange = (event: CustomEvent) => {
   activeTab.value = event.detail.value;
@@ -58,7 +47,7 @@ const handleTabChange = (event: CustomEvent) => {
 
       <div class="scrollable-content">
         <div v-show="activeTab === 'stats'" class="tab-panel">
-          <StatisticsCardComponent :filter-data="filterData" />
+          <StatisticsCardComponent />
           <BookingStatusOverviewComponent />
           <PropertyPerformanceComponent />
         </div>
