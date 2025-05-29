@@ -10,6 +10,10 @@ import {
   IonToggle,
   IonChip,
   IonButton,
+  IonSearchbar,
+  IonList,
+  IonCheckbox,
+  IonPopover,
 } from '@ionic/vue';
 import { watch, onMounted, computed, ref } from 'vue';
 import {
@@ -19,12 +23,17 @@ import {
 import { useFormStore } from '@/stores/useFormStore';
 import { SportsData } from '@/types/properyInterface';
 import { SystemData } from '@/services/systemDataService';
+import { Amenities } from '@/types/addPropertyInterface';
 
 const formStore = useFormStore();
 
 const formData = computed(() => formStore.propertyForm.propertyDetail);
 
-const otherSports = ref('');
+const sportsSearchText = ref('');
+const sportsPopoverOpen = ref(false);
+const sportsPopoverRef = ref();
+
+const AMENITIES_OPTIONS: Amenities[] = SystemData.amenities;
 
 const SPORTS_OPTIONS: SportsData[] = SystemData.sports;
 
@@ -61,17 +70,6 @@ const ACCESSIBILITY_OPTIONS = [
   'Wide Doorways',
   'Braille Signage',
   'Audio Announcements',
-];
-
-const AMENITIES_OPTIONS = [
-  'WiFi',
-  'Air Conditioning',
-  'Sound System',
-  'Scoreboard',
-  'CCTV',
-  'Security Guard',
-  'Referee Services',
-  'Coaching Available',
 ];
 
 onMounted(() => {
@@ -117,30 +115,60 @@ watch(
   { deep: true },
 );
 
-const addOtherSport = () => {
-  if (otherSports.value) {
-    const newSports = [...sports.value, otherSports.value];
-    sports.value = newSports;
-    otherSports.value = '';
+const filteredSports = computed(() => {
+  if (!sportsSearchText.value) {
+    return SPORTS_OPTIONS;
+  }
+  return SPORTS_OPTIONS.filter((sport) =>
+    sport.display_name
+      .toLowerCase()
+      .includes(sportsSearchText.value.toLowerCase()),
+  );
+});
+
+const toggleSportSelection = (sportName: string) => {
+  const currentSports = sports.value || [];
+  if (currentSports.includes(sportName)) {
+    sports.value = currentSports.filter((s) => s !== sportName);
+    const newSubUnits = { ...subUnits.value };
+    delete newSubUnits[sportName];
+    subUnits.value = newSubUnits;
+  } else {
+    sports.value = [...currentSports, sportName];
   }
 };
 
-const toggleSport = (sport: string) => {
-  const currentSports = sports.value || [];
-  if (currentSports.includes(sport)) {
-    sports.value = currentSports.filter((s) => s !== sport);
-    const newSubUnits = { ...subUnits.value };
-    delete newSubUnits[sport];
-    subUnits.value = newSubUnits;
+const removeSport = (sportName: string) => {
+  sports.value = sports.value.filter((s) => s !== sportName);
+  const newSubUnits = { ...subUnits.value };
+  delete newSubUnits[sportName];
+  subUnits.value = newSubUnits;
+};
+
+const openSportsPopover = () => {
+  sportsPopoverOpen.value = true;
+};
+
+const closeSportsPopover = () => {
+  sportsPopoverOpen.value = false;
+  sportsSearchText.value = '';
+};
+
+const toggleAmenity = (amenityName: string) => {
+  const currentAmenities = additionalAmenities.value || [];
+  if (currentAmenities.includes(amenityName)) {
+    additionalAmenities.value = currentAmenities.filter(
+      (a) => a !== amenityName,
+    );
   } else {
-    sports.value = [...currentSports, sport];
+    additionalAmenities.value = [...currentAmenities, amenityName];
   }
 };
 
 const toggleArrayItem = (
   array: string[],
   item: string,
-  field: 'facilities' | 'accessibility' | 'additionalAmenities',
+  field: 'facilities' | 'accessibility',
 ) => {
   const newArray = array.includes(item)
     ? array.filter((i) => i !== item)
@@ -150,8 +178,6 @@ const toggleArrayItem = (
     facilities.value = newArray;
   } else if (field === 'accessibility') {
     accessibility.value = newArray;
-  } else if (field === 'additionalAmenities') {
-    additionalAmenities.value = newArray;
   }
 };
 
@@ -187,42 +213,73 @@ const hasFieldError = (fieldName: keyof PropertyDetailFormData) => {
 
     <div class="form-section">
       <IonLabel class="section-label">Sports Available *</IonLabel>
-      <div class="chip-container">
+
+      <IonButton
+        fill="outline"
+        expand="block"
+        @click="openSportsPopover"
+        id="sports-trigger"
+        class="sports-select-button"
+      >
+        <IonText>
+          {{
+            selectedSports.length === 0
+              ? 'Select Sports'
+              : `${selectedSports.length} sport(s) selected`
+          }}
+        </IonText>
+      </IonButton>
+
+      <div v-if="selectedSports.length > 0" class="selected-chips-container">
         <IonChip
-          v-for="sport in SPORTS_OPTIONS"
-          :key="sport.id"
-          :color="
-            selectedSports.includes(sport.display_name) ? 'primary' : 'medium'
-          "
-          :outline="!selectedSports.includes(sport.display_name)"
-          @click="toggleSport(sport.display_name)"
-          class="sport-chip"
+          v-for="sport in selectedSports"
+          :key="sport"
+          color="primary"
+          @click="removeSport(sport)"
+          class="selected-sport-chip"
         >
-          {{ sport.display_name }}
+          {{ sport }}
+          <ion-icon name="close" slot="end"></ion-icon>
         </IonChip>
       </div>
+
+      <IonPopover
+        ref="sportsPopoverRef"
+        :is-open="sportsPopoverOpen"
+        trigger="sports-trigger"
+        @didDismiss="closeSportsPopover"
+        class="sports-popover"
+      >
+        <div class="popover-content">
+          <IonSearchbar
+            v-model="sportsSearchText"
+            placeholder="Search sports..."
+            show-clear-button="focus"
+            class="sports-search"
+          />
+          <IonList class="sports-list">
+            <IonItem
+              v-for="sport in filteredSports"
+              :key="sport.id"
+              @click="toggleSportSelection(sport.display_name)"
+              button
+            >
+              <IonCheckbox
+                :checked="selectedSports.includes(sport.display_name)"
+                slot="start"
+              />
+              <IonLabel>{{ sport.display_name }}</IonLabel>
+            </IonItem>
+            <IonItem v-if="filteredSports.length === 0">
+              <IonLabel color="medium">No sports found</IonLabel>
+            </IonItem>
+          </IonList>
+        </div>
+      </IonPopover>
+
       <IonText color="danger" class="form-error" v-if="hasFieldError('sports')">
         {{ getFieldError('sports') }}
       </IonText>
-    </div>
-
-    <div class="form-section">
-      <IonLabel class="section-label"
-        >If you have other sports available</IonLabel
-      >
-      <IonText color="medium" class="helper-text">
-        Please specify the sports you have available
-      </IonText>
-      <div class="flex gap-3">
-        <IonInput v-model="otherSports" placeholder="Other sports" />
-        <IonButton
-          fill="outline"
-          color="medium"
-          size="small"
-          @click="addOtherSport"
-          >Add</IonButton
-        >
-      </div>
     </div>
 
     <div v-if="selectedSports.length > 0" class="form-section">
@@ -317,15 +374,17 @@ const hasFieldError = (fieldName: keyof PropertyDetailFormData) => {
       <div class="chip-container">
         <IonChip
           v-for="amenity in AMENITIES_OPTIONS"
-          :key="amenity"
-          :color="selectedAmenities.includes(amenity) ? 'primary' : 'medium'"
-          :outline="!selectedAmenities.includes(amenity)"
-          @click="
-            toggleArrayItem(selectedAmenities, amenity, 'additionalAmenities')
+          :key="amenity.id"
+          :color="
+            selectedAmenities.includes(amenity.display_name)
+              ? 'primary'
+              : 'medium'
           "
+          :outline="!selectedAmenities.includes(amenity.display_name)"
+          @click="toggleAmenity(amenity.display_name)"
           class="amenity-chip"
         >
-          {{ amenity }}
+          {{ amenity.display_name }}
         </IonChip>
       </div>
     </div>
@@ -373,7 +432,48 @@ ion-input {
   margin-bottom: 8px;
 }
 
-.sport-chip,
+.sports-select-button {
+  margin-bottom: 12px;
+  text-align: left;
+  --border-radius: 8px;
+}
+
+.selected-chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.selected-sport-chip {
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.sports-popover {
+  --width: 300px;
+  --max-height: 400px;
+}
+
+.popover-content {
+  width: 100%;
+  height: 100%;
+}
+
+.sports-search {
+  --padding-start: 16px;
+  --padding-end: 16px;
+}
+
+.sports-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
 .surface-chip,
 .facility-chip,
 .accessibility-chip,
@@ -421,7 +521,6 @@ ion-input {
     gap: 6px;
   }
 
-  .sport-chip,
   .surface-chip,
   .facility-chip,
   .accessibility-chip,
@@ -429,6 +528,10 @@ ion-input {
     font-size: 12px;
     --padding-start: 8px;
     --padding-end: 8px;
+  }
+
+  .sports-popover {
+    --width: 280px;
   }
 }
 </style>

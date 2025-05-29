@@ -64,3 +64,11 @@ export interface MediaForm {
   videoUrl?: string;
   floorPlan?: string;
 }
+
+export interface Amenities {
+  id: number;
+  name: string;
+  display_name: string;
+  created_at: string;
+  updated_at: string;
+}

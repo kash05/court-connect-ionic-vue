@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/stores/useAuthStore';
-import { getRoles, getSports } from './systemDataService';
+import { getAmenities, getRoles, getSports } from './systemDataService';
 import { toastService } from './toastService';
 
 /**
@@ -27,5 +27,5 @@ export const initializeApp = async () => {
 async function OwnerConfig() {
   const authStore = useAuthStore();
   if (!authStore.isCurrentRoleOwner) return;
-  return await Promise.allSettled([getSports()]);
+  return await Promise.allSettled([getSports(), getAmenities()]);
 }
