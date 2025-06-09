@@ -1,4 +1,4 @@
-export interface SportsData {
+export interface SystemConfigInterface {
   id: number;
   name: string;
   display_name: string;
