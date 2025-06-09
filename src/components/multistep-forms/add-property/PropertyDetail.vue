@@ -14,6 +14,7 @@ import {
   IonList,
   IonCheckbox,
   IonPopover,
+  IonIcon,
 } from '@ionic/vue';
 import { watch, onMounted, computed, ref } from 'vue';
 import {
@@ -21,9 +22,8 @@ import {
   propertyDetailSchema,
 } from '@/lib/validation/addPropertyFormValidation';
 import { useFormStore } from '@/stores/useFormStore';
-import { SportsData } from '@/types/properyInterface';
 import { SystemData } from '@/services/systemDataService';
-import { Amenities } from '@/types/addPropertyInterface';
+import { SystemConfigInterface } from '@/types/properyInterface';
 
 const formStore = useFormStore();
 
@@ -33,9 +33,11 @@ const sportsSearchText = ref('');
 const sportsPopoverOpen = ref(false);
 const sportsPopoverRef = ref();
 
-const AMENITIES_OPTIONS: Amenities[] = SystemData.amenities;
+const AMENITIES_OPTIONS: SystemConfigInterface[] = SystemData.amenities;
 
-const SPORTS_OPTIONS: SportsData[] = SystemData.sports;
+const SPORTS_OPTIONS: SystemConfigInterface[] = SystemData.sports;
+
+const FACILITIES_OPTIONS: SystemConfigInterface[] = SystemData.facilities;
 
 const SURFACE_TYPES = [
   'Grass',
@@ -47,19 +49,6 @@ const SURFACE_TYPES = [
   'Synthetic',
   'Sand',
   'Indoor Court',
-];
-
-const FACILITIES_OPTIONS = [
-  'Parking',
-  'Restrooms',
-  'Changing Rooms',
-  'Showers',
-  'Lockers',
-  'First Aid',
-  'Cafeteria',
-  'Equipment Storage',
-  'Seating Area',
-  'Lighting',
 ];
 
 const ACCESSIBILITY_OPTIONS = [
@@ -261,11 +250,11 @@ const hasFieldError = (fieldName: keyof PropertyDetailFormData) => {
             <IonItem
               v-for="sport in filteredSports"
               :key="sport.id"
-              @click="toggleSportSelection(sport.display_name)"
+              @click="toggleSportSelection(sport.name)"
               button
             >
               <IonCheckbox
-                :checked="selectedSports.includes(sport.display_name)"
+                :checked="selectedSports.includes(sport.name)"
                 slot="start"
               />
               <IonLabel>{{ sport.display_name }}</IonLabel>
@@ -338,13 +327,23 @@ const hasFieldError = (fieldName: keyof PropertyDetailFormData) => {
       <div class="chip-container">
         <IonChip
           v-for="facility in FACILITIES_OPTIONS"
-          :key="facility"
-          :color="selectedFacilities.includes(facility) ? 'primary' : 'medium'"
-          :outline="!selectedFacilities.includes(facility)"
-          @click="toggleArrayItem(selectedFacilities, facility, 'facilities')"
+          :key="facility.id"
+          :color="
+            selectedFacilities.includes(facility.name)
+              ? 'primary'
+              : 'medium'
+          "
+          :outline="!selectedFacilities.includes(facility.name)"
+          @click="
+            toggleArrayItem(
+              selectedFacilities,
+              facility.name,
+              'facilities',
+            )
+          "
           class="facility-chip"
         >
-          {{ facility }}
+          {{ facility.display_name }}
         </IonChip>
       </div>
     </div>
@@ -376,12 +375,12 @@ const hasFieldError = (fieldName: keyof PropertyDetailFormData) => {
           v-for="amenity in AMENITIES_OPTIONS"
           :key="amenity.id"
           :color="
-            selectedAmenities.includes(amenity.display_name)
+            selectedAmenities.includes(amenity.name)
               ? 'primary'
               : 'medium'
           "
-          :outline="!selectedAmenities.includes(amenity.display_name)"
-          @click="toggleAmenity(amenity.display_name)"
+          :outline="!selectedAmenities.includes(amenity.name)"
+          @click="toggleAmenity(amenity.name)"
           class="amenity-chip"
         >
           {{ amenity.display_name }}
