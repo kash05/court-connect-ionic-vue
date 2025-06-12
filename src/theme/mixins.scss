@@ -1,20 +1,20 @@
 @use 'variables' as *;
 
 @mixin mobile-selector($extends: '') {
-  #{$MobileSelectors},
-  #{$extends} {
-    @content;
-  }
+    #{$MobileSelectors},
+    #{$extends} {
+        @content;
+    }
 
-  @media (max-width: 540px) {
-    @content;
-  }
+    @media (max-width: 540px) {
+        @content;
+    }
 }
 
 @mixin tablet-selector($extends: '') {
-  .plt-ipad,
-  .plt-tablet,
-  #{$extends} {
-    @content;
-  }
+    .plt-ipad,
+    .plt-tablet,
+    #{$extends} {
+        @content;
+    }
 }

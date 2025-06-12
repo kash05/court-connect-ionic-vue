@@ -11,26 +11,26 @@ import { useAuthStore } from './stores/useAuthStore';
 const authStore = useAuthStore();
 
 onMounted(async () => {
-  SplashScreen.hide();
-  await themeService.initialize();
+    SplashScreen.hide();
+    await themeService.initialize();
 
-  if (authStore.isAuthenticated) {
-    loadingService.withLoading(async () => {
-      try {
-        await initializeApp();
-      } catch (err) {
-        console.error('App failed to initialize', err);
-        toastService.dangerMessage(
-          'Failed to initialize the app. Please try again.',
-        );
-      }
-    }, 'Please wait...');
-  }
+    if (authStore.isAuthenticated) {
+        loadingService.withLoading(async () => {
+            try {
+                await initializeApp();
+            } catch (err) {
+                console.error('App failed to initialize', err);
+                toastService.dangerMessage(
+                    'Failed to initialize the app. Please try again.',
+                );
+            }
+        }, 'Please wait...');
+    }
 });
 </script>
 
 <template>
-  <IonApp mode="ios">
-    <IonRouterOutlet />
-  </IonApp>
+    <IonApp mode="ios">
+        <IonRouterOutlet />
+    </IonApp>
 </template>

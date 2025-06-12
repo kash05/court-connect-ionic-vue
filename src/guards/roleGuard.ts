@@ -7,19 +7,19 @@ import { UserRole } from '../types/enums/UserEnum';
  * Only allows access if user's activeRole is in the allowedRoles list.
  */
 export const roleGuard =
-  (allowedRoles: UserRole[]) =>
-  async (
-    to: RouteLocationNormalized,
-    from: RouteLocationNormalized,
-    next: NavigationGuardNext,
-  ) => {
-    const auth = await ensureAuthInitialized();
+    (allowedRoles: UserRole[]) =>
+    async (
+        to: RouteLocationNormalized,
+        from: RouteLocationNormalized,
+        next: NavigationGuardNext,
+    ) => {
+        const auth = await ensureAuthInitialized();
 
-    if (!allowedRoles.includes(auth.activeRole)) {
-      const fallback =
-        auth.activeRole === UserRole.OWNER ? '/owner' : '/player';
-      return next(fallback);
-    }
+        if (!allowedRoles.includes(auth.activeRole)) {
+            const fallback =
+                auth.activeRole === UserRole.OWNER ? '/owner' : '/player';
+            return next(fallback);
+        }
 
-    return next();
-  };
+        return next();
+    };

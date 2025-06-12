@@ -29,11 +29,11 @@ import App from './App.vue';
 const pinia = createPinia();
 
 const app = createApp(App)
-  .use(IonicVue, { mode: 'ios', animated: true })
-  .use(pinia)
-  .use(router)
-  .component('GlobalMessage', GlobalMessage);
+    .use(IonicVue, { mode: 'ios', animated: true })
+    .use(pinia)
+    .use(router)
+    .component('GlobalMessage', GlobalMessage);
 
 router.isReady().then(() => {
-  app.mount('#app');
+    app.mount('#app');
 });
